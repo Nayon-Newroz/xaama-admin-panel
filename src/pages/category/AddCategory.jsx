@@ -28,13 +28,13 @@ const useStyles = makeStyles((theme) => ({
 const AddCategory = () => {
   const classes = useStyles();
   const [name, setName] = useState("");
-  const [parentId, setParentId] = useState("");
+  const [parentName, setParentName] = useState("");
   const [loading, setLoading] = useState(false);
   const [categoryList, setCategoryList] = useState([]);
   const [message, setMessage] = useState("");
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
-    setParentId(event.target.value);
+    setParentName(event.target.value);
   };
 
   const handleSnakbarOpen = (msg, vrnt) => {
@@ -57,7 +57,7 @@ const AddCategory = () => {
       document.getElementById("name").focus();
       return (isError = true);
     }
-    if (!parentId) {
+    if (!parentName.trim()) {
       handleSnakbarOpen("Please select a parent", "error");
       document.getElementById("parent-id").focus();
       return (isError = true);
@@ -76,7 +76,7 @@ const AddCategory = () => {
       try {
         let data = {
           name: name,
-          parent_id: parentId,
+          parent_name: parentName,
         };
 
         let response = await axios({
@@ -155,12 +155,12 @@ const AddCategory = () => {
             <Select
               labelId="demo-simple-select-label"
               id="parent-id"
-              value={parentId}
+              value={parentName}
               label="Parent Name"
               onChange={handleChange}
             >
               {categoryList?.map((item, i) => (
-                <MenuItem value={item.cat_id}>{item.name}</MenuItem>
+                <MenuItem value={item.name}>{item.name}</MenuItem>
               ))}
             </Select>
           </FormControl>

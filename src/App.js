@@ -10,12 +10,13 @@ import "./App.css";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#21618C",
-      // main: "#353b48",
+      // main: "#21618C",
+      main: "#0A2647",
       contrastText: "#fff",
     },
     info: {
-      main: "#0E6251",
+      main: "#205295",
+      // main: "#0E6251",
       contrastText: "#fff",
     },
     error: {

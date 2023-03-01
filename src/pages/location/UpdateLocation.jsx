@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
   },
 }));
-const UpdateCategory = () => {
+const UpdateLocation = () => {
   const classes = useStyles();
   const navigate = useNavigate();
 
@@ -148,7 +148,7 @@ const UpdateCategory = () => {
             variant="h5"
             style={{ marginBottom: "30px", textAlign: "center" }}
           >
-            Update Category
+            Update Location
           </Typography>
 
           <TextField
@@ -214,4 +214,4 @@ const UpdateCategory = () => {
   );
 };
 
-export default UpdateCategory;
+export default UpdateLocation;

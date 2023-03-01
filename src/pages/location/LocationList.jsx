@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const CategoryList = () => {
+const LocationList = () => {
   const classes = useStyles();
   const [tableDataList, setTableDataList] = useState([]);
   const [page, setPage] = useState(0);
@@ -146,7 +146,7 @@ const CategoryList = () => {
     try {
       setLoading2(true);
       let response = await axios({
-        url: `/api/v1/category/delete/${deleteData.row._id}`,
+        url: `/api/v1/location/delete/${deleteData.row._id}`,
         method: "delete",
       });
       if (response.status >= 200 && response.status < 300) {
@@ -174,7 +174,7 @@ const CategoryList = () => {
     setName("");
     setStatus("");
     setPage(0);
-    const newUrl = `/api/v1/category?limit=${rowsPerPage}&page=1`;
+    const newUrl = `/api/v1/location?limit=${rowsPerPage}&page=1`;
     getData(0, rowsPerPage, newUrl);
   };
 
@@ -206,7 +206,7 @@ const CategoryList = () => {
         if (status === "None") {
           newStatus = "";
         }
-        url = `/api/v1/category?name=${name}&parent_name=${parentName}&status=${newStatus}&limit=${newLimit}&page=${
+        url = `/api/v1/location?name=${name}&parent_name=${parentName}&status=${newStatus}&limit=${newLimit}&page=${
           newPageNO + 1
         }`;
       }
@@ -501,4 +501,4 @@ const CategoryList = () => {
   );
 };
 
-export default CategoryList;
+export default LocationList;

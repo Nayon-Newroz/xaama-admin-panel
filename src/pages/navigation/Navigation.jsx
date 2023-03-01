@@ -1,5 +1,5 @@
-import React, { useContext } from "react"; 
-import { Routes, Route, Navigate } from "react-router-dom"; 
+import React, { useContext } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ForgotPassword from "../user-forms/ForgotPassword";
 import Login from "../user-forms/Login";
 import ResetPassword from "../user-forms/ResetPassword";
@@ -16,6 +16,9 @@ import Dashboard from "../dashboard/Dashboard";
 import AddCategory from "../category/AddCategory";
 import UpdateCategory from "../category/UpdateCategory";
 import CategoryList from "../category/CategoryList";
+import LocationList from "../location/LocationList";
+import AddLocation from "../location/AddLocation";
+import UpdateLocation from "../location/UpdateLocation";
 const useStyles = makeStyles((theme) => ({
   dialogStyle: {
     // backgroundColor: "red",
@@ -132,6 +135,30 @@ const Navigation = ({ openLoadingDialog, setOpenLoadingDialog }) => {
           element={
             <PrivateRoute>
               <CategoryList />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="location-list"
+          element={
+            <PrivateRoute>
+              <LocationList />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="add-location"
+          element={
+            <PrivateRoute>
+              <AddLocation />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="update-location"
+          element={
+            <PrivateRoute>
+              <UpdateLocation />
             </PrivateRoute>
           }
         />

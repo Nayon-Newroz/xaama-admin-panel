@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -25,23 +25,16 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
   },
 }));
-const UpdateCategory = () => {
+const AddLocation = () => {
   const classes = useStyles();
-  const navigate = useNavigate();
-
-  const { state } = useLocation();
   const [name, setName] = useState("");
   const [parentName, setParentName] = useState("");
-  const [status, setStatus] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categoryList, setCategoryList] = useState([]);
   const [message, setMessage] = useState("");
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
     setParentName(event.target.value);
-  };
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
   };
 
   const handleSnakbarOpen = (msg, vrnt) => {
@@ -83,19 +76,17 @@ const UpdateCategory = () => {
       try {
         let data = {
           name: name,
-          parent_id: parentName,
-          status: status,
+          parent_name: parentName,
         };
 
         let response = await axios({
-          url: `/api/v1/category/update/${state?.row?._id}`,
-          method: "put",
+          url: `/api/v1/location/create`,
+          method: "post",
           data: data,
         });
-        console.log("responseresponseresponse", response);
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Update successfully", "success");
-          navigate("/category-list");
+          handleSnakbarOpen("Added new book successfully", "success");
+          //   Navigate("/book-list");
         }
       } catch (error) {
         console.log("error", error);
@@ -105,17 +96,16 @@ const UpdateCategory = () => {
       setLoading(false);
     }
   };
-  const getDropdownData = async (catName) => {
+  const getData = async () => {
     try {
       setLoading(true);
 
-      const allDataUrl = `/api/v1/category/dropdownlist`;
+      const allDataUrl = `/api/v1/location/dropdownlist`;
       let allData = await getDataWithToken(allDataUrl);
       console.log("allData", allData);
 
       if (allData.status >= 200 && allData.status < 300) {
-        let list = allData?.data?.data.filter((item) => item.name !== catName);
-        setCategoryList(list);
+        setCategoryList(allData?.data?.data);
 
         if (allData.data.data.length < 1) {
           setMessage("No data found");
@@ -130,10 +120,7 @@ const UpdateCategory = () => {
   };
 
   useEffect(() => {
-    setName(state?.row?.name);
-    setParentName(state?.row?.parent_name);
-    setStatus(state?.row?.status);
-    getDropdownData(state?.row?.name);
+    getData();
   }, []);
   return (
     <>
@@ -148,7 +135,7 @@ const UpdateCategory = () => {
             variant="h5"
             style={{ marginBottom: "30px", textAlign: "center" }}
           >
-            Update Category
+            Add Location
           </Typography>
 
           <TextField
@@ -156,7 +143,7 @@ const UpdateCategory = () => {
             style={{ marginBottom: "30px" }}
             fullWidth
             id="name"
-            label="Category Name"
+            label="Location Name"
             variant="outlined"
             value={name}
             onChange={(e) => {
@@ -177,19 +164,6 @@ const UpdateCategory = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
-            <InputLabel id="demo-simple-select-label">Status</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="status"
-              value={status}
-              label="Status"
-              onChange={handleStatusChange}
-            >
-              <MenuItem value={true}>Active</MenuItem>
-              <MenuItem value={false}>Inactive</MenuItem>
-            </Select>
-          </FormControl>
           <div style={{ textAlign: "center" }}>
             <Button
               variant="contained"
@@ -205,7 +179,7 @@ const UpdateCategory = () => {
                 size={10}
                 speedMultiplier={0.5}
               />{" "}
-              {loading === false && "Update"}
+              {loading === false && "Submit"}
             </Button>
           </div>
         </form>
@@ -214,4 +188,4 @@ const UpdateCategory = () => {
   );
 };
 
-export default UpdateCategory;
+export default AddLocation;

@@ -47,10 +47,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 const useStyles = makeStyles((theme) => ({
   linkStyle: {
     textDecoration: "none",
-    color: "#858e9b",
+    color: "#787878",
   },
   menuItem: {
-    marginBottom: "5px !important",
+    marginTop: "5px !important",
     padding: "6px 16px !important",
 
     "& span": {
@@ -69,28 +69,28 @@ const useStyles = makeStyles((theme) => ({
     ["& .MuiSvgIcon-root"]: {
       position: "relative",
       top: "-2px",
-      color: "#858e9b",
+      color: "#787878",
       fontSize: "24px",
       [theme.breakpoints.down("md")]: {
         fontSize: "10px",
       },
     },
     ["&.MuiListItemButton-root:hover"]: {
-      color: "#0298A8 !important",
-      background: "#4CCFE0 !important",
-      borderRadius: "10px !important",
+      color: "#fff !important",
+      background: "#0A2647 !important",
+      // borderRadius: "10px !important",
       ["& .MuiSvgIcon-root"]: {
-        color: "#0298A8 !important",
+        color: "#fff !important",
       },
     },
   },
 
   menuItemActive: {
-    color: "#0298A8 !important",
-    background: "#4CCFE0 !important",
-    borderRadius: "10px !important",
+    color: "#fff !important",
+    background: "#0A2647 !important",
+    // borderRadius: "10px !important",
     ["& .MuiSvgIcon-root"]: {
-      color: "#0298A8 !important",
+      color: "#fff !important",
     },
   },
   menuSubItem: {
@@ -111,7 +111,7 @@ const useStyles = makeStyles((theme) => ({
     ["& .MuiSvgIcon-root"]: {
       position: "relative",
       top: "-2px",
-      color: "#858e9b",
+      color: "#787878",
       fontSize: "7px",
       [theme.breakpoints.down("md")]: {
         fontSize: "7px",
@@ -119,18 +119,18 @@ const useStyles = makeStyles((theme) => ({
     },
     ["&.MuiListItemButton-root:hover"]: {
       backgroundColor: "transparent !important",
-      color: "#0298A8 !important",
+      color: "#0A2647 !important",
       ["& .MuiSvgIcon-root"]: {
-        color: "#0298A8 !important",
+        color: "#0A2647 !important",
       },
     },
   },
   subMenuItemActive: {
-    color: "#0298A8 !important",
+    color: "#0A2647 !important",
     // background: "#4CCFE0 !important",
     // borderRadius: "10px !important",
     ["& .MuiSvgIcon-root"]: {
-      color: "#0298A8 !important",
+      color: "#0A2647 !important",
     },
   },
   // menuSubItem: {
@@ -149,7 +149,7 @@ const useStyles = makeStyles((theme) => ({
   //     minWidth: "46px",
   //   },
   //   ["& .MuiSvgIcon-root"]: {
-  //     color: "#858e9b",
+  //     color: "#787878",
   //     fontSize: "24px",
   //     [theme.breakpoints.down("md")]: {
   //       fontSize: "10px",
@@ -159,16 +159,18 @@ const useStyles = makeStyles((theme) => ({
 
   MuiDrawer: {
     backgroundColor: "#fff !important",
-    color: "#858e9b !important",
+    color: "#787878 !important",
     // paddingRight: "7px",
     // paddingLeft: "7px",
   },
   logoStyle: {
-    position: "relative",
-    top: "8px",
-    left: "-11px",
     cursor: "pointer",
-    maxWidth: "155px",
+    width: "175px",
+    height: "75px",
+  },
+  listStyle: {
+    padding: "0px 25px !important",
+    background: "#ededed",
   },
 }));
 
@@ -256,16 +258,9 @@ export default function Layout() {
   const { login, tuso_admin_panel, logout } = useContext(AuthContext);
   console.log("tuso_admin_panel", tuso_admin_panel);
 
-  const theme = useTheme();
   const [activeMenu, setActiveMenu] = useState("Dashboard");
-  const [kycRequestOpen, setKycRequestOpen] = useState(false);
-  const [onboardingOpen, setOnboardingOpen] = useState(false);
-  const [manageRolesOpen, setManageRolesOpen] = useState(false);
-  const [manageAccessOpen, setManageAccessOpen] = useState(false);
-  const [bankingLogOpen, setBankingLogOpen] = useState(false);
 
   const [openLoadingDialog, setOpenLoadingDialog] = useState(false);
-  const time = parseInt(1000 * 60 * 120);
 
   const navigateRoutes = (routeName) => {
     navigate(routeName, { replace: true });
@@ -315,6 +310,8 @@ export default function Layout() {
   };
   const checkUserRoute = () => {
     const userPathname = [
+      "/location-list",
+      "/add-location",
       "/user-list",
       "/profile-creation",
       "/user-access-control",
@@ -362,38 +359,43 @@ export default function Layout() {
       <Box sx={{ display: "flex" }}>
         <AppBar position="fixed" open={open}>
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <img
-                src="/image/logoTuso.png"
-                alt=""
-                className={classes.logoStyle}
-              />
-              <IconButton
-                onClick={handleDrawerClose}
-                aria-label="open drawer"
-                edge="start"
+            <div style={{ flexGrow: 1 }}>
+              <div
                 style={{
-                  ml: 2,
+                  width: "270px",
                   position: "relative",
-                  top: "-14px",
-                  left: "55px",
-                  borderRadius: "10px",
-                  border: "1px solid rgba(158,31,96,1)",
-
-                  padding: "5px",
-                  "&:hover": {
-                    background: "rgba(158,31,96,1)",
-                  },
                 }}
-                // sx={{ mr: 2, ...(open && { display: "none" }) }}
               >
-                <MenuIcon
-                  sx={{ color: "rgba(158,31,96,1)", fontSize: "26px" }}
+                <img
+                  src="/image/demo.png"
+                  alt=""
+                  className={classes.logoStyle}
                 />
-              </IconButton>
-            </Typography>
+                <IconButton
+                  onClick={handleDrawerClose}
+                  aria-label="open drawer"
+                  edge="start"
+                  style={{
+                    ml: 2,
+                    position: "absolute",
+                    top: "18px",
+                    right: "30px",
+                    borderRadius: "10px",
+                    border: "1px solid #0A2647",
 
-            <div variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    padding: "5px",
+                    "&:hover": {
+                      background: "rgba(158,31,96,1)",
+                    },
+                  }}
+                  // sx={{ mr: 2, ...(open && { display: "none" }) }}
+                >
+                  <MenuIcon color="primary" sx={{ fontSize: "26px" }} />
+                </IconButton>
+              </div>
+            </div>
+
+            <div sx={{ flexGrow: 1 }}>
               <IconButton
                 id="basic-button"
                 aria-controls={menuOpen ? "basic-menu" : undefined}
@@ -402,7 +404,7 @@ export default function Layout() {
                 onClick={handleClick}
                 style={{
                   padding: 0,
-                  color: "#9e1f63",
+                  color: "#0A2647",
                   fontSize: "14px",
                   textTransform: "none",
                 }}
@@ -545,12 +547,12 @@ export default function Layout() {
               in={activeMenu === "Category"}
               timeout="auto"
               unmountOnExit
-              style={{
-                borderLeft: "1px solid rgba(31,158,158,0.7)",
-                marginLeft: "25px",
-              }}
             >
-              <List component="div" disablePadding>
+              <List
+                component="div"
+                disablePadding
+                className={classes.listStyle}
+              >
                 <Link to="/add-category" className={classes.linkStyle}>
                   <ListItemButton
                     sx={{ pl: 4 }}
@@ -566,7 +568,6 @@ export default function Layout() {
                     <ListItemText primary="Add Category" />
                   </ListItemButton>
                 </Link>
-                
 
                 <Link to="/category-list" className={classes.linkStyle}>
                   <ListItemButton
@@ -604,12 +605,43 @@ export default function Layout() {
               in={activeMenu === "Location"}
               timeout="auto"
               unmountOnExit
-              style={{
-                borderLeft: "1px solid rgba(31,158,158,0.7)",
-                marginLeft: "25px",
-              }}
             >
-              <List component="div" disablePadding>
+              <List
+                component="div"
+                disablePadding
+                className={classes.listStyle}
+              >
+                <Link to="/add-location" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/add-location"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Add Location" />
+                  </ListItemButton>
+                </Link>
+                <Link to="/location-list" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/location-list"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Location list" />
+                  </ListItemButton>
+                </Link>
+                
                 <Link to="/user-list" className={classes.linkStyle}>
                   <ListItemButton
                     sx={{ pl: 4 }}
@@ -625,37 +657,7 @@ export default function Layout() {
                     <ListItemText primary="User list" />
                   </ListItemButton>
                 </Link>
-
-                <Link to="/profile-creation" className={classes.linkStyle}>
-                  <ListItemButton
-                    sx={{ pl: 4 }}
-                    className={`${classes.menuSubItem} ${
-                      pathname === "/profile-creation"
-                        ? classes.subMenuItemActive
-                        : null
-                    }`}
-                  >
-                    <ListItemIcon>
-                      <CircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Profile creation" />
-                  </ListItemButton>
-                </Link>
-                <Link to="/user-access-control" className={classes.linkStyle}>
-                  <ListItemButton
-                    sx={{ pl: 4 }}
-                    className={`${classes.menuSubItem} ${
-                      pathname === "/user-access-control"
-                        ? classes.subMenuItemActive
-                        : null
-                    }`}
-                  >
-                    <ListItemIcon>
-                      <CircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="User access control" />
-                  </ListItemButton>
-                </Link>
+ 
               </List>
             </Collapse>
 
@@ -673,16 +675,12 @@ export default function Layout() {
               <ListItemText primary="Filter" />
               {activeMenu === "Filter" ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-            <Collapse
-              in={activeMenu === "Filter"}
-              timeout="auto"
-              unmountOnExit
-              style={{
-                borderLeft: "1px solid rgba(31,158,158,0.7)",
-                marginLeft: "25px",
-              }}
-            >
-              <List component="div" disablePadding>
+            <Collapse in={activeMenu === "Filter"} timeout="auto" unmountOnExit>
+              <List
+                component="div"
+                disablePadding
+                className={classes.listStyle}
+              >
                 <Link to="/country" className={classes.linkStyle}>
                   <ListItemButton
                     sx={{ pl: 4 }}
