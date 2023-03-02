@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const CategoryList = () => {
+const FilterList = () => {
   const classes = useStyles();
   const [tableDataList, setTableDataList] = useState([]);
   const [page, setPage] = useState(0);
@@ -146,7 +146,7 @@ const CategoryList = () => {
     try {
       setLoading2(true);
       let response = await axios({
-        url: `/api/v1/category/delete/${deleteData.row._id}`,
+        url: `/api/v1/filter/delete/${deleteData.row._id}`,
         method: "delete",
       });
       if (response.status >= 200 && response.status < 300) {
@@ -173,9 +173,9 @@ const CategoryList = () => {
     console.log("clearFilter");
     setName("");
     setStatus("");
-    setParentName("")
+    setParentName("");
     setPage(0);
-    const newUrl = `/api/v1/category?limit=${rowsPerPage}&page=1`;
+    const newUrl = `/api/v1/filter?limit=${rowsPerPage}&page=1`;
     getData(0, rowsPerPage, newUrl);
   };
 
@@ -207,7 +207,7 @@ const CategoryList = () => {
         if (status === "None") {
           newStatus = "";
         }
-        url = `/api/v1/category?name=${name}&parent_name=${parentName}&status=${newStatus}&limit=${newLimit}&page=${
+        url = `/api/v1/filter?name=${name}&parent_name=${parentName}&status=${newStatus}&limit=${newLimit}&page=${
           newPageNO + 1
         }`;
       }
@@ -248,7 +248,7 @@ const CategoryList = () => {
         <Grid container columnSpacing={3} style={{ padding: "16px 0" }}>
           <Grid item lg={6} xl={6}>
             <Typography variant="h6" color="info" gutterBottom component="div">
-              Category List
+              Filter List
             </Typography>
           </Grid>
           <Grid item lg={6} xl={6} style={{ textAlign: "right" }}>
@@ -420,7 +420,7 @@ const CategoryList = () => {
                         // color="success"
                         disableElevation
                         component={Link}
-                        to={`/update-category`}
+                        to={`/update-filter`}
                         state={{ row }}
                       >
                         <EditOutlinedIcon />
@@ -502,4 +502,4 @@ const CategoryList = () => {
   );
 };
 
-export default CategoryList;
+export default FilterList;

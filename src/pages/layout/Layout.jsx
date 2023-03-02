@@ -681,19 +681,38 @@ export default function Layout() {
                 disablePadding
                 className={classes.listStyle}
               >
-                <Link to="/country" className={classes.linkStyle}>
+                  <Link to="/add-filter" className={classes.linkStyle}>
                   <ListItemButton
                     sx={{ pl: 4 }}
                     className={`${classes.menuSubItem} ${
-                      pathname === "/country" ? classes.subMenuItemActive : null
+                      pathname === "/add-filter"
+                        ? classes.subMenuItemActive
+                        : null
                     }`}
                   >
                     <ListItemIcon>
                       <CircleIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Country" />
+                    <ListItemText primary="Add Filter" />
                   </ListItemButton>
                 </Link>
+                  <Link to="/filter-list" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/filter-list"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Filter list" />
+                  </ListItemButton>
+                </Link>
+                
+              
 
                 <Link to="/role" className={classes.linkStyle}>
                   <ListItemButton

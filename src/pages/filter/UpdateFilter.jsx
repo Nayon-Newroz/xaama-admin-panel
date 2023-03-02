@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
   },
 }));
-const UpdateLocation = () => {
+const UpdateFilter = () => {
   const classes = useStyles();
   const navigate = useNavigate();
 
@@ -88,14 +88,14 @@ const UpdateLocation = () => {
         };
 
         let response = await axios({
-          url: `/api/v1/location/update/${state?.row?._id}`,
+          url: `/api/v1/filter/update/${state?.row?._id}`,
           method: "put",
           data: data,
         });
         console.log("responseresponseresponse", response);
         if (response.status >= 200 && response.status < 300) {
           handleSnakbarOpen("Update successfully", "success");
-          navigate("/location-list");
+          navigate("/filter-list");
         }
       } catch (error) {
         console.log("error", error);
@@ -105,17 +105,17 @@ const UpdateLocation = () => {
       setLoading(false);
     }
   };
-  const getDropdownData = async (LocationName) => {
+  const getDropdownData = async (filterName) => {
     try {
       setLoading(true);
 
-      const allDataUrl = `/api/v1/location/dropdownlist`;
+      const allDataUrl = `/api/v1/filter/dropdownlist`;
       let allData = await getDataWithToken(allDataUrl);
       console.log("allData", allData);
 
       if (allData.status >= 200 && allData.status < 300) {
         let list = allData?.data?.data.filter(
-          (item) => item.name !== LocationName
+          (item) => item.name !== filterName
         );
         setCategoryList(list);
 
@@ -150,7 +150,7 @@ const UpdateLocation = () => {
             variant="h5"
             style={{ marginBottom: "30px", textAlign: "center" }}
           >
-            Update Location
+            Update Filter
           </Typography>
 
           <TextField
@@ -216,4 +216,4 @@ const UpdateLocation = () => {
   );
 };
 
-export default UpdateLocation;
+export default UpdateFilter;

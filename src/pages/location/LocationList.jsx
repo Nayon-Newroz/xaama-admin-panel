@@ -173,6 +173,7 @@ const LocationList = () => {
     console.log("clearFilter");
     setName("");
     setStatus("");
+    setParentName("");
     setPage(0);
     const newUrl = `/api/v1/location?limit=${rowsPerPage}&page=1`;
     getData(0, rowsPerPage, newUrl);
@@ -247,7 +248,7 @@ const LocationList = () => {
         <Grid container columnSpacing={3} style={{ padding: "16px 0" }}>
           <Grid item lg={6} xl={6}>
             <Typography variant="h6" color="info" gutterBottom component="div">
-              Category List
+              Location List
             </Typography>
           </Grid>
           <Grid item lg={6} xl={6} style={{ textAlign: "right" }}>
@@ -419,7 +420,7 @@ const LocationList = () => {
                         // color="success"
                         disableElevation
                         component={Link}
-                        to={`/update-category`}
+                        to={`/update-location`}
                         state={{ row }}
                       >
                         <EditOutlinedIcon />
