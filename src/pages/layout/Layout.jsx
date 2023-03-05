@@ -308,13 +308,11 @@ export default function Layout() {
       return false;
     }
   };
-  const checkUserRoute = () => {
+  const checkLocationRoute = () => {
     const userPathname = [
       "/location-list",
       "/add-location",
-      "/user-list",
-      "/profile-creation",
-      "/user-access-control",
+      "/update-location",
     ];
     if (userPathname.includes(pathname)) {
       return true;
@@ -322,15 +320,13 @@ export default function Layout() {
       return false;
     }
   };
-  const checkConfigurationRoute = () => {
+  const checkFilterRoute = () => {
     const userPathname = [
-      "/country",
-      "/role",
+      "/add-filter",
+      "/update-filter",
+      "/filter-list",
       "/department",
       "/category",
-      "/quick-list",
-      "/urgency",
-      "/company",
     ];
     if (userPathname.includes(pathname)) {
       return true;
@@ -589,7 +585,7 @@ export default function Layout() {
 
             <ListItemButton
               className={`${classes.menuItem} ${
-                checkUserRoute() ? classes.menuItemActive : null
+                checkLocationRoute() ? classes.menuItemActive : null
               }`}
               onClick={() => {
                 manageOpen("Location");
@@ -641,29 +637,12 @@ export default function Layout() {
                     <ListItemText primary="Location list" />
                   </ListItemButton>
                 </Link>
-                
-                <Link to="/user-list" className={classes.linkStyle}>
-                  <ListItemButton
-                    sx={{ pl: 4 }}
-                    className={`${classes.menuSubItem} ${
-                      pathname === "/user-list"
-                        ? classes.subMenuItemActive
-                        : null
-                    }`}
-                  >
-                    <ListItemIcon>
-                      <CircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="User list" />
-                  </ListItemButton>
-                </Link>
- 
               </List>
             </Collapse>
 
             <ListItemButton
               className={`${classes.menuItem} ${
-                checkConfigurationRoute() ? classes.menuItemActive : null
+                checkFilterRoute() ? classes.menuItemActive : null
               }`}
               onClick={() => {
                 manageOpen("Filter");
@@ -681,7 +660,7 @@ export default function Layout() {
                 disablePadding
                 className={classes.listStyle}
               >
-                  <Link to="/add-filter" className={classes.linkStyle}>
+                <Link to="/add-filter" className={classes.linkStyle}>
                   <ListItemButton
                     sx={{ pl: 4 }}
                     className={`${classes.menuSubItem} ${
@@ -696,7 +675,7 @@ export default function Layout() {
                     <ListItemText primary="Add Filter" />
                   </ListItemButton>
                 </Link>
-                  <Link to="/filter-list" className={classes.linkStyle}>
+                <Link to="/filter-list" className={classes.linkStyle}>
                   <ListItemButton
                     sx={{ pl: 4 }}
                     className={`${classes.menuSubItem} ${
@@ -711,22 +690,7 @@ export default function Layout() {
                     <ListItemText primary="Filter list" />
                   </ListItemButton>
                 </Link>
-                
-              
 
-                <Link to="/role" className={classes.linkStyle}>
-                  <ListItemButton
-                    sx={{ pl: 4 }}
-                    className={`${classes.menuSubItem} ${
-                      pathname === "/role" ? classes.subMenuItemActive : null
-                    }`}
-                  >
-                    <ListItemIcon>
-                      <CircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Role" />
-                  </ListItemButton>
-                </Link>
                 <Link to="/department" className={classes.linkStyle}>
                   <ListItemButton
                     sx={{ pl: 4 }}
@@ -740,63 +704,6 @@ export default function Layout() {
                       <CircleIcon />
                     </ListItemIcon>
                     <ListItemText primary="Department" />
-                  </ListItemButton>
-                </Link>
-                <Link to="/category" className={classes.linkStyle}>
-                  <ListItemButton
-                    sx={{ pl: 4 }}
-                    className={`${classes.menuSubItem} ${
-                      pathname === "/category"
-                        ? classes.subMenuItemActive
-                        : null
-                    }`}
-                  >
-                    <ListItemIcon>
-                      <CircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Category" />
-                  </ListItemButton>
-                </Link>
-                <Link to="/quick-list" className={classes.linkStyle}>
-                  <ListItemButton
-                    sx={{ pl: 4 }}
-                    className={`${classes.menuSubItem} ${
-                      pathname === "/quick-list"
-                        ? classes.subMenuItemActive
-                        : null
-                    }`}
-                  >
-                    <ListItemIcon>
-                      <CircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Quick list" />
-                  </ListItemButton>
-                </Link>
-
-                <Link to="/urgency" className={classes.linkStyle}>
-                  <ListItemButton
-                    sx={{ pl: 4 }}
-                    className={`${classes.menuSubItem} ${
-                      pathname === "/urgency" ? classes.subMenuItemActive : null
-                    }`}
-                  >
-                    <ListItemIcon>
-                      <CircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Urgency" />
-                  </ListItemButton>
-                </Link>
-                <Link to="/company" className={classes.linkStyle}>
-                  <ListItemButton
-                    sx={{ pl: 4 }}
-                    className={`${classes.menuSubItem} ${
-                      pathname === "/company" ? classes.subMenuItemActive : null
-                    }`}
-                  >
-                    <ListItemIcon>
-                      <CircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Company" />
                   </ListItemButton>
                 </Link>
               </List>

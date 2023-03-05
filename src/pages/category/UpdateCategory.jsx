@@ -34,7 +34,7 @@ const UpdateCategory = () => {
   const [parentName, setParentName] = useState("");
   const [status, setStatus] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [categoryList, setCategoryList] = useState([]);
+  const [parentList, setParentList] = useState([]);
   const [message, setMessage] = useState("");
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
@@ -95,7 +95,7 @@ const UpdateCategory = () => {
         console.log("responseresponseresponse", response);
         if (response.status >= 200 && response.status < 300) {
           handleSnakbarOpen("Update successfully", "success");
-          navigate("/category-list");
+          // navigate("/category-list");
         }
       } catch (error) {
         console.log("error", error);
@@ -115,7 +115,7 @@ const UpdateCategory = () => {
 
       if (allData.status >= 200 && allData.status < 300) {
         let list = allData?.data?.data.filter((item) => item.name !== catName);
-        setCategoryList(list);
+        setParentList(list);
 
         if (allData.data.data.length < 1) {
           setMessage("No data found");
@@ -172,7 +172,7 @@ const UpdateCategory = () => {
               label="Parent Name"
               onChange={handleChange}
             >
-              {categoryList?.map((item, i) => (
+              {parentList?.map((item, i) => (
                 <MenuItem value={item.name}>{item.name}</MenuItem>
               ))}
             </Select>

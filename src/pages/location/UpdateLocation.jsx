@@ -34,7 +34,7 @@ const UpdateLocation = () => {
   const [parentName, setParentName] = useState("");
   const [status, setStatus] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [categoryList, setCategoryList] = useState([]);
+  const [parentList, setParentList] = useState([]);
   const [message, setMessage] = useState("");
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
@@ -117,7 +117,7 @@ const UpdateLocation = () => {
         let list = allData?.data?.data.filter(
           (item) => item.name !== LocationName
         );
-        setCategoryList(list);
+        setParentList(list);
 
         if (allData.data.data.length < 1) {
           setMessage("No data found");
@@ -174,7 +174,7 @@ const UpdateLocation = () => {
               label="Parent Name"
               onChange={handleChange}
             >
-              {categoryList?.map((item, i) => (
+              {parentList?.map((item, i) => (
                 <MenuItem value={item.name}>{item.name}</MenuItem>
               ))}
             </Select>

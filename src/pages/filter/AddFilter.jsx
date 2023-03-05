@@ -7,7 +7,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-
+import { useTheme } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
@@ -15,6 +15,19 @@ import PulseLoader from "react-spinners/PulseLoader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getDataWithToken } from "../../services/GetDataService";
+import Box from '@mui/material/Box';
+import OutlinedInput from '@mui/material/OutlinedInput'; 
+import Chip from '@mui/material/Chip';
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 const useStyles = makeStyles((theme) => ({
   form: {
     padding: "50px",
@@ -26,13 +39,46 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const AddFilter = () => {
+  const theme = useTheme();
   const classes = useStyles();
   const [name, setName] = useState("");
   const [parentName, setParentName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [categoryList, setCategoryList] = useState([]);
+  const [parentList, setParentList] = useState([]);
   const [message, setMessage] = useState("");
   const { enqueueSnackbar } = useSnackbar();
+  const [personName, setPersonName] = React.useState([]);
+
+  const handleChange2 = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setPersonName(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+  const names = [
+    'Oliver Hansen',
+    'Van Henry',
+    'April Tucker',
+    'Ralph Hubbard',
+    'Omar Alexander',
+    'Carlos Abbott',
+    'Miriam Wagner',
+    'Bradley Wilkerson',
+    'Virginia Andrews',
+    'Kelly Snyder',
+  ];
+
+  function getStyles(name, personName, theme) {
+    return {
+      fontWeight:
+        personName.indexOf(name) === -1
+          ? theme.typography.fontWeightRegular
+          : theme.typography.fontWeightMedium,
+    };
+  }
   const handleChange = (event) => {
     setParentName(event.target.value);
   };
@@ -105,7 +151,7 @@ const AddFilter = () => {
       console.log("allData", allData);
 
       if (allData.status >= 200 && allData.status < 300) {
-        setCategoryList(allData?.data?.data);
+        setParentList(allData?.data?.data);
 
         if (allData.data.data.length < 1) {
           setMessage("No data found");
@@ -159,11 +205,40 @@ const AddFilter = () => {
               label="Parent Name"
               onChange={handleChange}
             >
-              {categoryList?.map((item, i) => (
+              {parentList?.map((item, i) => (
                 <MenuItem value={item.name}>{item.name}</MenuItem>
               ))}
             </Select>
           </FormControl>
+          <FormControl sx={{ m: 1, width: 300 }}>
+        <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+        <Select
+          labelId="demo-multiple-chip-label"
+          id="demo-multiple-chip"
+          multiple
+          value={personName}
+          onChange={handleChange2}
+          input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+          renderValue={(selected) => (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              {selected.map((value) => (
+                <Chip key={value} label={value} />
+              ))}
+            </Box>
+          )}
+          MenuProps={MenuProps}
+        >
+          {names.map((name) => (
+            <MenuItem
+              key={name}
+              value={name}
+              style={getStyles(name, personName, theme)}
+            >
+              {name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
           <div style={{ textAlign: "center" }}>
             <Button
               variant="contained"
