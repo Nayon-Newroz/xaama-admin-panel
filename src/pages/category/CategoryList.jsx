@@ -95,6 +95,7 @@ const CategoryList = () => {
   const [totalData, setTotalData] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [loading2, setLoading2] = useState(false);
@@ -173,7 +174,7 @@ const CategoryList = () => {
     console.log("clearFilter");
     setName("");
     setStatus("");
-    setParentName("")
+    setParentName("");
     setPage(0);
     const newUrl = `/api/v1/category?limit=${rowsPerPage}&page=1`;
     getData(0, rowsPerPage, newUrl);
@@ -229,7 +230,37 @@ const CategoryList = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
+  const getFilters = async () => {
+    try {
+      setFilterLoading(true);
 
+      let response = await axios({
+        url: `/api/v1/filter/category-filter-list`,
+        method: "post",
+        data: {
+          category_Ids: [
+            "6405763a30cab6e55bddfa13",
+            "640574fd30cab6e55bddfa09",
+            "64058cc530cab6e55bddfb85",
+          ],
+        },
+      });
+      console.log("response", response);
+      if (response.status >= 200 && response.status < 300) {
+        // setTableDataList(response?.data?.data);
+        // setTotalData(response?.data?.totalData);
+
+        if (response.data.data.length < 1) {
+          setMessage("No data found");
+        }
+      }
+      setFilterLoading(false);
+    } catch (error) {
+      console.log("error", error);
+      setFilterLoading(false);
+      handleSnakbarOpen(error.response.data.message.toString(), "error");
+    }
+  };
   useEffect(() => {
     getData();
   }, []);
@@ -359,6 +390,7 @@ const CategoryList = () => {
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>Parent Name</TableCell>
+                <TableCell>Filters</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
               </TableRow>
@@ -373,6 +405,18 @@ const CategoryList = () => {
                   >
                     <TableCell>{row?.name}</TableCell>
                     <TableCell>{row?.parent_name}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outlined"
+                        color="info"
+                        size="small"
+                        onClick={() => {
+                          getFilters();
+                        }}
+                      >
+                        View
+                      </Button>
+                    </TableCell>
 
                     <TableCell>
                       {row?.status ? (

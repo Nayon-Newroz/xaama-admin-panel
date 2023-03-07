@@ -132,7 +132,7 @@ const FilterList = () => {
     for (let i = 0; i < 10; i++) {
       content.push(
         <TableRow key={i}>
-          {[...Array(7).keys()].map((e, i) => (
+          {[...Array(5).keys()].map((e, i) => (
             <TableCell key={i}>
               <Skeleton></Skeleton>
             </TableCell>
@@ -212,8 +212,9 @@ const FilterList = () => {
         }`;
       }
       let allData = await getDataWithToken(url);
-
+      console.log("allData", allData);
       if (allData.status >= 200 && allData.status < 300) {
+        // 111
         setTableDataList(allData?.data?.data);
         // setRowsPerPage(allData?.data?.limit);
         setTotalData(allData?.data?.totalData);
@@ -228,6 +229,9 @@ const FilterList = () => {
       setLoading(false);
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
+  };
+  const check = () => {
+    console.log("check");
   };
 
   useEffect(() => {
@@ -247,7 +251,13 @@ const FilterList = () => {
       >
         <Grid container columnSpacing={3} style={{ padding: "16px 0" }}>
           <Grid item lg={6} xl={6}>
-            <Typography variant="h6" color="info" gutterBottom component="div">
+            <Typography
+              variant="h6"
+              color="info"
+              gutterBottom
+              component="div"
+              onClick={check}
+            >
               Filter List
             </Typography>
           </Grid>
@@ -359,6 +369,7 @@ const FilterList = () => {
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>Parent Name</TableCell>
+                <TableCell>Children</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
               </TableRow>
@@ -373,6 +384,17 @@ const FilterList = () => {
                   >
                     <TableCell>{row?.name}</TableCell>
                     <TableCell>{row?.parent_name}</TableCell>
+                    <TableCell>
+                      {/* 111 */}
+                      {row?.children.length > 1
+                        ? row?.children?.map((item, i) => (
+                            <lavel key={item._id}>
+                              {item.name}
+                              {row?.children.length === i + 1 ? "" : ", "}
+                            </lavel>
+                          ))
+                        : "None"}
+                    </TableCell>
 
                     <TableCell>
                       {row?.status ? (

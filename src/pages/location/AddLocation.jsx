@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react"; 
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -26,7 +25,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const AddLocation = () => {
-  const classes = useStyles();
+  const classes = useStyles(); 
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [parentName, setParentName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -86,7 +86,7 @@ const AddLocation = () => {
         });
         if (response.status >= 200 && response.status < 300) {
           handleSnakbarOpen("Added new book successfully", "success");
-          //   Navigate("/book-list");
+            navigate("/location-list");
         }
       } catch (error) {
         console.log("error", error);

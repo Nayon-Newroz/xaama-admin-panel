@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -7,7 +6,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from "@mui/material/styles";
 import { TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
@@ -15,9 +14,9 @@ import PulseLoader from "react-spinners/PulseLoader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getDataWithToken } from "../../services/GetDataService";
-import Box from '@mui/material/Box';
-import OutlinedInput from '@mui/material/OutlinedInput'; 
-import Chip from '@mui/material/Chip';
+import Box from "@mui/material/Box";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Chip from "@mui/material/Chip";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -40,41 +39,31 @@ const useStyles = makeStyles((theme) => ({
 }));
 const AddFilter = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const classes = useStyles();
   const [name, setName] = useState("");
   const [parentName, setParentName] = useState("");
   const [loading, setLoading] = useState(false);
   const [parentList, setParentList] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
+  const [categoryName, setCategoryName] = React.useState([]);
   const [message, setMessage] = useState("");
   const { enqueueSnackbar } = useSnackbar();
-  const [personName, setPersonName] = React.useState([]);
 
   const handleChange2 = (event) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
+    setCategoryName(
       // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
+      typeof value === "string" ? value.split(",") : value
     );
   };
-  const names = [
-    'Oliver Hansen',
-    'Van Henry',
-    'April Tucker',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
-  ];
 
-  function getStyles(name, personName, theme) {
+  function getStyles(name, categoryName, theme) {
     return {
       fontWeight:
-        personName.indexOf(name) === -1
+        categoryName.indexOf(name) === -1
           ? theme.typography.fontWeightRegular
           : theme.typography.fontWeightMedium,
     };
@@ -120,9 +109,20 @@ const AddFilter = () => {
     } else {
       setLoading(true);
       try {
+        let categoryIds = [];
+        categoryName.map((name) => {
+          let result = categoryList.find((res) => res.name === name);
+          if (result) {
+            categoryIds.push(result._id);
+          }
+        });
+
+        console.log("categoryName", categoryName);
+        console.log("categoryIds", categoryIds);
         let data = {
           name: name,
           parent_name: parentName,
+          category_id: categoryIds,
         };
 
         let response = await axios({
@@ -132,7 +132,7 @@ const AddFilter = () => {
         });
         if (response.status >= 200 && response.status < 300) {
           handleSnakbarOpen("Added new book successfully", "success");
-          // Navigate("/filter-list");
+          // navigate("/filter-list");
         }
       } catch (error) {
         console.log("error", error);
@@ -164,9 +164,31 @@ const AddFilter = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
+  const getCategoryList = async () => {
+    try {
+      setLoading(true);
 
+      const allDataUrl = `/api/v1/category/dropdownlist`;
+      let allData = await getDataWithToken(allDataUrl);
+      console.log("allData", allData);
+
+      if (allData.status >= 200 && allData.status < 300) {
+        setCategoryList(allData?.data?.data);
+
+        if (allData.data.data.length < 1) {
+          setMessage("No data found");
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log("error", error);
+      setLoading(false);
+      handleSnakbarOpen(error.response.data.message.toString(), "error");
+    }
+  };
   useEffect(() => {
     getData();
+    getCategoryList();
   }, []);
   return (
     <>
@@ -189,7 +211,7 @@ const AddFilter = () => {
             style={{ marginBottom: "30px" }}
             fullWidth
             id="name"
-            label="Location Name"
+            label="Filter Name"
             variant="outlined"
             value={name}
             onChange={(e) => {
@@ -210,35 +232,37 @@ const AddFilter = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
-        <Select
-          labelId="demo-multiple-chip-label"
-          id="demo-multiple-chip"
-          multiple
-          value={personName}
-          onChange={handleChange2}
-          input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-          renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Box>
-          )}
-          MenuProps={MenuProps}
-        >
-          {names.map((name) => (
-            <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
+          <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
+            <InputLabel id="demo-multiple-chip-label">Categories</InputLabel>
+            <Select
+              labelId="demo-multiple-chip-label"
+              id="demo-multiple-chip"
+              multiple
+              value={categoryName}
+              onChange={handleChange2}
+              input={
+                <OutlinedInput id="select-multiple-chip" label="Categories" />
+              }
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} />
+                  ))}
+                </Box>
+              )}
+              MenuProps={MenuProps}
             >
-              {name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+              {categoryList.map((item) => (
+                <MenuItem
+                  key={item._id}
+                  value={item.name}
+                  style={getStyles(item.name, categoryName, theme)}
+                >
+                  {item.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <div style={{ textAlign: "center" }}>
             <Button
               variant="contained"

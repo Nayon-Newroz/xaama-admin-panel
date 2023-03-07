@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -95,7 +95,7 @@ const UpdateCategory = () => {
         console.log("responseresponseresponse", response);
         if (response.status >= 200 && response.status < 300) {
           handleSnakbarOpen("Update successfully", "success");
-          // navigate("/category-list");
+          navigate("/category-list");
         }
       } catch (error) {
         console.log("error", error);
