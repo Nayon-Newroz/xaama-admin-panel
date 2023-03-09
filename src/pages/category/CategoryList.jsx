@@ -36,6 +36,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import { makeStyles } from "@mui/styles";
+import { Label } from "@mui/icons-material";
 const useStyles = makeStyles((theme) => ({
   tableBodyStyle: {
     "& tr:nth-of-type(odd)": {
@@ -105,6 +106,16 @@ const CategoryList = () => {
   const [status, setStatus] = useState("");
   const [open, setOpen] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
+  const [filterListDialog, setFilterListDialog] = useState(false);
+  const [filterList, setFilterList] = useState([]);
+
+  const handleFilterListDialogOpen = () => {
+    setFilterListDialog(true);
+  };
+
+  const handleFilterListDialogClose = () => {
+    setFilterListDialog(false);
+  };
   const handleSnakbarOpen = (msg, vrnt) => {
     let duration;
     if (vrnt === "error") {
@@ -230,24 +241,18 @@ const CategoryList = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
-  const getFilters = async () => {
+  const getFilters = async (row) => {
     try {
       setFilterLoading(true);
 
       let response = await axios({
-        url: `/api/v1/filter/category-filter-list`,
+        url: `/api/v1/category/category-filter-list`,
         method: "post",
-        data: {
-          category_Ids: [
-            "6405763a30cab6e55bddfa13",
-            "640574fd30cab6e55bddfa09",
-            "64058cc530cab6e55bddfb85",
-          ],
-        },
+        data: row,
       });
       console.log("response", response);
       if (response.status >= 200 && response.status < 300) {
-        // setTableDataList(response?.data?.data);
+        setFilterList(response?.data?.data);
         // setTotalData(response?.data?.totalData);
 
         if (response.data.data.length < 1) {
@@ -255,6 +260,7 @@ const CategoryList = () => {
         }
       }
       setFilterLoading(false);
+      handleFilterListDialogOpen();
     } catch (error) {
       console.log("error", error);
       setFilterLoading(false);
@@ -411,7 +417,7 @@ const CategoryList = () => {
                         color="info"
                         size="small"
                         onClick={() => {
-                          getFilters();
+                          getFilters(row);
                         }}
                       >
                         View
@@ -541,6 +547,42 @@ const CategoryList = () => {
             </Button>
           </DialogActions>
         </div>
+      </Dialog>
+      <Dialog
+        open={filterListDialog}
+        onClose={handleFilterListDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Category Filter List"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {filterList.length > 0 ? (
+              filterList.map((row, i) => (
+                <>
+                  <p>
+                    <b>{row.filter_name}</b>
+                  </p>
+                  <div>
+                    {row?.filter_values?.map((value) => (
+                      <label>{value.name},&nbsp;&nbsp;</label>
+                    ))}
+                  </div>
+                </>
+              ))
+            ) : (
+              <p>No filter is available for this category</p>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleFilterListDialogClose}>Disagree</Button>
+          <Button onClick={handleFilterListDialogClose} autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );
