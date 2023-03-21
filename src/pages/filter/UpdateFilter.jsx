@@ -177,7 +177,7 @@ const UpdateFilter = () => {
     try {
       setLoading(true);
 
-      const allDataUrl = `/api/v1/category/dropdownlist`;
+      const allDataUrl = `/api/v1/category/leaf-dropdown`;
       let allData = await getDataWithToken(allDataUrl);
       console.log("allData", allData);
 

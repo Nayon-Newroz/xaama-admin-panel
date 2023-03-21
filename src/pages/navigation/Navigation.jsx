@@ -22,6 +22,10 @@ import UpdateLocation from "../location/UpdateLocation";
 import FilterList from "../filter/FilterList";
 import AddFilter from "../filter/AddFilter";
 import UpdateFilter from "../filter/UpdateFilter";
+import Test from "../../Test";
+import UpdateProduct from "../product/UpdateProduct";
+import AddProduct from "../product/AddProduct";
+import ProductList from "../product/ProductList";
 const useStyles = makeStyles((theme) => ({
   dialogStyle: {
     // backgroundColor: "red",
@@ -190,6 +194,31 @@ const Navigation = ({ openLoadingDialog, setOpenLoadingDialog }) => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="product-list"
+          element={
+            <PrivateRoute>
+              <ProductList />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="add-product"
+          element={
+            <PrivateRoute>
+              <AddProduct />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="update-product"
+          element={
+            <PrivateRoute>
+              <UpdateProduct />
+            </PrivateRoute>
+          }
+        />
+        <Route path="test" element={<Test />} />
         <Route
           path="*"
           element={!tuso_admin_panel.token ? <Navigate to="/" /> : <NoMatch />}

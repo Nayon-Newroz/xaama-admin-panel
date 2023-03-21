@@ -89,7 +89,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const CategoryList = () => {
+const ProductList = () => {
   const classes = useStyles();
   const [tableDataList, setTableDataList] = useState([]);
   const [page, setPage] = useState(0);
@@ -144,7 +144,7 @@ const CategoryList = () => {
     for (let i = 0; i < 10; i++) {
       content.push(
         <TableRow key={i}>
-          {[...Array(5).keys()].map((e, i) => (
+          {[...Array(7).keys()].map((e, i) => (
             <TableCell key={i}>
               <Skeleton></Skeleton>
             </TableCell>
@@ -158,7 +158,7 @@ const CategoryList = () => {
     try {
       setLoading2(true);
       let response = await axios({
-        url: `/api/v1/category/delete/${deleteData.row._id}`,
+        url: `/api/v1/product/delete/${deleteData.row._id}`,
         method: "delete",
       });
       if (response.status >= 200 && response.status < 300) {
@@ -187,7 +187,7 @@ const CategoryList = () => {
     setStatus("");
     setParentName("");
     setPage(0);
-    const newUrl = `/api/v1/category?limit=${rowsPerPage}&page=1`;
+    const newUrl = `/api/v1/product?limit=${rowsPerPage}&page=1`;
     getData(0, rowsPerPage, newUrl);
   };
 
@@ -219,7 +219,7 @@ const CategoryList = () => {
         if (status === "None") {
           newStatus = "";
         }
-        url = `/api/v1/category?name=${name}&parent_name=${parentName}&status=${newStatus}&limit=${newLimit}&page=${
+        url = `/api/v1/product?name=${name}&parent_name=${parentName}&status=${newStatus}&limit=${newLimit}&page=${
           newPageNO + 1
         }`;
       }
@@ -285,7 +285,7 @@ const CategoryList = () => {
         <Grid container columnSpacing={3} style={{ padding: "16px 0" }}>
           <Grid item lg={6} xl={6}>
             <Typography variant="h6" color="info" gutterBottom component="div">
-              Category List
+              Product List
             </Typography>
           </Grid>
           <Grid item lg={6} xl={6} style={{ textAlign: "right" }}>
@@ -395,7 +395,7 @@ const CategoryList = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>
-                <TableCell>Parent Name</TableCell>
+                <TableCell>Description</TableCell>
                 <TableCell>Filters</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
@@ -410,7 +410,13 @@ const CategoryList = () => {
                     // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>{row?.name}</TableCell>
-                    <TableCell>{row?.parent_name}</TableCell>
+                    <TableCell
+                      dangerouslySetInnerHTML={{
+                        __html: row?.description,
+                      }}
+                    >
+                     
+                    </TableCell>
                     <TableCell>
                       <Button
                         variant="outlined"
@@ -470,7 +476,7 @@ const CategoryList = () => {
                         // color="success"
                         disableElevation
                         component={Link}
-                        to={`/update-category`}
+                        to={`/update-product`}
                         state={{ row }}
                       >
                         <EditOutlinedIcon />
@@ -588,4 +594,4 @@ const CategoryList = () => {
   );
 };
 
-export default CategoryList;
+export default ProductList;

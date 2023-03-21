@@ -7,6 +7,8 @@ import axios from "axios";
 import { SnackbarProvider } from "notistack";
 import { BrowserRouter } from "react-router-dom";
 import "./App.css";
+import Test from "./Test";
+import DropZoneImage from "./pages/utils/DropZoneImage";
 const theme = createTheme({
   palette: {
     primary: {
@@ -56,6 +58,8 @@ function App() {
           <BrowserRouter>
             <AuthContextProvider>
               <Layout />
+              {/* <DropZoneImage /> */}
+              {/* <Test /> */}
             </AuthContextProvider>
           </BrowserRouter>
         </SnackbarProvider>

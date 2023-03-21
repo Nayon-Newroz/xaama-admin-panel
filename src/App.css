@@ -1,3 +1,18 @@
 body {
   background: rgb(245, 245, 245);
 }
+
+.wrapper-class {
+  /* padding: 1rem; */
+  /* border: 1px solid green; */
+}
+.editor-class {
+  background-color: #fff;
+  padding: 8.5px 14px;
+  border: 1px solid #c4c4c4;
+  border-radius: 4px;
+  height: 350px;
+}
+.toolbar-class {
+  border: 1px solid #fff;
+}

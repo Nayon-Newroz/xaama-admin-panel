@@ -17,7 +17,7 @@ import { getDataWithToken } from "../../services/GetDataService";
 const useStyles = makeStyles((theme) => ({
   form: {
     padding: "50px",
-    background: "#fff", 
+    background: "#fff",
     borderRadius: "10px",
     width: "400px",
     boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
@@ -84,7 +84,7 @@ const AddCategory = () => {
           data: data,
         });
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Added new book successfully", "success");
+          handleSnakbarOpen("Added successfully", "success");
           navigate("/category-list");
         }
       } catch (error) {

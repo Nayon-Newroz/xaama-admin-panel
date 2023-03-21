@@ -85,7 +85,7 @@ const AddLocation = () => {
           data: data,
         });
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Added new book successfully", "success");
+          handleSnakbarOpen("Added successfully", "success");
             navigate("/location-list");
         }
       } catch (error) {

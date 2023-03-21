@@ -126,11 +126,7 @@ const Dashboard = () => {
           >
             <div>
               <Typography className={classes.white} variant="h1">
-                <CountUp
-                  start={0}
-                  end={177}
-                  duration={0.5}
-                />
+                <CountUp start={0} end={177} duration={0.5} />
               </Typography>
               <Typography className={classes.white} variant="h4">
                 New Employee
@@ -145,11 +141,7 @@ const Dashboard = () => {
             onClick={() => navigate("/kyb-request")}
           >
             <Typography className={classes.white} variant="h1">
-              <CountUp
-                start={0}
-                end={255}
-                duration={0.5}
-              />
+              <CountUp start={0} end={255} duration={0.5} />
             </Typography>
             <Typography className={classes.white} variant="h4">
               New Account
@@ -163,11 +155,7 @@ const Dashboard = () => {
             onClick={() => navigate("/block-user-list")}
           >
             <Typography className={classes.white} variant="h1">
-              <CountUp
-                start={0}
-                end={154}
-                duration={0.5}
-              />
+              <CountUp start={0} end={154} duration={0.5} />
             </Typography>
             <Typography className={classes.white} variant="h4">
               Blocked Account
@@ -200,11 +188,7 @@ const Dashboard = () => {
         <Grid item xs={4}>
           <div className={`${classes.card} ${classes.cardBg6}`}>
             <Typography className={classes.white} variant="h1">
-              <CountUp
-                start={0}
-                end={155}
-                duration={0.5}
-              />
+              <CountUp start={0} end={155} duration={0.5} />
             </Typography>
             <Typography className={classes.white} variant="h4">
               Solved Tickets

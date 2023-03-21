@@ -326,8 +326,15 @@ export default function Layout() {
       "/update-filter",
       "/filter-list",
       "/department",
-      "/category",
     ];
+    if (userPathname.includes(pathname)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+  const checkProductRoute = () => {
+    const userPathname = ["/add-product", "/update-product", "/product-list"];
     if (userPathname.includes(pathname)) {
       return true;
     } else {
@@ -704,6 +711,62 @@ export default function Layout() {
                       <CircleIcon />
                     </ListItemIcon>
                     <ListItemText primary="Department" />
+                  </ListItemButton>
+                </Link>
+              </List>
+            </Collapse>
+            <ListItemButton
+              className={`${classes.menuItem} ${
+                checkProductRoute() ? classes.menuItemActive : null
+              }`}
+              onClick={() => {
+                manageOpen("Product");
+              }}
+            >
+              <ListItemIcon>
+                <LockResetIcon />
+              </ListItemIcon>
+              <ListItemText primary="Product" />
+              {activeMenu === "Product" ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse
+              in={activeMenu === "Product"}
+              timeout="auto"
+              unmountOnExit
+            >
+              <List
+                component="div"
+                disablePadding
+                className={classes.listStyle}
+              >
+                <Link to="/add-product" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/add-product"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Add Product" />
+                  </ListItemButton>
+                </Link>
+                <Link to="/product-list" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/product-list"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Product list" />
                   </ListItemButton>
                 </Link>
               </List>
