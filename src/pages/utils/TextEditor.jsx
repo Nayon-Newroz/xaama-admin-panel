@@ -5,7 +5,7 @@ import { convertToHTML } from "draft-convert";
 import htmlToDraft from "html-to-draftjs";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
-const TextEditor = ({ convertedContent, setConvertedContent }) => {
+const TextEditor = ({ convertedContent, setConvertedContent, data }) => {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
@@ -15,11 +15,16 @@ const TextEditor = ({ convertedContent, setConvertedContent }) => {
     setConvertedContent(convertToHTML(editorState.getCurrentContent()));
   };
 
-  const loadDataFormHtml = () => {
-    const html = "<p>Hey this <strong>editor</strong> rocks 😀</p>";
+  const loadDataFormHtml = (data) => {
+    // const html = "<p>Hey this <strong>editor</strong> rocks 😀</p>";
+    const html = data;
     const contentBlock = htmlToDraft(html);
     const contentState = ContentState.createFromBlockArray(
       contentBlock.contentBlocks
+    );
+    console.log(
+      "EditorState.createWithContent(contentState)",
+      EditorState.createWithContent(contentState)
     );
     setEditorState(EditorState.createWithContent(contentState));
   };
@@ -27,6 +32,13 @@ const TextEditor = ({ convertedContent, setConvertedContent }) => {
     let html = convertToHTML(editorState.getCurrentContent());
     setConvertedContent(html);
   }, [editorState]);
+  useEffect(() => {
+    console.log("aaaaaaaaaaaaaaaaaaaa data", data);
+    if (data !== undefined) {
+      loadDataFormHtml(data);
+    }
+  }, []);
+
   return (
     <div>
       {/* <h2 onClick={check}>Check</h2>
@@ -48,6 +60,7 @@ const TextEditor = ({ convertedContent, setConvertedContent }) => {
             "list",
             "textAlign",
             "history",
+            "colorPicker",
           ],
           // inline: { inDropdown: true },
           // list: { inDropdown: true },

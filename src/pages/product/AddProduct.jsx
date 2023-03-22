@@ -141,6 +141,26 @@ const AddProduct = () => {
       document.getElementById("name").focus();
       return (isError = true);
     }
+    if (!price) {
+      handleSnakbarOpen("Please enter price", "error");
+      document.getElementById("price").focus();
+      return (isError = true);
+    }
+    // if (!discountPrice) {
+    //   handleSnakbarOpen("Please enter discount price", "error");
+    //   document.getElementById("discountPrice").focus();
+    //   return (isError = true);
+    // }
+    if (!stockUnit) {
+      handleSnakbarOpen("Please enter stock unit", "error");
+      document.getElementById("stockUnit").focus();
+      return (isError = true);
+    }
+    if (!sku) {
+      handleSnakbarOpen("Please enter sku", "error");
+      document.getElementById("sku").focus();
+      return (isError = true);
+    }
     if (!category.trim()) {
       handleSnakbarOpen("Please select a category", "error");
       document.getElementById("parent-id").focus();
@@ -205,7 +225,7 @@ const AddProduct = () => {
       setLoading(false);
     }
   };
-  const getData = async () => {
+  const getCategoryList = async () => {
     try {
       setLoading(true);
 
@@ -284,7 +304,7 @@ const AddProduct = () => {
     return content;
   };
   useEffect(() => {
-    getData();
+    getCategoryList();
   }, []);
   return (
     <>
@@ -307,7 +327,7 @@ const AddProduct = () => {
             style={{ marginBottom: "30px" }}
             fullWidth
             id="name"
-            label="Product Name"
+            label="Product Name *"
             variant="outlined"
             value={name}
             onChange={(e) => {
@@ -320,8 +340,10 @@ const AddProduct = () => {
             style={{ marginBottom: "30px" }}
             fullWidth
             id="price"
-            label="Price"
+            label="Price *"
             variant="outlined"
+            inputProps={{ min: 0 }}
+            onWheel={(e) => e.target.blur()}
             value={price}
             onChange={(e) => {
               setPrice(e.target.value);
@@ -335,6 +357,8 @@ const AddProduct = () => {
             id="discountPrice"
             label="Discount Price"
             variant="outlined"
+            inputProps={{ min: 0 }}
+            onWheel={(e) => e.target.blur()}
             value={discountPrice}
             onChange={(e) => {
               setDiscountPrice(e.target.value);
@@ -346,8 +370,10 @@ const AddProduct = () => {
             style={{ marginBottom: "30px" }}
             fullWidth
             id="stockUnit"
-            label="Stock Unit"
+            label="Stock Unit *"
             variant="outlined"
+            inputProps={{ min: 0 }}
+            onWheel={(e) => e.target.blur()}
             value={stockUnit}
             onChange={(e) => {
               setStockUnit(e.target.value);
@@ -367,12 +393,12 @@ const AddProduct = () => {
           />
 
           <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
-            <InputLabel id="demo-simple-select-label">Category</InputLabel>
+            <InputLabel id="demo-simple-select-label">Category *</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="category"
               value={category}
-              label="Category"
+              label="Category *"
               onChange={handleChange}
             >
               {categoryList?.map((item, i) => (
@@ -441,15 +467,20 @@ const AddProduct = () => {
             )}
           </Collapse>
           <div style={{ marginBottom: "30px" }}>
-            <Typography variant="h6">Upload Images</Typography>
+            <Typography variant="h6">
+              Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}
+            </Typography>
             <Alert severity="info" style={{ marginBottom: "8px" }}>
-              Upload jpg / jpeg / png images.Try resolution 800*600 for better
+             Max 5 (jpg / jpeg / png) images.Try resolution 800*600 for better
               image view
             </Alert>
             <DropZoneImage files={files} setFiles={setFiles} />
           </div>
           <div style={{ marginBottom: "30px" }}>
-            <Typography variant="h6">Enter Description</Typography>
+            <Typography variant="h6">
+              Enter Description{" "}
+              <span style={{ color: "#c4c4c4" }}>(Optional)</span>
+            </Typography>
 
             <TextEditor
               convertedContent={convertedContent}

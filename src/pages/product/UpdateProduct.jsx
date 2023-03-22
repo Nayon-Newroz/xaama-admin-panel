@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -8,40 +7,120 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
-import { TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Collapse,
+  Skeleton,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
 import PulseLoader from "react-spinners/PulseLoader";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getDataWithToken } from "../../services/GetDataService";
+import TextEditor from "../utils/TextEditor";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import DropZoneImage from "../utils/DropZoneImage";
 const useStyles = makeStyles((theme) => ({
   form: {
     padding: "50px",
     background: "#fff",
-
     borderRadius: "10px",
-    width: "400px",
+    // width: "400px",
     boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+  },
+  checkboxStyle: {
+    "& span": {
+      fontSize: "20px",
+      fontWeight: 600,
+      [theme.breakpoints.down("xl")]: {
+        fontSize: "14px",
+      },
+    },
+  },
+  checkboxStyle2: {
+    "& span": {
+      // fontSize: "20px",
+      // fontWeight: 600,
+      [theme.breakpoints.down("xl")]: {
+        fontSize: "12px",
+      },
+    },
   },
 }));
 const UpdateProduct = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-
   const { state } = useLocation();
   const [name, setName] = useState("");
-  const [parentName, setParentName] = useState("");
-  const [status, setStatus] = useState(false);
+  const [price, setPrice] = useState(null);
+  const [discountPrice, setDiscountPrice] = useState(null);
+  const [sku, setSku] = useState("");
+  const [stockUnit, setStockUnit] = useState(null);
+  const [convertedContent, setConvertedContent] = useState(null);
+  const [status, setStatus] = useState();
+  const [category, SetCategory] = useState("");
   const [loading, setLoading] = useState(false);
-  const [parentList, setParentList] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
   const [message, setMessage] = useState("");
+  const [filterMessage, setFilterMessage] = useState("");
+  const [filterList, setFilterList] = useState([]);
+  const [filterLoading, setFilterLoading] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
-    setParentName(event.target.value);
+    SetCategory(event.target.value);
+    let categoryData = categoryList.find(
+      (res) => res._id === event.target.value
+    );
+    console.log("event.target.value", event.target.value);
+    console.log("categoryData", categoryData);
+    getFilters(categoryData);
   };
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
+  const getFilters = async (row) => {
+    try {
+      setFilterLoading(true);
+      setFilterMessage("");
+      let newList = [];
+      let response = await axios({
+        url: `/api/v1/category/category-filter-list`,
+        method: "post",
+        data: row,
+      });
+      console.log("response", response);
+      if (response.status >= 200 && response.status < 300) {
+        response?.data?.data.map((item) => {
+          let newObj = item.filter_values.map((obj) => ({
+            ...obj,
+            isChecked: false,
+          }));
+
+          let myObj = {
+            title: item.filter_name,
+            allChecked: false,
+            filter_values: newObj,
+          };
+          newList.push(myObj);
+        });
+        console.log("newList", newList);
+        setFilterList(newList);
+
+        if (response.data.data.length < 1) {
+          setFilterMessage("No filter is available for this category");
+        }
+      }
+      setFilterLoading(false);
+    } catch (error) {
+      console.log("error", error);
+      setFilterLoading(false);
+      handleSnakbarOpen(error.response.data.message.toString(), "error");
+    }
   };
 
   const handleSnakbarOpen = (msg, vrnt) => {
@@ -64,8 +143,28 @@ const UpdateProduct = () => {
       document.getElementById("name").focus();
       return (isError = true);
     }
-    if (!parentName.trim()) {
-      handleSnakbarOpen("Please select a parent", "error");
+    if (!price) {
+      handleSnakbarOpen("Please enter price", "error");
+      document.getElementById("price").focus();
+      return (isError = true);
+    }
+    // if (!discountPrice) {
+    //   handleSnakbarOpen("Please enter discount price", "error");
+    //   document.getElementById("discountPrice").focus();
+    //   return (isError = true);
+    // }
+    if (!stockUnit) {
+      handleSnakbarOpen("Please enter stock unit", "error");
+      document.getElementById("stockUnit").focus();
+      return (isError = true);
+    }
+    if (!sku) {
+      handleSnakbarOpen("Please enter sku", "error");
+      document.getElementById("sku").focus();
+      return (isError = true);
+    }
+    if (!category.trim()) {
+      handleSnakbarOpen("Please select a category", "error");
       document.getElementById("parent-id").focus();
       return (isError = true);
     }
@@ -80,22 +179,45 @@ const UpdateProduct = () => {
       return;
     } else {
       setLoading(true);
+      let filterIdList = [];
+      filterList.map((item) => {
+        item.filter_values.map((el) => {
+          if (el.isChecked) {
+            filterIdList.push(el._id);
+          }
+        });
+      });
+      console.log("filterIdList", filterIdList);
       try {
-        let data = {
-          name: name,
-          parent_id: parentName,
-          status: status,
-        };
+        var formdata = new FormData();
+        formdata.append("name", name);
+        formdata.append("price", price);
+        formdata.append("discount_price", discountPrice);
+        formdata.append("description", convertedContent);
+        formdata.append("sku", sku);
+        formdata.append("stock_unit", stockUnit);
+        formdata.append("category_id", category);
+        for (let i = 0; i < filterIdList.length; i++) {
+          formdata.append("filter_id", filterIdList[i]);
+        }
+        for (let i = 0; i < files.length; i++) {
+          formdata.append("images", files[i]);
+        }
+
+        // let data = {
+        //   name: name,
+        //   description: convertedContent,
+        // };
 
         let response = await axios({
-          url: `/api/v1/category/update/${state?.row?._id}`,
-          method: "put",
-          data: data,
+          url: `/api/v1/product/create`,
+          method: "post",
+          data: formdata,
+          headers: { "Content-Type": "application/json" },
         });
-        console.log("responseresponseresponse", response);
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Update successfully", "success");
-          navigate("/category-list");
+          handleSnakbarOpen("Added successfully", "success");
+          // navigate("/product-list");
         }
       } catch (error) {
         console.log("error", error);
@@ -105,20 +227,26 @@ const UpdateProduct = () => {
       setLoading(false);
     }
   };
-  const getDropdownData = async (catName) => {
+  const getCategoryList = async () => {
     try {
       setLoading(true);
 
-      const allDataUrl = `/api/v1/category/dropdownlist`;
+      const allDataUrl = `/api/v1/category/leaf-dropdown`;
       let allData = await getDataWithToken(allDataUrl);
       console.log("allData", allData);
 
       if (allData.status >= 200 && allData.status < 300) {
-        let list = allData?.data?.data.filter((item) => item.name !== catName);
-        setParentList(list);
+        setCategoryList(allData?.data?.data);
 
         if (allData.data.data.length < 1) {
           setMessage("No data found");
+        } else {
+          let categoryData = allData?.data?.data.find(
+            (res) => res._id === state?.row?.category_id
+          );
+          console.log("state?.row?.category_id", state?.row?.category_id);
+          console.log("categoryData", categoryData);
+          getFilters(categoryData);
         }
       }
       setLoading(false);
@@ -128,13 +256,77 @@ const UpdateProduct = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
+  const handlePermissionChange = (item, index, el, i) => {
+    let newObj = { ...el, isChecked: !el.isChecked };
+    let newFilterValues = item.filter_values;
+    item.filter_values[i] = newObj;
+    const isAnyPermissionFalse = newFilterValues.some(
+      (el) => el.isChecked === false
+    );
 
+    filterList[index] = {
+      ...item,
+      allChecked: !isAnyPermissionFalse,
+      filter_values: newFilterValues,
+    };
+
+    setRefresh(!refresh);
+  };
+  const handlePermissionSelectByTitle = (checked, item, index) => {
+    console.log("item", item);
+    let newArray = item.filter_values.map((obj) => ({
+      ...obj,
+      isChecked: checked,
+    }));
+
+    filterList[index] = {
+      ...item,
+      allChecked: checked,
+      filter_values: newArray,
+    };
+    setRefresh(!refresh);
+  };
+  const filterSectionLoading = () => {
+    let content = [];
+
+    for (let i = 0; i < 6; i++) {
+      content.push(
+        <Grid item xs={4} key={i}>
+          <div className={classes.checkboxStyle}>
+            <Skeleton></Skeleton>
+          </div>
+          <div
+            style={{
+              paddingLeft: "48px",
+              boxSizing: "border-box",
+            }}
+          >
+            <Skeleton></Skeleton>
+
+            <Skeleton></Skeleton>
+
+            <Skeleton></Skeleton>
+          </div>
+        </Grid>
+      );
+    }
+    return content;
+  };
   useEffect(() => {
+    console.log("state?.row", state?.row);
+    getCategoryList();
     setName(state?.row?.name);
-    setParentName(state?.row?.parent_name);
+    setPrice(state?.row?.price);
+    setDiscountPrice(state?.row?.discount_price);
+    setStockUnit(state?.row?.stock_unit);
+    setSku(state?.row?.sku);
     setStatus(state?.row?.status);
-    getDropdownData(state?.row?.name);
+    SetCategory(state?.row?.category_id);
+    // setConvertedContent(state?.row?.description);
+
+    // getDropdownData(state?.row?.name);
   }, []);
+
   return (
     <>
       <Grid
@@ -156,46 +348,174 @@ const UpdateProduct = () => {
             style={{ marginBottom: "30px" }}
             fullWidth
             id="name"
-            label="Category Name"
+            label="Product Name *"
             variant="outlined"
             value={name}
             onChange={(e) => {
               setName(e.target.value);
             }}
           />
+          <TextField
+            type="number"
+            size="small"
+            style={{ marginBottom: "30px" }}
+            fullWidth
+            id="price"
+            label="Price *"
+            variant="outlined"
+            inputProps={{ min: 0 }}
+            onWheel={(e) => e.target.blur()}
+            value={price}
+            onChange={(e) => {
+              setPrice(e.target.value);
+            }}
+          />
+          <TextField
+            type="number"
+            size="small"
+            style={{ marginBottom: "30px" }}
+            fullWidth
+            id="discountPrice"
+            label="Discount Price"
+            variant="outlined"
+            inputProps={{ min: 0 }}
+            onWheel={(e) => e.target.blur()}
+            value={discountPrice}
+            onChange={(e) => {
+              setDiscountPrice(e.target.value);
+            }}
+          />
+          <TextField
+            type="number"
+            size="small"
+            style={{ marginBottom: "30px" }}
+            fullWidth
+            id="stockUnit"
+            label="Stock Unit *"
+            variant="outlined"
+            inputProps={{ min: 0 }}
+            onWheel={(e) => e.target.blur()}
+            value={stockUnit}
+            onChange={(e) => {
+              setStockUnit(e.target.value);
+            }}
+          />
+          <TextField
+            size="small"
+            style={{ marginBottom: "30px" }}
+            fullWidth
+            id="sku"
+            label="SKU"
+            variant="outlined"
+            value={sku}
+            onChange={(e) => {
+              setSku(e.target.value);
+            }}
+          />
+
           <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
-            <InputLabel id="demo-simple-select-label">Parent Name</InputLabel>
+            <InputLabel id="demo-simple-select-label">Category *</InputLabel>
             <Select
               labelId="demo-simple-select-label"
-              id="parent-id"
-              value={parentName}
-              label="Parent Name"
+              id="category"
+              value={category}
+              label="Category *"
               onChange={handleChange}
             >
-              {parentList?.map((item, i) => (
-                <MenuItem value={item.name}>{item.name}</MenuItem>
+              {categoryList?.map((item, i) => (
+                <MenuItem value={item._id}>{item.name}</MenuItem>
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
-            <InputLabel id="demo-simple-select-label">Status</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="status"
-              value={status}
-              label="Status"
-              onChange={handleStatusChange}
-            >
-              <MenuItem value={true}>Active</MenuItem>
-              <MenuItem value={false}>Inactive</MenuItem>
-            </Select>
-          </FormControl>
+
+          <Collapse in={category.length > 0} timeout="auto" unmountOnExit>
+            {filterMessage.length > 0 ? (
+              <Typography variant="h6" style={{ color: "#ddd" }}>
+                {filterMessage}
+              </Typography>
+            ) : (
+              <Grid container spacing={3}>
+                {filterLoading ? (
+                  filterSectionLoading()
+                ) : (
+                  <>
+                    <Grid item xs={12}>
+                      <Typography variant="h6">Select the filters</Typography>
+                    </Grid>
+                    {filterList?.map((item, index) => (
+                      <Grid item xs={12} key={index}>
+                        <div className={classes.checkboxStyle}>
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label={item.title}
+                            checked={item.allChecked}
+                            onChange={(event) => {
+                              handlePermissionSelectByTitle(
+                                event.target.checked,
+                                item,
+                                index
+                              );
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            paddingLeft: "48px",
+                            boxSizing: "border-box",
+                            display: "flex",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {item.filter_values?.map((el, i) => (
+                            <div key={i} className={classes.checkboxStyle2}>
+                              <FormControlLabel
+                                component="div"
+                                control={<Checkbox />}
+                                label={el.name}
+                                checked={el.isChecked}
+                                onChange={() => {
+                                  handlePermissionChange(item, index, el, i);
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </Grid>
+                    ))}
+                  </>
+                )}
+              </Grid>
+            )}
+          </Collapse>
+          <div style={{ marginBottom: "30px" }}>
+            <Typography variant="h6">
+              Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}
+            </Typography>
+            <Alert severity="info" style={{ marginBottom: "8px" }}>
+              Max 5 (jpg / jpeg / png) images.Try resolution 800*600 for better
+              image view
+            </Alert>
+            <DropZoneImage files={files} setFiles={setFiles} />
+          </div>
+          <div style={{ marginBottom: "30px" }}>
+            <Typography variant="h6">
+              Enter Description{" "}
+              <span style={{ color: "#c4c4c4" }}>(Optional)</span>
+            </Typography>
+
+            <TextEditor
+              convertedContent={convertedContent}
+              setConvertedContent={setConvertedContent}
+              data={state?.row?.description}
+            />
+          </div>
           <div style={{ textAlign: "center" }}>
             <Button
+              fullWidth
               variant="contained"
               disabled={loading}
               type="submit"
-              style={{ minWidth: "180px", minHeight: "35px" }}
+              style={{ minHeight: "35px" }}
               autoFocus
               disableElevation
             >
@@ -205,7 +525,7 @@ const UpdateProduct = () => {
                 size={10}
                 speedMultiplier={0.5}
               />{" "}
-              {loading === false && "Update"}
+              {loading === false && "Submit"}
             </Button>
           </div>
         </form>

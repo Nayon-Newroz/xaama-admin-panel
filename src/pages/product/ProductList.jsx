@@ -395,8 +395,14 @@ const ProductList = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>
-                <TableCell>Description</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell style={{whiteSpace:"nowrap"}}>Discount Price</TableCell>
+                <TableCell>Category</TableCell>
+                <TableCell>SKU</TableCell>
                 <TableCell>Filters</TableCell>
+                <TableCell>Images</TableCell>
+
+                <TableCell>Description</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
               </TableRow>
@@ -410,13 +416,34 @@ const ProductList = () => {
                     // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>{row?.name}</TableCell>
-                    <TableCell
+                    <TableCell>{row?.price}</TableCell>
+                    <TableCell>{row?.discount_price}</TableCell>
+                    <TableCell>{row?.category_id}</TableCell>
+                    <TableCell>{row?.sku}</TableCell>
+                    <TableCell>{row?.filter_id}</TableCell>
+                    <TableCell>
+                      <div
+                        style={{ width: "350px", display: "flex", gap: "10px" }}
+                      >
+                        {row?.images.length > 0
+                          ? row?.images.map((item, i) => (
+                              <img
+                                src={item.url}
+                                alt=""
+                                width="70px"
+                                height="70px"
+                              />
+                            ))
+                          : "No Image Available"}
+                      </div>
+                    </TableCell>
+                    {/* <TableCell
                       dangerouslySetInnerHTML={{
                         __html: row?.description,
                       }}
                     >
                      
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       <Button
                         variant="outlined"
@@ -470,10 +497,9 @@ const ProductList = () => {
                       )}
                     </TableCell>
 
-                    <TableCell align="right">
+                    <TableCell align="right" >
                       <IconButton
-                        variant="contained"
-                        // color="success"
+                        variant="contained" 
                         disableElevation
                         component={Link}
                         to={`/update-product`}
