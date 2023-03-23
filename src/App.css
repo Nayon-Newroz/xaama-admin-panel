@@ -1,7 +1,7 @@
 body {
   background: rgb(245, 245, 245);
 }
-
+/* --------------------------Text Editor Css Start----------------------------------- */
 .wrapper-class {
   /* padding: 1rem; */
   /* border: 1px solid green; */
@@ -16,3 +16,16 @@ body {
 .toolbar-class {
   border: 1px solid #fff;
 }
+/* --------------------------Text Editor Css End----------------------------------- */
+/* --------------------------Input number up and down arrow hide Css Start----------------------------------- */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
+/* --------------------------Input number up and down arrow hide Css End----------------------------------- */

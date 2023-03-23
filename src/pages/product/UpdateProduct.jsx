@@ -98,12 +98,16 @@ const UpdateProduct = () => {
         response?.data?.data.map((item) => {
           let newObj = item.filter_values.map((obj) => ({
             ...obj,
-            isChecked: false,
+            isChecked: state?.row?.filter_id.includes(obj._id),
           }));
+
+          const isAnyPermissionFalse = newObj.some(
+            (el) => el.isChecked === false
+          );
 
           let myObj = {
             title: item.filter_name,
-            allChecked: false,
+            allChecked: !isAnyPermissionFalse,
             filter_values: newObj,
           };
           newList.push(myObj);
@@ -210,13 +214,13 @@ const UpdateProduct = () => {
         // };
 
         let response = await axios({
-          url: `/api/v1/product/create`,
-          method: "post",
+          url: `/api/v1/product/update/${state?.row?._id}`,
+          method: "put",
           data: formdata,
           headers: { "Content-Type": "application/json" },
         });
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Added successfully", "success");
+          handleSnakbarOpen("Updated successfully", "success");
           // navigate("/product-list");
         }
       } catch (error) {
@@ -363,7 +367,7 @@ const UpdateProduct = () => {
             id="price"
             label="Price *"
             variant="outlined"
-            inputProps={{ min: 0 }}
+            inputProps={{ min: 0, step: 0.01 }}
             onWheel={(e) => e.target.blur()}
             value={price}
             onChange={(e) => {
@@ -378,7 +382,7 @@ const UpdateProduct = () => {
             id="discountPrice"
             label="Discount Price"
             variant="outlined"
-            inputProps={{ min: 0 }}
+            inputProps={{ min: 0, step: 0.01 }}
             onWheel={(e) => e.target.blur()}
             value={discountPrice}
             onChange={(e) => {
@@ -492,10 +496,33 @@ const UpdateProduct = () => {
               Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}
             </Typography>
             <Alert severity="info" style={{ marginBottom: "8px" }}>
-              Max 5 (jpg / jpeg / png) images.Try resolution 800*600 for better
-              image view
+              You can upload max 5 (jpg / jpeg / png) images.Try resolution
+              800*600 for better image view. If you upload new image, all
+              previous images will be deleted.
             </Alert>
             <DropZoneImage files={files} setFiles={setFiles} />
+            {files.length < 1 && (
+              <div style={{ textAlign: "center" }}>
+                {state?.row?.images.map((item, i) => (
+                  <img
+                    src={item.url}
+                    alt=""
+                    style={{
+                      display: "inline-flex",
+                      borderRadius: 2,
+                      border: "1px solid #c4c4c4",
+                      marginTop: 15,
+                      marginBottom: 8,
+                      marginRight: 8,
+                      width: 120,
+                      height: 150,
+                      padding: 4,
+                      boxSizing: "border-box",
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">

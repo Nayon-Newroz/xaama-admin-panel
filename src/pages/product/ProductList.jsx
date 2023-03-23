@@ -396,7 +396,9 @@ const ProductList = () => {
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>Price</TableCell>
-                <TableCell style={{whiteSpace:"nowrap"}}>Discount Price</TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Discount Price
+                </TableCell>
                 <TableCell>Category</TableCell>
                 <TableCell>SKU</TableCell>
                 <TableCell>Filters</TableCell>
@@ -497,9 +499,9 @@ const ProductList = () => {
                       )}
                     </TableCell>
 
-                    <TableCell align="right" >
+                    <TableCell align="right" style={{ minWidth: "110px" }}>
                       <IconButton
-                        variant="contained" 
+                        variant="contained"
                         disableElevation
                         component={Link}
                         to={`/update-product`}

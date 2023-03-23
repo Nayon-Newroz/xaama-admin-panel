@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
   checkboxStyle: {
     "& span": {
+      color: "#727272",
       fontSize: "20px",
       fontWeight: 600,
       [theme.breakpoints.down("xl")]: {
@@ -342,7 +343,7 @@ const AddProduct = () => {
             id="price"
             label="Price *"
             variant="outlined"
-            inputProps={{ min: 0 }}
+            inputProps={{ min: 0, step: 0.01 }}
             onWheel={(e) => e.target.blur()}
             value={price}
             onChange={(e) => {
@@ -357,7 +358,7 @@ const AddProduct = () => {
             id="discountPrice"
             label="Discount Price"
             variant="outlined"
-            inputProps={{ min: 0 }}
+            inputProps={{ min: 0, step: 0.01 }}
             onWheel={(e) => e.target.blur()}
             value={discountPrice}
             onChange={(e) => {
@@ -413,7 +414,7 @@ const AddProduct = () => {
                 {filterMessage}
               </Typography>
             ) : (
-              <Grid container spacing={3}>
+              <Grid container spacing={1}>
                 {filterLoading ? (
                   filterSectionLoading()
                 ) : (
@@ -465,13 +466,14 @@ const AddProduct = () => {
                 )}
               </Grid>
             )}
+            <br />
           </Collapse>
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">
               Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}
             </Typography>
             <Alert severity="info" style={{ marginBottom: "8px" }}>
-             Max 5 (jpg / jpeg / png) images.Try resolution 800*600 for better
+            You can upload max 5 (jpg / jpeg / png) images.Try resolution 800*600 for better
               image view
             </Alert>
             <DropZoneImage files={files} setFiles={setFiles} />
