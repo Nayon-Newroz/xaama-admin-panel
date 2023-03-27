@@ -420,9 +420,23 @@ const ProductList = () => {
                     <TableCell>{row?.name}</TableCell>
                     <TableCell>{row?.price}</TableCell>
                     <TableCell>{row?.discount_price}</TableCell>
-                    <TableCell>{row?.category_id}</TableCell>
+                    <TableCell>
+                      {row?.category_data.length > 0
+                        ? row?.category_data[0].name
+                        : "N/A"}
+                    </TableCell>
                     <TableCell>{row?.sku}</TableCell>
-                    <TableCell>{row?.filter_id}</TableCell>
+
+                    <TableCell>
+                      {row?.filter_data.length > 0
+                        ? row?.filter_data.map((e, i) => (
+                            <label key={e._id}>
+                              {i !== 0 && <>,&nbsp;&nbsp;</>}
+                              {e.name}
+                            </label>
+                          ))
+                        : "N/A"}
+                    </TableCell>
                     <TableCell>
                       <div
                         style={{ width: "350px", display: "flex", gap: "10px" }}

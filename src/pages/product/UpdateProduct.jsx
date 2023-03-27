@@ -246,7 +246,7 @@ const UpdateProduct = () => {
           setMessage("No data found");
         } else {
           let categoryData = allData?.data?.data.find(
-            (res) => res._id === state?.row?.category_id
+            (res) => res.category_id === state?.row?.category_id
           );
           console.log("state?.row?.category_id", state?.row?.category_id);
           console.log("categoryData", categoryData);
@@ -427,7 +427,7 @@ const UpdateProduct = () => {
               onChange={handleChange}
             >
               {categoryList?.map((item, i) => (
-                <MenuItem value={item._id}>{item.name}</MenuItem>
+                <MenuItem value={item.category_id}>{item.name}</MenuItem>
               ))}
             </Select>
           </FormControl>

@@ -76,7 +76,7 @@ const AddProduct = () => {
   const handleChange = (event) => {
     SetCategory(event.target.value);
     let categoryData = categoryList.find(
-      (res) => res._id === event.target.value
+      (res) => res.category_id === event.target.value
     );
     console.log("event.target.value", event.target.value);
     console.log("categoryData", categoryData);
@@ -179,10 +179,11 @@ const AddProduct = () => {
     } else {
       setLoading(true);
       let filterIdList = [];
+
       filterList.map((item) => {
         item.filter_values.map((el) => {
           if (el.isChecked) {
-            filterIdList.push(el._id);
+            filterIdList.push(el.filter_id);
           }
         });
       });
@@ -403,7 +404,7 @@ const AddProduct = () => {
               onChange={handleChange}
             >
               {categoryList?.map((item, i) => (
-                <MenuItem value={item._id}>{item.name}</MenuItem>
+                <MenuItem value={item.category_id}>{item.name}</MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -473,8 +474,8 @@ const AddProduct = () => {
               Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}
             </Typography>
             <Alert severity="info" style={{ marginBottom: "8px" }}>
-            You can upload max 5 (jpg / jpeg / png) images.Try resolution 800*600 for better
-              image view
+              You can upload max 5 (jpg / jpeg / png) images.Try resolution
+              800*600 for better image view
             </Alert>
             <DropZoneImage files={files} setFiles={setFiles} />
           </div>

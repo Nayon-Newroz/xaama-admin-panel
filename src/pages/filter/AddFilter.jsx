@@ -113,7 +113,7 @@ const AddFilter = () => {
         categoryName.map((name) => {
           let result = categoryList.find((res) => res.name === name);
           if (result) {
-            categoryIds.push(result._id);
+            categoryIds.push(result.category_id);
           }
         });
 
