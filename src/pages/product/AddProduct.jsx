@@ -188,6 +188,11 @@ const AddProduct = () => {
         });
       });
       console.log("filterIdList", filterIdList);
+      if (filterIdList.length < 1) {
+        handleSnakbarOpen("Please select filters", "error");
+        return setLoading(false);
+      }
+
       try {
         var formdata = new FormData();
         formdata.append("name", name);

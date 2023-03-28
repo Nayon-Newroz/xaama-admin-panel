@@ -36,7 +36,12 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import { makeStyles } from "@mui/styles";
-import { Label } from "@mui/icons-material";
+import dayjs from "dayjs";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import moment from "moment";
 const useStyles = makeStyles((theme) => ({
   tableBodyStyle: {
     "& tr:nth-of-type(odd)": {
@@ -102,13 +107,44 @@ const ProductList = () => {
   const [loading2, setLoading2] = useState(false);
   const [deleteData, setDeleteData] = useState({});
   const [name, setName] = useState("");
-  const [parentName, setParentName] = useState("");
+  const [sku, setSku] = useState("");
+  const [minPrice, setMinPrice] = useState(null);
+  const [maxPrice, setMaxPrice] = useState(null);
   const [status, setStatus] = useState("");
+  const [category, SetCategory] = useState("");
+  const [categoryList, setCategoryList] = useState([]);
   const [open, setOpen] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
   const [filterListDialog, setFilterListDialog] = useState(false);
   const [filterList, setFilterList] = useState([]);
+  const [startingTime, setStartingTime] = useState(null);
+  const [endingTime, setEndingTime] = useState(null);
+  const [value, setValue] = React.useState(dayjs("2022-04-17T15:30"));
+  const handleChange = (event) => {
+    SetCategory(event.target.value);
+  };
+  const getCategoryList = async () => {
+    try {
+      setLoading(true);
 
+      const allDataUrl = `/api/v1/category/leaf-dropdown`;
+      let allData = await getDataWithToken(allDataUrl);
+      console.log("allData", allData);
+
+      if (allData.status >= 200 && allData.status < 300) {
+        setCategoryList(allData?.data?.data);
+
+        if (allData.data.data.length < 1) {
+          setMessage("No data found");
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log("error", error);
+      setLoading(false);
+      handleSnakbarOpen(error.response.data.message.toString(), "error");
+    }
+  };
   const handleFilterListDialogOpen = () => {
     setFilterListDialog(true);
   };
@@ -144,7 +180,7 @@ const ProductList = () => {
     for (let i = 0; i < 10; i++) {
       content.push(
         <TableRow key={i}>
-          {[...Array(7).keys()].map((e, i) => (
+          {[...Array(10).keys()].map((e, i) => (
             <TableCell key={i}>
               <Skeleton></Skeleton>
             </TableCell>
@@ -185,7 +221,7 @@ const ProductList = () => {
     console.log("clearFilter");
     setName("");
     setStatus("");
-    setParentName("");
+    setSku("");
     setPage(0);
     const newUrl = `/api/v1/product?limit=${rowsPerPage}&page=1`;
     getData(0, rowsPerPage, newUrl);
@@ -216,10 +252,19 @@ const ProductList = () => {
         url = newUrl;
       } else {
         let newStatus = status;
+        let newMinPrice = minPrice;
+        let newMaxPrice = maxPrice;
         if (status === "None") {
           newStatus = "";
         }
-        url = `/api/v1/product?name=${name}&parent_name=${parentName}&status=${newStatus}&limit=${newLimit}&page=${
+        if (minPrice === null) {
+          newMinPrice = "";
+        }
+        if (maxPrice === null) {
+          newMaxPrice = "";
+        }
+
+        url = `/api/v1/product?name=${name}&category_id=${category}&minPrice=${newMinPrice}&maxPrice=${newMaxPrice}&sku=${sku}&status=${newStatus}&limit=${newLimit}&page=${
           newPageNO + 1
         }`;
       }
@@ -269,6 +314,7 @@ const ProductList = () => {
   };
   useEffect(() => {
     getData();
+    getCategoryList();
   }, []);
 
   return (
@@ -300,34 +346,129 @@ const ProductList = () => {
               {open ? <FilterListOffIcon /> : <FilterListIcon />}
             </Button>
           </Grid>
-          <br />
+
           <Grid item xs={12}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <br />
               <Grid container spacing={3}>
                 <Grid item xs={3}>
                   <TextField
-                    id="Category Name"
+                    id="Product Name"
                     fullWidth
                     size="small"
                     variant="outlined"
-                    label="Category Name"
+                    label="Product Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel id="demo-simple-select-label">
+                      Category *
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="category"
+                      value={category}
+                      label="Category *"
+                      onChange={handleChange}
+                    >
+                      {categoryList?.map((item, i) => (
+                        <MenuItem value={item.category_id}>
+                          {item.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={3}>
                   <TextField
-                    id="Parent Name"
-                    fullWidth
+                    type="number"
                     size="small"
+                    fullWidth
+                    id="minPrice"
+                    label="Minimum Price"
                     variant="outlined"
-                    label="Parent Name"
-                    value={parentName}
-                    onChange={(e) => setParentName(e.target.value)}
+                    inputProps={{ min: 0, step: 0.01 }}
+                    onWheel={(e) => e.target.blur()}
+                    value={minPrice}
+                    onChange={(e) => {
+                      setMinPrice(e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <TextField
+                    type="number"
+                    size="small"
+                    fullWidth
+                    id="maxPrice"
+                    label="Maximum Price"
+                    variant="outlined"
+                    inputProps={{ min: 0, step: 0.01 }}
+                    onWheel={(e) => e.target.blur()}
+                    value={maxPrice}
+                    onChange={(e) => {
+                      setMaxPrice(e.target.value);
+                    }}
                   />
                 </Grid>
 
+                <Grid item xs={3}>
+                  <TextField
+                    id="sku"
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    label="SKU"
+                    value={sku}
+                    onChange={(e) => setSku(e.target.value)}
+                  />
+                </Grid>
+                {/* <Grid item md={3} lg={3}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DateTimePicker
+                      renderInput={(props) => (
+                        <TextField {...props} size="small" fullWidth />
+                      )}
+                      label="Starting Time"
+                      value={startingTime}
+                      onChange={(newValue) => {
+                        setStartingTime(newValue);
+                      }}
+                    />
+                  </LocalizationProvider>
+                </Grid> */}
+                <Grid item xs={3}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    {/* <DemoContainer
+                      components={["DateTimePicker", "DateTimePicker"]}
+                    > */}
+                    <DateTimePicker
+                      size="small"
+                      fullWidth
+                      label="Controlled picker"
+                      value={value}
+                      onChange={(newValue) => setValue(newValue)}
+                    />
+                    {/* </DemoContainer> */}
+                  </LocalizationProvider>
+                </Grid>
+                {/* <Grid item md={3} lg={3}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DateTimePicker
+                      renderInput={(props) => (
+                        <TextField {...props} size="small" fullWidth />
+                      )}
+                      label="Ending Time"
+                      value={endingTime}
+                      onChange={(newValue) => {
+                        setEndingTime(newValue);
+                      }}
+                    />
+                  </LocalizationProvider>
+                </Grid> */}
                 <Grid item xs={3}>
                   <FormControl variant="outlined" fullWidth size="small">
                     <InputLabel id="demo-status-outlined-label">
@@ -386,7 +527,7 @@ const ProductList = () => {
             overflowX: "auto",
 
             minWidth: "100%",
-            // width: "Calc(100vw - 367px)",
+            width: "Calc(100vw - 367px)",
             // padding: "10px 16px 0px",
             boxSizing: "border-box",
           }}
@@ -394,18 +535,23 @@ const ProductList = () => {
           <Table aria-label="simple table" className={classes.tableStyle}>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
+                <TableCell style={{ minWidth: "220px" }}>Name</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
                   Discount Price
                 </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>Viewed</TableCell>
                 <TableCell>Category</TableCell>
                 <TableCell>SKU</TableCell>
                 <TableCell>Filters</TableCell>
                 <TableCell>Images</TableCell>
 
                 <TableCell>Description</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell>Created</TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Last Updated
+                </TableCell>
+                <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
                 <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
               </TableRow>
             </TableHead>
@@ -420,6 +566,7 @@ const ProductList = () => {
                     <TableCell>{row?.name}</TableCell>
                     <TableCell>{row?.price}</TableCell>
                     <TableCell>{row?.discount_price}</TableCell>
+                    <TableCell>{row?.viewed}</TableCell>
                     <TableCell>
                       {row?.category_data.length > 0
                         ? row?.category_data[0].name
@@ -472,7 +619,18 @@ const ProductList = () => {
                         View
                       </Button>
                     </TableCell>
-
+                    <TableCell>
+                      <b>{row?.created_by}</b>
+                      {/* <br />
+                      {row?.created_at} */}
+                      <br />
+                      {moment(row?.created_at).format("MM/DD/YYYY, h:mm:ss a")}
+                    </TableCell>
+                    <TableCell>
+                      <b>{row?.updated_by}</b>
+                      <br />
+                      {moment(row?.updated_at).format("MM/DD/YYYY, h:mm:ss a")}
+                    </TableCell>
                     <TableCell>
                       {row?.status ? (
                         <>

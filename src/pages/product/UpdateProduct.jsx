@@ -63,7 +63,7 @@ const UpdateProduct = () => {
   const [sku, setSku] = useState("");
   const [stockUnit, setStockUnit] = useState(null);
   const [convertedContent, setConvertedContent] = useState(null);
-  const [status, setStatus] = useState();
+  const [status, setStatus] = useState(false);
   const [category, SetCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [categoryList, setCategoryList] = useState([]);
@@ -73,11 +73,14 @@ const UpdateProduct = () => {
   const [filterLoading, setFilterLoading] = useState(false);
   const [files, setFiles] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
+  };
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
     SetCategory(event.target.value);
     let categoryData = categoryList.find(
-      (res) => res._id === event.target.value
+      (res) => res.category_id === event.target.value
     );
     console.log("event.target.value", event.target.value);
     console.log("categoryData", categoryData);
@@ -98,7 +101,7 @@ const UpdateProduct = () => {
         response?.data?.data.map((item) => {
           let newObj = item.filter_values.map((obj) => ({
             ...obj,
-            isChecked: state?.row?.filter_id.includes(obj._id),
+            isChecked: state?.row?.filter_id.includes(obj.filter_id),
           }));
 
           const isAnyPermissionFalse = newObj.some(
@@ -192,6 +195,10 @@ const UpdateProduct = () => {
         });
       });
       console.log("filterIdList", filterIdList);
+      if (filterIdList.length < 1) {
+        handleSnakbarOpen("Please select filters", "error");
+        return setLoading(false);
+      }
       try {
         var formdata = new FormData();
         formdata.append("name", name);
@@ -324,7 +331,8 @@ const UpdateProduct = () => {
     setDiscountPrice(state?.row?.discount_price);
     setStockUnit(state?.row?.stock_unit);
     setSku(state?.row?.sku);
-    setStatus(state?.row?.status);
+    // setStatus(state?.row?.status);
+    setStatus(true);
     SetCategory(state?.row?.category_id);
     // setConvertedContent(state?.row?.description);
 
@@ -416,7 +424,19 @@ const UpdateProduct = () => {
               setSku(e.target.value);
             }}
           />
-
+          <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
+            <InputLabel id="demo-simple-select-label">Status</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="status"
+              value={status}
+              label="Status"
+              onChange={handleStatusChange}
+            >
+              <MenuItem value={true}>Active</MenuItem>
+              <MenuItem value={false}>Inactive</MenuItem>
+            </Select>
+          </FormControl>
           <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
             <InputLabel id="demo-simple-select-label">Category *</InputLabel>
             <Select
@@ -491,6 +511,7 @@ const UpdateProduct = () => {
               </Grid>
             )}
           </Collapse>
+
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">
               Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}
