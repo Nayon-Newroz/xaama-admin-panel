@@ -41,6 +41,8 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { DateTimeField } from "@mui/x-date-pickers/DateTimeField";
+import { DateField } from "@mui/x-date-pickers/DateField";
 import moment from "moment";
 const useStyles = makeStyles((theme) => ({
   tableBodyStyle: {
@@ -120,6 +122,7 @@ const ProductList = () => {
   const [startingTime, setStartingTime] = useState(null);
   const [endingTime, setEndingTime] = useState(null);
   const [value, setValue] = React.useState(dayjs("2022-04-17T15:30"));
+
   const handleChange = (event) => {
     SetCategory(event.target.value);
   };
@@ -222,6 +225,11 @@ const ProductList = () => {
     setName("");
     setStatus("");
     setSku("");
+    SetCategory("");
+    setMinPrice("");
+    setMaxPrice("");
+    setStartingTime(null);
+    setEndingTime(null);
     setPage(0);
     const newUrl = `/api/v1/product?limit=${rowsPerPage}&page=1`;
     getData(0, rowsPerPage, newUrl);
@@ -236,6 +244,7 @@ const ProductList = () => {
 
   const getData = async (pageNO, limit, newUrl) => {
     console.log("pageNO ==============", pageNO);
+
     try {
       setLoading(true);
       let newPageNO = page;
@@ -254,6 +263,8 @@ const ProductList = () => {
         let newStatus = status;
         let newMinPrice = minPrice;
         let newMaxPrice = maxPrice;
+        let newStartingTime = "";
+        let newEndingTime = "";
         if (status === "None") {
           newStatus = "";
         }
@@ -263,8 +274,14 @@ const ProductList = () => {
         if (maxPrice === null) {
           newMaxPrice = "";
         }
+        if (startingTime !== null) {
+          newStartingTime = dayjs(startingTime).format("YYYY-MM-DD");
+        }
+        if (endingTime !== null) {
+          newEndingTime = dayjs(endingTime).format("YYYY-MM-DD");
+        }
 
-        url = `/api/v1/product?name=${name}&category_id=${category}&minPrice=${newMinPrice}&maxPrice=${newMaxPrice}&sku=${sku}&status=${newStatus}&limit=${newLimit}&page=${
+        url = `/api/v1/product?name=${name}&category_id=${category}&minPrice=${newMinPrice}&maxPrice=${newMaxPrice}&sku=${sku}&startDate=${newStartingTime}&endDate=${newEndingTime}&status=${newStatus}&limit=${newLimit}&page=${
           newPageNO + 1
         }`;
       }
@@ -312,6 +329,11 @@ const ProductList = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
+  const check = () => {
+    console.log("startingTime", dayjs(startingTime).format("YYYY-MM-DD"));
+    let start = dayjs(startingTime).format("YYYY-MM-DD");
+    console.log("new Start", start.concat("T00:00:00"));
+  };
   useEffect(() => {
     getData();
     getCategoryList();
@@ -330,7 +352,13 @@ const ProductList = () => {
       >
         <Grid container columnSpacing={3} style={{ padding: "16px 0" }}>
           <Grid item lg={6} xl={6}>
-            <Typography variant="h6" color="info" gutterBottom component="div">
+            <Typography
+              variant="h6"
+              color="info"
+              gutterBottom
+              component="div"
+              onClick={check}
+            >
               Product List
             </Typography>
           </Grid>
@@ -384,6 +412,35 @@ const ProductList = () => {
                 </Grid>
                 <Grid item xs={3}>
                   <TextField
+                    id="sku"
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    label="SKU"
+                    value={sku}
+                    onChange={(e) => setSku(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <FormControl variant="outlined" fullWidth size="small">
+                    <InputLabel id="demo-status-outlined-label">
+                      Status
+                    </InputLabel>
+                    <Select
+                      labelId="demo-status-outlined-label"
+                      id="demo-status-outlined"
+                      label="Status"
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                    >
+                      <MenuItem value="None">None</MenuItem>
+                      <MenuItem value={true}>Active</MenuItem>
+                      <MenuItem value={false}>Inactive</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={3}>
+                  <TextField
                     type="number"
                     size="small"
                     fullWidth
@@ -415,78 +472,36 @@ const ProductList = () => {
                   />
                 </Grid>
 
-                <Grid item xs={3}>
-                  <TextField
-                    id="sku"
-                    fullWidth
-                    size="small"
-                    variant="outlined"
-                    label="SKU"
-                    value={sku}
-                    onChange={(e) => setSku(e.target.value)}
-                  />
-                </Grid>
-                {/* <Grid item md={3} lg={3}>
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <DateTimePicker
-                      renderInput={(props) => (
-                        <TextField {...props} size="small" fullWidth />
-                      )}
-                      label="Starting Time"
-                      value={startingTime}
-                      onChange={(newValue) => {
-                        setStartingTime(newValue);
-                      }}
-                    />
-                  </LocalizationProvider>
-                </Grid> */}
-                <Grid item xs={3}>
+                <Grid item xs={3} style={{ paddingTop: "16px" }}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    {/* <DemoContainer
-                      components={["DateTimePicker", "DateTimePicker"]}
-                    > */}
-                    <DateTimePicker
-                      size="small"
-                      fullWidth
-                      label="Controlled picker"
-                      value={value}
-                      onChange={(newValue) => setValue(newValue)}
-                    />
-                    {/* </DemoContainer> */}
+                    <DemoContainer components={["DateField", "DateField"]}>
+                      <DateField
+                        size="small"
+                        fullWidth
+                        format="DD-MM-YYYY"
+                        label="Starting Date"
+                        value={startingTime}
+                        onChange={(newValue) => setStartingTime(newValue)}
+                      />
+                    </DemoContainer>
                   </LocalizationProvider>
                 </Grid>
-                {/* <Grid item md={3} lg={3}>
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <DateTimePicker
-                      renderInput={(props) => (
-                        <TextField {...props} size="small" fullWidth />
-                      )}
-                      label="Ending Time"
-                      value={endingTime}
-                      onChange={(newValue) => {
-                        setEndingTime(newValue);
-                      }}
-                    />
+                <Grid item xs={3} style={{ paddingTop: "16px" }}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={["DateField", "DateField"]}>
+                      <DateField
+                        size="small"
+                        fullWidth
+                        format="DD-MM-YYYY"
+                        label="Ending Date"
+                        value={endingTime}
+                        onChange={(newValue) => setEndingTime(newValue)}
+                      />
+                    </DemoContainer>
                   </LocalizationProvider>
-                </Grid> */}
-                <Grid item xs={3}>
-                  <FormControl variant="outlined" fullWidth size="small">
-                    <InputLabel id="demo-status-outlined-label">
-                      Status
-                    </InputLabel>
-                    <Select
-                      labelId="demo-status-outlined-label"
-                      id="demo-status-outlined"
-                      label="Status"
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                    >
-                      <MenuItem value="None">None</MenuItem>
-                      <MenuItem value={true}>Active</MenuItem>
-                      <MenuItem value={false}>Inactive</MenuItem>
-                    </Select>
-                  </FormControl>
                 </Grid>
+
+                <Grid item xs={9}></Grid>
                 <Grid item xs={3}>
                   <Grid container spacing={{ lg: 6, xl: 3 }}>
                     <Grid item xs={3}>
@@ -527,7 +542,7 @@ const ProductList = () => {
             overflowX: "auto",
 
             minWidth: "100%",
-            width: "Calc(100vw - 367px)",
+            width: "Calc(100vw - 385px)",
             // padding: "10px 16px 0px",
             boxSizing: "border-box",
           }}
@@ -547,9 +562,11 @@ const ProductList = () => {
                 <TableCell>Images</TableCell>
 
                 <TableCell>Description</TableCell>
-                <TableCell>Created</TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
-                  Last Updated
+                  Created Info
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Last Updated Info
                 </TableCell>
                 <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
                 <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
@@ -624,12 +641,12 @@ const ProductList = () => {
                       {/* <br />
                       {row?.created_at} */}
                       <br />
-                      {moment(row?.created_at).format("MM/DD/YYYY, h:mm:ss a")}
+                      {moment(row?.created_at).format("DD-MM-YYYY, h:mm:ss a")}
                     </TableCell>
                     <TableCell>
                       <b>{row?.updated_by}</b>
                       <br />
-                      {moment(row?.updated_at).format("MM/DD/YYYY, h:mm:ss a")}
+                      {moment(row?.updated_at).format("DD-MM-YYYY, h:mm:ss a")}
                     </TableCell>
                     <TableCell>
                       {row?.status ? (
