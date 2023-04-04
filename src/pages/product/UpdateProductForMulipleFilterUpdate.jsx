@@ -6,9 +6,6 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormLabel from "@mui/material/FormLabel";
 
 import {
   Alert,
@@ -56,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const UpdateProduct = () => {
+const UpdateProductForMulipleFilterUpdate = () => {
   const classes = useStyles();
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -91,10 +88,9 @@ const UpdateProduct = () => {
   };
   const getFilters = async (row) => {
     try {
-      let newList = [];
       setFilterLoading(true);
       setFilterMessage("");
-
+      let newList = [];
       let response = await axios({
         url: `/api/v1/category/category-filter-list`,
         method: "post",
@@ -102,19 +98,22 @@ const UpdateProduct = () => {
       });
       console.log("response", response);
       if (response.status >= 200 && response.status < 300) {
-        response?.data?.data.map((obj) => {
-          let newObj = {
+        response?.data?.data.map((item) => {
+          let newObj = item.filter_values.map((obj) => ({
             ...obj,
-            selectedFilterId: "",
-          };
-          obj.filter_values.map((item) => {
-            if (state?.row?.filter_id.includes(item.filter_id)) {
-              console.log("if==============================",item.filter_id);
-              newObj.selectedFilterId = item.filter_id;
-            }
-          });
+            isChecked: state?.row?.filter_id.includes(obj.filter_id),
+          }));
 
-          newList.push(newObj);
+          const isAnyPermissionFalse = newObj.some(
+            (el) => el.isChecked === false
+          );
+
+          let myObj = {
+            title: item.filter_name,
+            allChecked: !isAnyPermissionFalse,
+            filter_values: newObj,
+          };
+          newList.push(myObj);
         });
         console.log("newList", newList);
         setFilterList(newList);
@@ -298,19 +297,6 @@ const UpdateProduct = () => {
     };
     setRefresh(!refresh);
   };
-  const handleFilter = (event) => {
-    console.log("event.target.value", event.target.value);
-
-    filterList.map((obj) => {
-      obj.filter_values.map((item) => {
-        if (item.filter_id === event.target.value) {
-          obj.selectedFilterId = event.target.value;
-        }
-      });
-    });
-
-    setRefresh(!refresh);
-  };
   const filterSectionLoading = () => {
     let content = [];
 
@@ -472,7 +458,7 @@ const UpdateProduct = () => {
                 {filterMessage}
               </Typography>
             ) : (
-              <Grid container spacing={1}>
+              <Grid container spacing={3}>
                 {filterLoading ? (
                   filterSectionLoading()
                 ) : (
@@ -483,26 +469,40 @@ const UpdateProduct = () => {
                     {filterList?.map((item, index) => (
                       <Grid item xs={12} key={index}>
                         <div className={classes.checkboxStyle}>
-                          <FormControl>
-                            <FormLabel id="demo-row-radio-buttons-group-label">
-                              {item.filter_name}
-                            </FormLabel>
-                            <RadioGroup
-                              row
-                              aria-labelledby="demo-row-radio-buttons-group-label"
-                              name="row-radio-buttons-group"
-                              value={item.selectedFilterId}
-                              onChange={handleFilter}
-                            >
-                              {item.filter_values?.map((el, i) => (
-                                <FormControlLabel
-                                  value={el.filter_id}
-                                  control={<Radio />}
-                                  label={el.name}
-                                />
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label={item.title}
+                            checked={item.allChecked}
+                            onChange={(event) => {
+                              handlePermissionSelectByTitle(
+                                event.target.checked,
+                                item,
+                                index
+                              );
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            paddingLeft: "48px",
+                            boxSizing: "border-box",
+                            display: "flex",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {item.filter_values?.map((el, i) => (
+                            <div key={i} className={classes.checkboxStyle2}>
+                              <FormControlLabel
+                                component="div"
+                                control={<Checkbox />}
+                                label={el.name}
+                                checked={el.isChecked}
+                                onChange={() => {
+                                  handlePermissionChange(item, index, el, i);
+                                }}
+                              />
+                            </div>
+                          ))}
                         </div>
                       </Grid>
                     ))}
@@ -510,7 +510,6 @@ const UpdateProduct = () => {
                 )}
               </Grid>
             )}
-            <br />
           </Collapse>
 
           <div style={{ marginBottom: "30px" }}>
@@ -583,4 +582,4 @@ const UpdateProduct = () => {
   );
 };
 
-export default UpdateProduct;
+export default UpdateProductForMulipleFilterUpdate;

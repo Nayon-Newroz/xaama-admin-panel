@@ -6,6 +6,9 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormLabel from "@mui/material/FormLabel";
 
 import {
   Alert,
@@ -95,17 +98,12 @@ const AddProduct = () => {
       console.log("response", response);
       if (response.status >= 200 && response.status < 300) {
         response?.data?.data.map((item) => {
-          let newObj = item.filter_values.map((obj) => ({
-            ...obj,
-            isChecked: false,
-          }));
-
-          let myObj = {
-            title: item.filter_name,
-            allChecked: false,
-            filter_values: newObj,
+          let newObj = {
+            ...item,
+            selectedFilterId: "",
           };
-          newList.push(myObj);
+
+          newList.push(newObj);
         });
         console.log("newList", newList);
         setFilterList(newList);
@@ -181,11 +179,9 @@ const AddProduct = () => {
       let filterIdList = [];
 
       filterList.map((item) => {
-        item.filter_values.map((el) => {
-          if (el.isChecked) {
-            filterIdList.push(el.filter_id);
-          }
-        });
+        if (item.selectedFilterId) {
+          filterIdList.push(item.selectedFilterId);
+        }
       });
       console.log("filterIdList", filterIdList);
       if (filterIdList.length < 1) {
@@ -208,11 +204,6 @@ const AddProduct = () => {
         for (let i = 0; i < files.length; i++) {
           formdata.append("images", files[i]);
         }
-
-        // let data = {
-        //   name: name,
-        //   description: convertedContent,
-        // };
 
         let response = await axios({
           url: `/api/v1/product/create`,
@@ -254,34 +245,18 @@ const AddProduct = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
-  const handlePermissionChange = (item, index, el, i) => {
-    let newObj = { ...el, isChecked: !el.isChecked };
-    let newFilterValues = item.filter_values;
-    item.filter_values[i] = newObj;
-    const isAnyPermissionFalse = newFilterValues.some(
-      (el) => el.isChecked === false
-    );
 
-    filterList[index] = {
-      ...item,
-      allChecked: !isAnyPermissionFalse,
-      filter_values: newFilterValues,
-    };
+  const handleFilter = (event) => {
+    console.log("event.target.value", event.target.value);
 
-    setRefresh(!refresh);
-  };
-  const handlePermissionSelectByTitle = (checked, item, index) => {
-    console.log("item", item);
-    let newArray = item.filter_values.map((obj) => ({
-      ...obj,
-      isChecked: checked,
-    }));
+    filterList.map((obj) => {
+      obj.filter_values.map((item) => {
+        if (item.filter_id === event.target.value) {
+          obj.selectedFilterId = event.target.value;
+        }
+      });
+    });
 
-    filterList[index] = {
-      ...item,
-      allChecked: checked,
-      filter_values: newArray,
-    };
     setRefresh(!refresh);
   };
   const filterSectionLoading = () => {
@@ -310,6 +285,7 @@ const AddProduct = () => {
     }
     return content;
   };
+
   useEffect(() => {
     getCategoryList();
   }, []);
@@ -431,40 +407,26 @@ const AddProduct = () => {
                     {filterList?.map((item, index) => (
                       <Grid item xs={12} key={index}>
                         <div className={classes.checkboxStyle}>
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label={item.title}
-                            checked={item.allChecked}
-                            onChange={(event) => {
-                              handlePermissionSelectByTitle(
-                                event.target.checked,
-                                item,
-                                index
-                              );
-                            }}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            paddingLeft: "48px",
-                            boxSizing: "border-box",
-                            display: "flex",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          {item.filter_values?.map((el, i) => (
-                            <div key={i} className={classes.checkboxStyle2}>
-                              <FormControlLabel
-                                component="div"
-                                control={<Checkbox />}
-                                label={el.name}
-                                checked={el.isChecked}
-                                onChange={() => {
-                                  handlePermissionChange(item, index, el, i);
-                                }}
-                              />
-                            </div>
-                          ))}
+                          <FormControl>
+                            <FormLabel id="demo-row-radio-buttons-group-label">
+                              {item.filter_name}
+                            </FormLabel>
+                            <RadioGroup
+                              row
+                              aria-labelledby="demo-row-radio-buttons-group-label"
+                              name="row-radio-buttons-group"
+                              value={item.selectedFilterId}
+                              onChange={handleFilter}
+                            >
+                              {item.filter_values?.map((el, i) => (
+                                <FormControlLabel
+                                  value={el.filter_id}
+                                  control={<Radio />}
+                                  label={el.name}
+                                />
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
                         </div>
                       </Grid>
                     ))}
@@ -474,6 +436,7 @@ const AddProduct = () => {
             )}
             <br />
           </Collapse>
+         
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">
               Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}

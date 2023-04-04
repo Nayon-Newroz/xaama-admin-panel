@@ -21,7 +21,7 @@ import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
 import PulseLoader from "react-spinners/PulseLoader";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getDataWithToken } from "../../services/GetDataService";
 import TextEditor from "../utils/TextEditor";
 import Box from "@mui/material/Box";
@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
   checkboxStyle: {
     "& span": {
+      color: "#727272",
       fontSize: "20px",
       fontWeight: 600,
       [theme.breakpoints.down("xl")]: {
@@ -56,17 +57,15 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const UpdateProduct = () => {
+const AddProductForMultiFilterAdd = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { state } = useLocation();
   const [name, setName] = useState("");
   const [price, setPrice] = useState(null);
   const [discountPrice, setDiscountPrice] = useState(null);
   const [sku, setSku] = useState("");
   const [stockUnit, setStockUnit] = useState(null);
   const [convertedContent, setConvertedContent] = useState(null);
-  const [status, setStatus] = useState(false);
   const [category, SetCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [categoryList, setCategoryList] = useState([]);
@@ -76,9 +75,6 @@ const UpdateProduct = () => {
   const [filterLoading, setFilterLoading] = useState(false);
   const [files, setFiles] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
-  };
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
     SetCategory(event.target.value);
@@ -91,10 +87,9 @@ const UpdateProduct = () => {
   };
   const getFilters = async (row) => {
     try {
-      let newList = [];
       setFilterLoading(true);
       setFilterMessage("");
-
+      let newList = [];
       let response = await axios({
         url: `/api/v1/category/category-filter-list`,
         method: "post",
@@ -102,19 +97,18 @@ const UpdateProduct = () => {
       });
       console.log("response", response);
       if (response.status >= 200 && response.status < 300) {
-        response?.data?.data.map((obj) => {
-          let newObj = {
+        response?.data?.data.map((item) => {
+          let newObj = item.filter_values.map((obj) => ({
             ...obj,
-            selectedFilterId: "",
-          };
-          obj.filter_values.map((item) => {
-            if (state?.row?.filter_id.includes(item.filter_id)) {
-              console.log("if==============================",item.filter_id);
-              newObj.selectedFilterId = item.filter_id;
-            }
-          });
+            isChecked: false,
+          }));
 
-          newList.push(newObj);
+          let myObj = {
+            title: item.filter_name,
+            allChecked: false,
+            filter_values: newObj,
+          };
+          newList.push(myObj);
         });
         console.log("newList", newList);
         setFilterList(newList);
@@ -188,10 +182,11 @@ const UpdateProduct = () => {
     } else {
       setLoading(true);
       let filterIdList = [];
+
       filterList.map((item) => {
         item.filter_values.map((el) => {
           if (el.isChecked) {
-            filterIdList.push(el._id);
+            filterIdList.push(el.filter_id);
           }
         });
       });
@@ -200,6 +195,7 @@ const UpdateProduct = () => {
         handleSnakbarOpen("Please select filters", "error");
         return setLoading(false);
       }
+
       try {
         var formdata = new FormData();
         formdata.append("name", name);
@@ -222,13 +218,13 @@ const UpdateProduct = () => {
         // };
 
         let response = await axios({
-          url: `/api/v1/product/update/${state?.row?._id}`,
-          method: "put",
+          url: `/api/v1/product/create`,
+          method: "post",
           data: formdata,
           headers: { "Content-Type": "application/json" },
         });
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Updated successfully", "success");
+          handleSnakbarOpen("Added successfully", "success");
           // navigate("/product-list");
         }
       } catch (error) {
@@ -252,13 +248,6 @@ const UpdateProduct = () => {
 
         if (allData.data.data.length < 1) {
           setMessage("No data found");
-        } else {
-          let categoryData = allData?.data?.data.find(
-            (res) => res.category_id === state?.row?.category_id
-          );
-          console.log("state?.row?.category_id", state?.row?.category_id);
-          console.log("categoryData", categoryData);
-          getFilters(categoryData);
         }
       }
       setLoading(false);
@@ -298,19 +287,6 @@ const UpdateProduct = () => {
     };
     setRefresh(!refresh);
   };
-  const handleFilter = (event) => {
-    console.log("event.target.value", event.target.value);
-
-    filterList.map((obj) => {
-      obj.filter_values.map((item) => {
-        if (item.filter_id === event.target.value) {
-          obj.selectedFilterId = event.target.value;
-        }
-      });
-    });
-
-    setRefresh(!refresh);
-  };
   const filterSectionLoading = () => {
     let content = [];
 
@@ -338,21 +314,8 @@ const UpdateProduct = () => {
     return content;
   };
   useEffect(() => {
-    console.log("state?.row", state?.row);
     getCategoryList();
-    setName(state?.row?.name);
-    setPrice(state?.row?.price);
-    setDiscountPrice(state?.row?.discount_price);
-    setStockUnit(state?.row?.stock_unit);
-    setSku(state?.row?.sku);
-    // setStatus(state?.row?.status);
-    setStatus(true);
-    SetCategory(state?.row?.category_id);
-    // setConvertedContent(state?.row?.description);
-
-    // getDropdownData(state?.row?.name);
   }, []);
-
   return (
     <>
       <Grid
@@ -366,7 +329,7 @@ const UpdateProduct = () => {
             variant="h5"
             style={{ marginBottom: "30px", textAlign: "center" }}
           >
-            Update Product
+            Add Product
           </Typography>
 
           <TextField
@@ -438,19 +401,7 @@ const UpdateProduct = () => {
               setSku(e.target.value);
             }}
           />
-          <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
-            <InputLabel id="demo-simple-select-label">Status</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="status"
-              value={status}
-              label="Status"
-              onChange={handleStatusChange}
-            >
-              <MenuItem value={true}>Active</MenuItem>
-              <MenuItem value={false}>Inactive</MenuItem>
-            </Select>
-          </FormControl>
+
           <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
             <InputLabel id="demo-simple-select-label">Category *</InputLabel>
             <Select
@@ -483,26 +434,40 @@ const UpdateProduct = () => {
                     {filterList?.map((item, index) => (
                       <Grid item xs={12} key={index}>
                         <div className={classes.checkboxStyle}>
-                          <FormControl>
-                            <FormLabel id="demo-row-radio-buttons-group-label">
-                              {item.filter_name}
-                            </FormLabel>
-                            <RadioGroup
-                              row
-                              aria-labelledby="demo-row-radio-buttons-group-label"
-                              name="row-radio-buttons-group"
-                              value={item.selectedFilterId}
-                              onChange={handleFilter}
-                            >
-                              {item.filter_values?.map((el, i) => (
-                                <FormControlLabel
-                                  value={el.filter_id}
-                                  control={<Radio />}
-                                  label={el.name}
-                                />
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label={item.title}
+                            checked={item.allChecked}
+                            onChange={(event) => {
+                              handlePermissionSelectByTitle(
+                                event.target.checked,
+                                item,
+                                index
+                              );
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            paddingLeft: "48px",
+                            boxSizing: "border-box",
+                            display: "flex",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {item.filter_values?.map((el, i) => (
+                            <div key={i} className={classes.checkboxStyle2}>
+                              <FormControlLabel
+                                component="div"
+                                control={<Checkbox />}
+                                label={el.name}
+                                checked={el.isChecked}
+                                onChange={() => {
+                                  handlePermissionChange(item, index, el, i);
+                                }}
+                              />
+                            </div>
+                          ))}
                         </div>
                       </Grid>
                     ))}
@@ -512,39 +477,15 @@ const UpdateProduct = () => {
             )}
             <br />
           </Collapse>
-
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">
               Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}
             </Typography>
             <Alert severity="info" style={{ marginBottom: "8px" }}>
               You can upload max 5 (jpg / jpeg / png) images.Try resolution
-              800*600 for better image view. If you upload new image, all
-              previous images will be deleted.
+              800*600 for better image view
             </Alert>
             <DropZoneImage files={files} setFiles={setFiles} />
-            {files.length < 1 && (
-              <div style={{ textAlign: "center" }}>
-                {state?.row?.images.map((item, i) => (
-                  <img
-                    src={item.url}
-                    alt=""
-                    style={{
-                      display: "inline-flex",
-                      borderRadius: 2,
-                      border: "1px solid #c4c4c4",
-                      marginTop: 15,
-                      marginBottom: 8,
-                      marginRight: 8,
-                      width: 120,
-                      height: 150,
-                      padding: 4,
-                      boxSizing: "border-box",
-                    }}
-                  />
-                ))}
-              </div>
-            )}
           </div>
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">
@@ -555,7 +496,6 @@ const UpdateProduct = () => {
             <TextEditor
               convertedContent={convertedContent}
               setConvertedContent={setConvertedContent}
-              data={state?.row?.description}
             />
           </div>
           <div style={{ textAlign: "center" }}>
@@ -583,4 +523,4 @@ const UpdateProduct = () => {
   );
 };
 
-export default UpdateProduct;
+export default AddProductForMultiFilterAdd;

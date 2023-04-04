@@ -43,7 +43,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { DateTimeField } from "@mui/x-date-pickers/DateTimeField";
 import { DateField } from "@mui/x-date-pickers/DateField";
+import Checkbox from "@mui/material/Checkbox";
 import moment from "moment";
+import Slide from "@mui/material/Slide";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import CartItems from "./CartItems";
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="down" ref={ref} {...props} />;
+});
 const useStyles = makeStyles((theme) => ({
   tableBodyStyle: {
     "& tr:nth-of-type(odd)": {
@@ -122,6 +129,36 @@ const ProductList = () => {
   const [startingTime, setStartingTime] = useState(null);
   const [endingTime, setEndingTime] = useState(null);
   const [value, setValue] = React.useState(dayjs("2022-04-17T15:30"));
+  const [orderIds, setOrderIds] = useState([]);
+  const [orderItems, setOrderItems] = useState([]);
+  const [openOrderList, setOpenOrderList] = useState(false);
+  const [imageDialog, setImageDialog] = useState(false);
+  const [images, setImages] = useState([]);
+  const [detailDialog, setDetailDialog] = useState(false);
+  const [details, setDetails] = useState({});
+  const handleDetailClickOpen = (obj) => {
+    setDetails(obj);
+    setImageDialog(true);
+  };
+  const handleDetailClose = () => {
+    setDetails({});
+    setDetailDialog(false);
+  };
+  const handleImageClickOpen = (images) => {
+    setImages(images);
+    setImageDialog(true);
+  };
+  const handleImageClose = () => {
+    setImages([]);
+    setImageDialog(false);
+  };
+  const handleClickOpen = () => {
+    setOpenOrderList(true);
+  };
+
+  const handleOpenOrderListClose = () => {
+    setOpenOrderList(false);
+  };
 
   const handleChange = (event) => {
     SetCategory(event.target.value);
@@ -334,6 +371,22 @@ const ProductList = () => {
     let start = dayjs(startingTime).format("YYYY-MM-DD");
     console.log("new Start", start.concat("T00:00:00"));
   };
+  const handleOrderChange = (id, row) => {
+    console.log("event.target.checked", id);
+    if (orderIds.includes(id)) {
+      console.log("if-----------");
+      let newIds = orderIds.filter((res) => res !== id);
+      let newOrderItem = orderItems.filter((res) => res._id !== id);
+      setOrderIds(newIds);
+      setOrderItems(newOrderItem);
+    } else {
+      console.log("else-----------");
+      setOrderIds([...orderIds, id]);
+      setOrderItems([...orderItems, row]);
+      // orderIds.push(id);
+    }
+    console.log("orderIds", orderIds);
+  };
   useEffect(() => {
     getData();
     getCategoryList();
@@ -363,6 +416,17 @@ const ProductList = () => {
             </Typography>
           </Grid>
           <Grid item lg={6} xl={6} style={{ textAlign: "right" }}>
+            <Button
+              variant="contained"
+              color="info"
+              size="large"
+              disableElevation
+              onClick={handleClickOpen}
+            >
+              Order List
+              {orderItems.length > 0 && " (" + orderItems.length + ")"}
+            </Button>
+            &nbsp;&nbsp; &nbsp;{" "}
             <Button
               disableElevation
               variant="outlined"
@@ -550,6 +614,10 @@ const ProductList = () => {
           <Table aria-label="simple table" className={classes.tableStyle}>
             <TableHead>
               <TableRow>
+                <TableCell style={{ width: "20px" }}>
+                  <Checkbox disabled />
+                </TableCell>
+                <TableCell style={{ minWidth: "70px" }}>Image</TableCell>
                 <TableCell style={{ minWidth: "220px" }}>Name</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
@@ -559,9 +627,9 @@ const ProductList = () => {
                 <TableCell>Category</TableCell>
                 <TableCell>SKU</TableCell>
                 <TableCell>Filters</TableCell>
-                <TableCell>Images</TableCell>
+                {/* <TableCell>Images</TableCell> */}
 
-                <TableCell>Description</TableCell>
+                {/* <TableCell>Description</TableCell> */}
                 <TableCell style={{ whiteSpace: "nowrap" }}>
                   Created Info
                 </TableCell>
@@ -580,7 +648,39 @@ const ProductList = () => {
                     key={i}
                     // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
-                    <TableCell>{row?.name}</TableCell>
+                    <TableCell>
+                      <Checkbox
+                        checked={orderIds.includes(row?._id)}
+                        onChange={() => handleOrderChange(row?._id, row)}
+                        inputProps={{ "aria-label": "controlled" }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {row?.images.length > 0 ? (
+                        <>
+                          <img
+                            src={row?.images[0].url}
+                            alt=""
+                            width="70px"
+                            height="70px"
+                            style={{ display: "block", margin: "5px 0" }}
+                          />
+                          <Button
+                            // variant="outlined"
+                            size="small"
+                            style={{ whiteSpace: "nowrap", fontSize: "10px" }}
+                            onClick={() => handleImageClickOpen(row?.images)}
+                          >
+                            View All
+                          </Button>
+                        </>
+                      ) : (
+                        "No Image Available"
+                      )}
+                    </TableCell>
+                    <TableCell style={{ minWidth: "250px" }}>
+                      {row?.name}
+                    </TableCell>
                     <TableCell>{row?.price}</TableCell>
                     <TableCell>{row?.discount_price}</TableCell>
                     <TableCell>{row?.viewed}</TableCell>
@@ -589,7 +689,9 @@ const ProductList = () => {
                         ? row?.category_data[0].name
                         : "N/A"}
                     </TableCell>
-                    <TableCell>{row?.sku}</TableCell>
+                    <TableCell style={{ whiteSpace: "nowrap" }}>
+                      {row?.sku}
+                    </TableCell>
 
                     <TableCell>
                       {row?.filter_data.length > 0
@@ -601,7 +703,7 @@ const ProductList = () => {
                           ))
                         : "N/A"}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <div
                         style={{ width: "350px", display: "flex", gap: "10px" }}
                       >
@@ -616,7 +718,7 @@ const ProductList = () => {
                             ))
                           : "No Image Available"}
                       </div>
-                    </TableCell>
+                    </TableCell> */}
                     {/* <TableCell
                       dangerouslySetInnerHTML={{
                         __html: row?.description,
@@ -624,7 +726,7 @@ const ProductList = () => {
                     >
                      
                     </TableCell> */}
-                    <TableCell>
+                    {/* <TableCell>
                       <Button
                         variant="outlined"
                         color="info"
@@ -635,11 +737,10 @@ const ProductList = () => {
                       >
                         View
                       </Button>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       <b>{row?.created_by}</b>
-                      {/* <br />
-                      {row?.created_at} */}
+
                       <br />
                       {moment(row?.created_at).format("DD-MM-YYYY, h:mm:ss a")}
                     </TableCell>
@@ -688,7 +789,14 @@ const ProductList = () => {
                       )}
                     </TableCell>
 
-                    <TableCell align="right" style={{ minWidth: "110px" }}>
+                    <TableCell align="right" style={{ minWidth: "130px" }}>
+                      <IconButton
+                        variant="contained"
+                        disableElevation
+                        onClick={() => handleDetailClickOpen(row)}
+                      >
+                        <VisibilityOutlinedIcon />
+                      </IconButton>
                       <IconButton
                         variant="contained"
                         disableElevation
@@ -737,6 +845,158 @@ const ProductList = () => {
           <br />
         )}
       </div>
+      <Dialog
+        open={imageDialog}
+        onClose={handleImageClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="lg"
+        fullWidth={true}
+      >
+        {/* <div style={{ padding: "10px", minWidth: "300px" }}> */}
+        <DialogTitle id="alert-dialog-title">{"Product Detail"}</DialogTitle>
+        <DialogContent>
+          <Grid container>
+            <Grid item xs={6}>
+              <Typography variant="subtitle2">
+                <strong>Product Name</strong> : {details?.name}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Price</strong> : {details?.price}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Discount Price</strong> : {details?.discount_price}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Stock Unit</strong> : {details?.stock_unit} units
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>SKU</strong> : {details?.sku}
+              </Typography>
+
+              <Typography variant="subtitle2">
+                <strong>Category</strong> :{" "}
+                {details?.category_data?.length > 0 &&
+                  details?.category_data[0]?.name}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Filters</strong> :{" "}
+                {details?.filter_data?.length > 0
+                  ? details?.filter_data?.map((e, i) => (
+                      <label key={e._id}>
+                        {i !== 0 && <>,&nbsp;&nbsp;</>}
+                        {e.name}
+                      </label>
+                    ))
+                  : "N/A"}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Status</strong> :
+                {details?.status ? (
+                  <>
+                    <TaskAltOutlinedIcon
+                      style={{
+                        color: "#10ac84",
+                        height: "16px",
+                        position: "relative",
+                        top: "4px",
+                      }}
+                    />{" "}
+                    <span
+                      style={{
+                        color: "#10ac84",
+                      }}
+                    >
+                      Active &nbsp;
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <HighlightOffOutlinedIcon
+                      style={{
+                        color: "#ee5253",
+                        height: "16px",
+                        position: "relative",
+                        top: "4px",
+                      }}
+                    />
+                    <span
+                      style={{
+                        color: "#ee5253",
+                      }}
+                    >
+                      Inactive
+                    </span>
+                  </>
+                )}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Created By</strong> : {details?.created_by}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Created At</strong> :&nbsp;
+                {moment(details?.created_at).format("DD-MM-YYYY, h:mm:ss a")}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Updated By</strong> : {details?.updated_by}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Updated At</strong> : &nbsp;
+                {moment(details?.updated_at).format("DD-MM-YYYY, h:mm:ss a")}
+              </Typography>
+              <Typography variant="subtitle2">
+                <strong>Images</strong>
+              </Typography>
+              <div style={{ display: "flex", gap: "10px" }}>
+                {details?.images?.length > 0
+                  ? details?.images?.map((item, i) => (
+                      <img src={item.url} alt="" width="70px" height="70px" />
+                    ))
+                  : "No Image Available"}
+              </div>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle2">
+                <strong>Description</strong>
+              </Typography>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: details?.description,
+                }}
+              ></div>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleImageClose}>Close</Button>
+        </DialogActions>
+        {/* </div> */}
+      </Dialog>
+      <Dialog
+        open={detailDialog}
+        onClose={handleDetailClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="xl"
+      >
+        {/* <div style={{ padding: "10px", minWidth: "300px" }}> */}
+        <DialogTitle id="alert-dialog-title">{"Images"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <div style={{ display: "flex", gap: "10px" }}>
+              {images.length > 0
+                ? images.map((item, i) => (
+                    <img src={item.url} alt="" width="220px" height="220px" />
+                  ))
+                : "No Image Available"}
+            </div>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDetailClose}>Close</Button>
+        </DialogActions>
+        {/* </div> */}
+      </Dialog>
       <Dialog
         open={deleteDialog}
         onClose={handleDeleteDialogClose}
@@ -801,10 +1061,24 @@ const ProductList = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleFilterListDialogClose}>Disagree</Button>
           <Button onClick={handleFilterListDialogClose} autoFocus>
-            Agree
+            Close
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        fullWidth={true}
+        maxWidth="xl"
+        TransitionComponent={Transition}
+        open={openOrderList}
+        onClose={handleOpenOrderListClose}
+      >
+        <DialogTitle>Order List</DialogTitle>
+        <DialogContent>
+          <CartItems orderItems={orderItems} handleOpenOrderListClose={handleOpenOrderListClose}/>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleOpenOrderListClose}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
