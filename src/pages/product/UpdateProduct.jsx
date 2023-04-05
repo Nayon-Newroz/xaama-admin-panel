@@ -109,7 +109,7 @@ const UpdateProduct = () => {
           };
           obj.filter_values.map((item) => {
             if (state?.row?.filter_id.includes(item.filter_id)) {
-              console.log("if==============================",item.filter_id);
+              console.log("if==============================", item.filter_id);
               newObj.selectedFilterId = item.filter_id;
             }
           });
@@ -204,7 +204,9 @@ const UpdateProduct = () => {
         var formdata = new FormData();
         formdata.append("name", name);
         formdata.append("price", price);
-        formdata.append("discount_price", discountPrice);
+        if (discountPrice) {
+          formdata.append("discount_price", discountPrice);
+        }
         formdata.append("description", convertedContent);
         formdata.append("sku", sku);
         formdata.append("stock_unit", stockUnit);

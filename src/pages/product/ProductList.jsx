@@ -381,8 +381,9 @@ const ProductList = () => {
       setOrderItems(newOrderItem);
     } else {
       console.log("else-----------");
+      let newRow = { ...row, quantity: 1 };
       setOrderIds([...orderIds, id]);
-      setOrderItems([...orderItems, row]);
+      setOrderItems([...orderItems, newRow]);
       // orderIds.push(id);
     }
     console.log("orderIds", orderIds);
@@ -1075,7 +1076,12 @@ const ProductList = () => {
       >
         <DialogTitle>Order List</DialogTitle>
         <DialogContent>
-          <CartItems orderItems={orderItems} handleOpenOrderListClose={handleOpenOrderListClose}/>
+          <CartItems
+            orderItems={orderItems}
+            setOrderItems={setOrderItems}
+            handleOrderChange={handleOrderChange}
+            handleOpenOrderListClose={handleOpenOrderListClose}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleOpenOrderListClose}>Close</Button>

@@ -193,7 +193,9 @@ const AddProduct = () => {
         var formdata = new FormData();
         formdata.append("name", name);
         formdata.append("price", price);
-        formdata.append("discount_price", discountPrice);
+        if (discountPrice) {
+          formdata.append("discount_price", discountPrice);
+        }
         formdata.append("description", convertedContent);
         formdata.append("sku", sku);
         formdata.append("stock_unit", stockUnit);
@@ -436,7 +438,7 @@ const AddProduct = () => {
             )}
             <br />
           </Collapse>
-         
+
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">
               Upload Images <span style={{ color: "#c4c4c4" }}>(Optional)</span>{" "}
