@@ -48,7 +48,7 @@ function App() {
 
       <ThemeProvider theme={theme}>
         <SnackbarProvider
-          maxSnack={1}
+          maxSnack={3}
           anchorOrigin={{
             vertical: "top",
             horizontal: "right",

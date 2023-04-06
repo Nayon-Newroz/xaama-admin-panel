@@ -187,19 +187,28 @@ const UpdateProduct = () => {
       return;
     } else {
       setLoading(true);
+      console.log("filterList", filterList);
+
+
       let filterIdList = [];
-      filterList.map((item) => {
-        item.filter_values.map((el) => {
-          if (el.isChecked) {
-            filterIdList.push(el._id);
-          }
-        });
+
+     
+
+
+ filterList.map((item) => {
+        if (item.selectedFilterId) {
+          filterIdList.push(item.selectedFilterId);
+        }
       });
       console.log("filterIdList", filterIdList);
       if (filterIdList.length < 1) {
         handleSnakbarOpen("Please select filters", "error");
         return setLoading(false);
       }
+
+
+ 
+
       try {
         var formdata = new FormData();
         formdata.append("name", name);

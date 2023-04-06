@@ -89,12 +89,14 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   imgDiv: {
+    width: "65px",
     [theme.breakpoints.down("sm")]: {
       width: "65px",
     },
   },
   buttonGroup: {
     width: "200px !important",
+    margin: "auto",
     [theme.breakpoints.down("sm")]: {
       width: "25px !important",
       flexDirection: "column !important",
@@ -168,8 +170,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   cartImg: {
-    width: "80px",
-    height: "80px",
+    width: "40px",
+    height: "40px",
     [theme.breakpoints.down("sm")]: {
       width: "60px",
       height: "60px",
@@ -196,8 +198,21 @@ const useStyles = makeStyles((theme) => ({
       // width: "100%",
     },
   },
+  amountTitle: {
+    fontSize: "16px",
+    fontWeight: 400,
+    color: "#154360",
+    margin: 0,
+  },
+  amountStyle: {
+    fontSize: "16px",
+    fontWeight: 500,
+    textAlign: "right",
+    color: "#154360",
+    margin: 0,
+  },
 }));
-const CartItems = ({
+const OrderList = ({
   orderItems,
   setOrderItems,
   handleOrderChange,
@@ -212,7 +227,7 @@ const CartItems = ({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [refresh, setRefresh] = useState(false);
-
+  const [tax, setTax] = useState(0);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const handleSnakbarOpen = (msg, vrnt) => {
     let duration;
@@ -226,7 +241,19 @@ const CartItems = ({
       autoHideDuration: duration,
     });
   };
+  const sortByParentName = (a, b) => {
+    const nameA = a.parent_name.toUpperCase();
+    const nameB = b.parent_name.toUpperCase();
 
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+
+    return 0;
+  };
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -249,25 +276,32 @@ const CartItems = ({
 
   const modifyArray = (value, row, i) => {
     console.log("value", value);
-    let newObject;
-    if (!value) {
-      newObject = { ...row, quantity: 0 };
+
+    if (parseInt(value) > parseInt(row?.stock_unit)) {
+      handleSnakbarOpen(
+        `Sorry! available stock is ${row?.stock_unit} unit${
+          parseInt(row?.stock_unit) > 1 && "s"
+        } `,
+        "error"
+      );
     } else {
-      newObject = { ...row, quantity: parseInt(value) };
-    }
-    console.log("newObject", newObject);
-    let newOrderItems = orderItems.map((item) => {
-      if (item._id === row._id) {
-        return newObject;
+      let newObject;
+      if (!value) {
+        newObject = { ...row, quantity: 0 };
       } else {
-        return item;
+        newObject = { ...row, quantity: parseInt(value) };
       }
-    });
-    console.log("newOrderItems", newOrderItems);
-    setOrderItems(newOrderItems);
-    // orderItems[i] = newObject;
-    // setRefresh(!refresh);
-    // updatelist(newObject);
+      console.log("newObject", newObject);
+      let newOrderItems = orderItems.map((item) => {
+        if (item._id === row._id) {
+          return newObject;
+        } else {
+          return item;
+        }
+      });
+      console.log("newOrderItems", newOrderItems);
+      setOrderItems(newOrderItems);
+    }
   };
   const increaseQuantity = (qty, row, i) => {
     console.log("qty", qty);
@@ -281,7 +315,7 @@ const CartItems = ({
     }
   };
   const fnTotalPrice = () => {
-    console.log("fnTotalPrice", fnTotalPrice);
+    console.log("fnTotalPrice");
     let total = 0;
 
     orderItems.map((item) => {
@@ -353,11 +387,16 @@ const CartItems = ({
           </Grid>
 
           <TableContainer>
-            <Table aria-label="simple table">
+            <Table
+              aria-label="simple table"
+              //  style={{ border:"1px solid #c4c4c4",}}
+            >
               <TableHead className={classes.forOtherView}>
                 <TableRow>
-                  <TableCell>Product Details</TableCell>
+                  <TableCell>Image</TableCell>
                   <TableCell>Title</TableCell>
+                  <TableCell>Filters</TableCell>
+                  <TableCell align="">In Stock</TableCell>
                   <TableCell align="center">Quantity</TableCell>
                   <TableCell align="right"> Price</TableCell>
                   <TableCell align="right"> Discount Price</TableCell>
@@ -370,9 +409,11 @@ const CartItems = ({
                   orderItems.map((row, i) => (
                     <TableRow
                       key={i}
-                      sx={{
-                        "&:last-child td, &:last-child th": { border: 0 },
-                      }}
+                      sx={
+                        {
+                          // "&:last-child td, &:last-child th": { border: 0 },
+                        }
+                      }
                     >
                       <TableCell className={classes.imgDiv}>
                         {row?.images.length > 0 ? (
@@ -385,8 +426,21 @@ const CartItems = ({
                           "No Image Available"
                         )}
                       </TableCell>
+                      <TableCell>{row?.name}</TableCell>
                       <TableCell>
-                        <p className={classes.titleStyle}> {row?.name}</p>
+                        {" "}
+                        {row?.filter_data.length > 0
+                          ? row?.filter_data.sort(sortByParentName).map((e, i) => (
+                              <label key={e._id}>
+                                {i !== 0 && <>,&nbsp;&nbsp;</>}
+                                <b>{e.parent_name}</b> : {e.name}
+                              </label>
+                            ))
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {row?.stock_unit} unit
+                        {parseInt(row?.stock_unit) > 1 && "s"}
                       </TableCell>
 
                       <TableCell style={{ whiteSpace: "nowrap" }}>
@@ -471,37 +525,86 @@ const CartItems = ({
                       </TableCell>
                     </TableRow>
                   ))}
-                <TableRow
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell align="right" colSpan={4}></TableCell>
-                  <TableCell align="right">
-                    <p
-                      style={{
-                        fontSize: "18px",
-                        fontWeight: 500,
-                        color: "#154360",
-                      }}
-                    >
-                      Total Cost
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <div style={{ width: "50%", marginTop: "20px", marginLeft: "auto" }}>
+            <Table>
+              <TableBody>
+                <TableRow>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountTitle}>SubTotal Cost</p>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountStyle}>
+                      Tk. {productTotalPrice}
                     </p>
                   </TableCell>
-                  <TableCell align="right">
-                    <p
-                      style={{
-                        fontSize: "18px",
-                        fontWeight: 500,
-                        textAlign: "right",
-                        color: "#154360",
-                      }}
-                    >
-                      Tk. {productTotalPrice}
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountTitle}>TAX</p>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountStyle}>{tax.toFixed(2)}%</p>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountTitle}>Total Cost</p>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountStyle}>
+                      Tk. {productTotalPrice + (productTotalPrice * tax) / 100}
                     </p>
                   </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
-          </TableContainer>
+          </div>
+          {/* <Grid container alignItems="right" justifyContent="flex-end">
+            <Grid item>
+              <p
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 400,
+                  color: "#154360",
+                }}
+              >
+                SubTotal Cost
+              </p>
+            </Grid>
+            <Grid item>
+              <p
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  textAlign: "right",
+                  color: "#154360",
+                }}
+              >
+                Tk. {productTotalPrice}
+              </p>
+            </Grid>
+          </Grid> */}
 
           <Dialog
             open={open}
@@ -535,4 +638,4 @@ const CartItems = ({
   );
 };
 
-export default CartItems;
+export default OrderList;

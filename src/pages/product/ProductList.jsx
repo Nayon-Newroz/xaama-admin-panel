@@ -47,7 +47,7 @@ import Checkbox from "@mui/material/Checkbox";
 import moment from "moment";
 import Slide from "@mui/material/Slide";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import CartItems from "./CartItems";
+import OrderList from "./OrderList";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
@@ -128,7 +128,6 @@ const ProductList = () => {
   const [filterList, setFilterList] = useState([]);
   const [startingTime, setStartingTime] = useState(null);
   const [endingTime, setEndingTime] = useState(null);
-  const [value, setValue] = React.useState(dayjs("2022-04-17T15:30"));
   const [orderIds, setOrderIds] = useState([]);
   const [orderItems, setOrderItems] = useState([]);
   const [openOrderList, setOpenOrderList] = useState(false);
@@ -138,7 +137,7 @@ const ProductList = () => {
   const [details, setDetails] = useState({});
   const handleDetailClickOpen = (obj) => {
     setDetails(obj);
-    setImageDialog(true);
+    setDetailDialog(true);
   };
   const handleDetailClose = () => {
     setDetails({});
@@ -220,7 +219,7 @@ const ProductList = () => {
     for (let i = 0; i < 10; i++) {
       content.push(
         <TableRow key={i}>
-          {[...Array(10).keys()].map((e, i) => (
+          {[...Array(14).keys()].map((e, i) => (
             <TableCell key={i}>
               <Skeleton></Skeleton>
             </TableCell>
@@ -340,32 +339,7 @@ const ProductList = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
-  const getFilters = async (row) => {
-    try {
-      setFilterLoading(true);
 
-      let response = await axios({
-        url: `/api/v1/category/category-filter-list`,
-        method: "post",
-        data: row,
-      });
-      console.log("response", response);
-      if (response.status >= 200 && response.status < 300) {
-        setFilterList(response?.data?.data);
-        // setTotalData(response?.data?.totalData);
-
-        if (response.data.data.length < 1) {
-          setMessage("No data found");
-        }
-      }
-      setFilterLoading(false);
-      handleFilterListDialogOpen();
-    } catch (error) {
-      console.log("error", error);
-      setFilterLoading(false);
-      handleSnakbarOpen(error.response.data.message.toString(), "error");
-    }
-  };
   const check = () => {
     console.log("startingTime", dayjs(startingTime).format("YYYY-MM-DD"));
     let start = dayjs(startingTime).format("YYYY-MM-DD");
@@ -387,6 +361,20 @@ const ProductList = () => {
       // orderIds.push(id);
     }
     console.log("orderIds", orderIds);
+  };
+ 
+  const sortByParentName = (a, b) => {
+    const nameA = a.parent_name.toUpperCase();
+    const nameB = b.parent_name.toUpperCase();
+
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+
+    return 0;
   };
   useEffect(() => {
     getData();
@@ -624,9 +612,10 @@ const ProductList = () => {
                 <TableCell style={{ whiteSpace: "nowrap" }}>
                   Discount Price
                 </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>In Stock</TableCell>
+                <TableCell>SKU</TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>Viewed</TableCell>
                 <TableCell>Category</TableCell>
-                <TableCell>SKU</TableCell>
                 <TableCell>Filters</TableCell>
                 {/* <TableCell>Images</TableCell> */}
 
@@ -683,62 +672,38 @@ const ProductList = () => {
                       {row?.name}
                     </TableCell>
                     <TableCell>{row?.price}</TableCell>
-                    <TableCell>{row?.discount_price}</TableCell>
+                    <TableCell>
+                      {parseInt(row.discount_price) > 0
+                        ? row.discount_price
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell style={{ whiteSpace: "nowrap" }}>
+                      {row?.stock_unit}
+                    </TableCell>
+                    <TableCell style={{ whiteSpace: "nowrap" }}>
+                      {row?.sku}
+                    </TableCell>
                     <TableCell>{row?.viewed}</TableCell>
                     <TableCell>
                       {row?.category_data.length > 0
                         ? row?.category_data[0].name
                         : "N/A"}
                     </TableCell>
-                    <TableCell style={{ whiteSpace: "nowrap" }}>
-                      {row?.sku}
-                    </TableCell>
 
-                    <TableCell>
+                    <TableCell
+                      style={{ minWidth: "120px", whiteSpace: "nowrap" }}
+                    >
+                   
                       {row?.filter_data.length > 0
-                        ? row?.filter_data.map((e, i) => (
+                        ? row?.filter_data.sort(sortByParentName).map((e, i) => (
                             <label key={e._id}>
                               {i !== 0 && <>,&nbsp;&nbsp;</>}
-                              {e.name}
+                              <b>{e.parent_name}</b> : {e.name}
                             </label>
                           ))
                         : "N/A"}
                     </TableCell>
-                    {/* <TableCell>
-                      <div
-                        style={{ width: "350px", display: "flex", gap: "10px" }}
-                      >
-                        {row?.images.length > 0
-                          ? row?.images.map((item, i) => (
-                              <img
-                                src={item.url}
-                                alt=""
-                                width="70px"
-                                height="70px"
-                              />
-                            ))
-                          : "No Image Available"}
-                      </div>
-                    </TableCell> */}
-                    {/* <TableCell
-                      dangerouslySetInnerHTML={{
-                        __html: row?.description,
-                      }}
-                    >
-                     
-                    </TableCell> */}
-                    {/* <TableCell>
-                      <Button
-                        variant="outlined"
-                        color="info"
-                        size="small"
-                        onClick={() => {
-                          getFilters(row);
-                        }}
-                      >
-                        View
-                      </Button>
-                    </TableCell> */}
+
                     <TableCell>
                       <b>{row?.created_by}</b>
 
@@ -847,8 +812,8 @@ const ProductList = () => {
         )}
       </div>
       <Dialog
-        open={imageDialog}
-        onClose={handleImageClose}
+        open={detailDialog}
+        onClose={handleDetailClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
@@ -969,13 +934,13 @@ const ProductList = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleImageClose}>Close</Button>
+          <Button onClick={handleDetailClose}>Close</Button>
         </DialogActions>
         {/* </div> */}
       </Dialog>
       <Dialog
-        open={detailDialog}
-        onClose={handleDetailClose}
+        open={imageDialog}
+        onClose={handleImageClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="xl"
@@ -994,7 +959,7 @@ const ProductList = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDetailClose}>Close</Button>
+          <Button onClick={handleImageClose}>Close</Button>
         </DialogActions>
         {/* </div> */}
       </Dialog>
@@ -1076,7 +1041,7 @@ const ProductList = () => {
       >
         <DialogTitle>Order List</DialogTitle>
         <DialogContent>
-          <CartItems
+          <OrderList
             orderItems={orderItems}
             setOrderItems={setOrderItems}
             handleOrderChange={handleOrderChange}
