@@ -189,13 +189,9 @@ const UpdateProduct = () => {
       setLoading(true);
       console.log("filterList", filterList);
 
-
       let filterIdList = [];
 
-     
-
-
- filterList.map((item) => {
+      filterList.map((item) => {
         if (item.selectedFilterId) {
           filterIdList.push(item.selectedFilterId);
         }
@@ -205,9 +201,6 @@ const UpdateProduct = () => {
         handleSnakbarOpen("Please select filters", "error");
         return setLoading(false);
       }
-
-
- 
 
       try {
         var formdata = new FormData();
@@ -530,10 +523,12 @@ const UpdateProduct = () => {
             </Typography>
             <Alert severity="info" style={{ marginBottom: "8px" }}>
               You can upload max 5 (jpg / jpeg / png) images.Try resolution
-              800*600 for better image view. If you upload new image, all
-              previous images will be deleted.
+              800*600 for better image view
             </Alert>
-            <DropZoneImage files={files} setFiles={setFiles} />
+            <Alert severity="warning" style={{ marginBottom: "8px" }}>
+              If you upload new image, all previous images will be deleted.
+            </Alert>
+            <DropZoneImage files={files} setFiles={setFiles} maxFilesNo={5} />
             {files.length < 1 && (
               <div style={{ textAlign: "center" }}>
                 {state?.row?.images.map((item, i) => (
@@ -585,7 +580,7 @@ const UpdateProduct = () => {
                 size={10}
                 speedMultiplier={0.5}
               />{" "}
-              {loading === false && "Submit"}
+              {loading === false && "Update"}
             </Button>
           </div>
         </form>

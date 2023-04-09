@@ -5,7 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { Grid, Typography, Button, IconButton } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import ClearIcon from "@mui/icons-material/Clear";
-
+import { useSnackbar } from "notistack";
 const useStyles = makeStyles(() => ({
   marginBottomStyle: {
     marginBottom: "30px",
@@ -122,30 +122,44 @@ const useStyles = makeStyles(() => ({
     overflow: "hidden",
   },
 }));
-const DropZoneImage = ({ files, setFiles }) => {
+const DropZoneImage = ({ files, setFiles, maxFilesNo }) => {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
+  const handleSnakbarOpen = (msg, vrnt) => {
+    let duration;
+    if (vrnt === "error") {
+      duration = 3000;
+    } else {
+      duration = 1000;
+    }
+    enqueueSnackbar(msg, {
+      variant: vrnt,
+      autoHideDuration: duration,
+    });
+  };
 
   const [reload, setReload] = useState(false);
 
   //=========================Drop Zone======================================
   const thumb = {
     display: "inline-flex",
+    justifyContent: "center",
     borderRadius: 2,
     border: "1px solid #c4c4c4",
     marginTop: 15,
     marginBottom: 8,
     marginRight: 8,
-    width: 120,
+    width: 150,
     height: 150,
     padding: 4,
     boxSizing: "border-box",
     position: "relative",
   };
   const removeButton = {
-    // background: "#c4c4c4",
+    background: "#8d8d8d60",
     position: "absolute",
-    right: 0,
-    top: 0,
+    right: 6,
+    top: 7,
   };
   const thumbInner = {
     display: "flex",
@@ -156,7 +170,9 @@ const DropZoneImage = ({ files, setFiles }) => {
   const img = {
     display: "block",
     width: "auto",
+    margin: "auto",
     height: "100%",
+    width: "100%",
   };
   const baseStyle = {
     // flex: 1,
@@ -215,8 +231,14 @@ const DropZoneImage = ({ files, setFiles }) => {
           preview: URL.createObjectURL(file),
         })
       );
+      console.log("files", files);
       console.log("newFiles", newFiles);
-      setFiles(files.concat(newFiles));
+      console.log("files.concat(newFiles", files.concat(newFiles));
+      if (files.concat(newFiles).length > parseInt(maxFilesNo)) {
+        handleSnakbarOpen("sorry! max 5 images", "error");
+      } else {
+        setFiles(files.concat(newFiles));
+      }
     },
   });
 
@@ -236,12 +258,17 @@ const DropZoneImage = ({ files, setFiles }) => {
     </label>
   ));
   const thumbs = files?.map((file, i) => (
-    <div style={thumb} key={file.name}>
+    <div style={thumb} key={i}>
       <div style={thumbInner}>
-        <img src={file.preview} style={img} />
+        <img src={URL.createObjectURL(file)} style={img} />
+        {/* <img src={file.preview} style={img} /> */}
       </div>
-      <IconButton style={removeButton} size="small">
-        <ClearIcon style={{ color: "#fff" }} onClick={() => removeFile(i)} />
+      <IconButton
+        style={removeButton}
+        size="small"
+        onClick={() => removeFile(i)}
+      >
+        <ClearIcon style={{ color: "#fff", fontSize: "18px" }} />
       </IconButton>
     </div>
   ));

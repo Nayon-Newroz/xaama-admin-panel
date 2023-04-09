@@ -74,6 +74,7 @@ const AddProduct = () => {
   const [filterList, setFilterList] = useState([]);
   const [filterLoading, setFilterLoading] = useState(false);
   const [files, setFiles] = useState([]);
+  
   const [refresh, setRefresh] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
@@ -445,9 +446,9 @@ const AddProduct = () => {
             </Typography>
             <Alert severity="info" style={{ marginBottom: "8px" }}>
               You can upload max 5 (jpg / jpeg / png) images.Try resolution
-              800*600 for better image view
+              800*600 for better image view.
             </Alert>
-            <DropZoneImage files={files} setFiles={setFiles} />
+            <DropZoneImage files={files} setFiles={setFiles} maxFilesNo = {5}/>
           </div>
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">
