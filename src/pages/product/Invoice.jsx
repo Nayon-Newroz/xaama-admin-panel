@@ -26,7 +26,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { v4 as uuidv4 } from "uuid";
-import ClearIcon from "@mui/icons-material/Clear";
 import axios from "axios";
 
 import { useSnackbar } from "notistack";
@@ -171,33 +170,6 @@ const useStyles = makeStyles((theme) => ({
       width: "35px",
     },
   },
-  input3: {
-    // textAlign: "center !important",
-    "& input[type=text]": {
-      "-moz-appearance": "textfield",
-      fontSize: "16px",
-      fontWeight: 500,
-      textAlign: "right",
-      color: "#154360",
-      border: "none",
-      [theme.breakpoints.down("sm")]: {
-        padding: "3px",
-        textAlign: "right",
-      },
-    },
-    "& input[type=text]::-webkit-outer-spin-button": {
-      "-webkit-appearance": "none",
-      margin: 0,
-    },
-    "& input[type=text]::-webkit-inner-spin-button": {
-      "-webkit-appearance": "none",
-      margin: 0,
-    },
-    // width: "250px",
-    [theme.breakpoints.down("sm")]: {
-      width: "35px",
-    },
-  },
   titleStyle: {
     fontSize: "17px",
     color: "#154360",
@@ -209,10 +181,10 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   titleStyle2: {
-    fontSize: "22px",
+    fontSize: "30px",
     color: "#154360",
     fontWeight: 500,
-    margin: "0 0 20px 0px",
+    margin: "30px 0px",
     [theme.breakpoints.down("sm")]: {
       fontSize: "17px",
     },
@@ -267,37 +239,15 @@ const useStyles = makeStyles((theme) => ({
     color: "#154360",
     margin: 0,
   },
-  tableStyle: {
-    border: "1px solid #ddd",
-    "& thead": {
-      background: "#ddd",
-      "& tr": {
-        "& th": {
-          paddingTop: "8px",
-          paddingBottom: "8px",
-        },
-      },
-    },
-    "& tbody": {
-      "& tr": {
-        "& td": {
-          paddingTop: "2px",
-          paddingBottom: "2px",
-        },
-      },
-    },
-  },
 }));
-const OrderList = ({
+const Invoice = ({
   orderItems,
   setOrderItems,
   handleOrderChange,
   handleOpenOrderListClose,
 }) => {
   const classes = useStyles();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [PhoneNo, setPhoneNo] = useState("");
+
   const [address, setAddress] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [productTotalPrice, setProductTotalPrice] = useState(0);
@@ -451,115 +401,30 @@ const OrderList = ({
         <>
           <Grid container>
             <Grid item xs={6} sm={6} md={6}>
-              <p className={classes.titleStyle2}>
-                Orders &nbsp;&nbsp;
-                {/* <span style={{ fontSize: "18px" }}> */}({orderItems.length}{" "}
-                Item{orderItems.length > 1 && "s"}){/* </span> */}
+              <p className={classes.titleStyle2}>Order List</p>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6}>
+              <p
+                style={{
+                  textAlign: "right",
+                }}
+                className={classes.titleStyle2}
+              >
+                {orderItems.length} Item{orderItems.length > 1 && "s"}
               </p>
             </Grid>
-            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }} >
-              <IconButton onClick={handleOpenOrderListClose}>
-                <ClearIcon style={{ color: "#205295" }} />
-              </IconButton>
-            </Grid>
           </Grid>
-          <Grid
-            container
-            justifyContent="center"
-            // alignItems="center"
-            spacing={2}
-          >
-            <Grid item xs={3}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      Customer Name
-                    </InputAdornment>
-                  ),
-                }}
-                className={classes.input3}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                fullWidth
-                className={classes.input3}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Email</InputAdornment>
-                  ),
-                }}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                fullWidth
-                className={classes.input3}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Phone</InputAdornment>
-                  ),
-                }}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={PhoneNo}
-                onChange={(e) => setPhoneNo(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Address</InputAdornment>
-                  ),
-                }}
-                className={classes.input3}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-            </Grid>
-          </Grid>
-          <br />
+
           <TableContainer>
             <Table
               aria-label="simple table"
-              className={classes.tableStyle}
               //  style={{ border:"1px solid #c4c4c4",}}
             >
-              <TableHead className={classes.tableStyle}>
+              <TableHead className={classes.forOtherView}>
                 <TableRow>
                   <TableCell>Image</TableCell>
                   <TableCell>Title</TableCell>
-                  <TableCell>Specification</TableCell>
+                  <TableCell>Filters</TableCell>
                   <TableCell align="">In Stock</TableCell>
                   <TableCell align="center">Quantity</TableCell>
                   <TableCell align="right"> Price</TableCell>
@@ -694,7 +559,124 @@ const OrderList = ({
               </TableBody>
             </Table>
           </TableContainer>
-          <br />
+          <div style={{ width: "50%", marginTop: "20px", marginLeft: "auto" }}>
+            <Table>
+              <TableBody>
+                <TableRow>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountTitle}>SubTotal Cost</p>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    {/* <p className={classes.amountStyle}>
+                      Tk. {productTotalPrice.toFixed(2)}
+                    </p> */}
+                    <TextField
+                      id="outlined-basic"
+                      // label="Outlined"
+                      variant="outlined"
+                      size="small"
+                      type="number"
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment
+                            position="start"
+                            className={classes.amountTitle}
+                          >
+                            SubTotal{" "}
+                          </InputAdornment>
+                        ),
+                      }}
+                      className={classes.input2}
+                      inputProps={{ min: 0, step: 0.01 }}
+                      onWheel={(e) => e.target.blur()}
+                      value={productTotalPrice}
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountTitle}>Discount</p>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <TextField
+                      id="outlined-basic"
+                      // label="Outlined"
+                      variant="outlined"
+                      size="small"
+                      type="number"
+                      className={classes.input2}
+                      inputProps={{ min: 0, step: 0.01 }}
+                      onWheel={(e) => e.target.blur()}
+                      value={discount}
+                      onChange={(e) => setDiscount(e.target.value)}
+                    />
+                    {/* <p className={classes.amountStyle}>{tax.toFixed(2)}%</p> */}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountTitle}>TAX</p>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    {/* <p className={classes.amountStyle}>{tax.toFixed(2)}%</p> */}
+                    <TextField
+                      id="outlined-basic"
+                      // label="Outlined"
+                      variant="outlined"
+                      size="small"
+                      type="number"
+                      className={classes.input2}
+                      inputProps={{ min: 0, step: 0.01 }}
+                      onWheel={(e) => e.target.blur()}
+                      value={tax}
+                      onChange={(e) => setTax(e.target.value)}
+                    />
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountTitle}>Total Cost</p>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{ border: "none", padding: "5px" }}
+                  >
+                    <p className={classes.amountStyle}>
+                      Tk.{" "}
+                      {(
+                        productTotalPrice -
+                        discount +
+                        ((productTotalPrice - discount) * tax) / 100
+                      ).toFixed(2)}
+                    </p>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
           <Grid
             container
             justifyContent="center"
@@ -711,7 +693,12 @@ const OrderList = ({
                 fullWidth
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">Subtotal </InputAdornment>
+                    <InputAdornment
+                      position="start"
+                      className={classes.amountTitle}
+                    >
+                      SubTotal{" "}
+                    </InputAdornment>
                   ),
                 }}
                 className={classes.input2}
@@ -731,7 +718,12 @@ const OrderList = ({
                 className={classes.input2}
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">Discount </InputAdornment>
+                    <InputAdornment
+                      position="start"
+                      className={classes.amountTitle}
+                    >
+                      Discount{" "}
+                    </InputAdornment>
                   ),
                 }}
                 inputProps={{ min: 0, step: 0.01 }}
@@ -751,7 +743,12 @@ const OrderList = ({
                 className={classes.input2}
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">TAX </InputAdornment>
+                    <InputAdornment
+                      position="start"
+                      className={classes.amountTitle}
+                    >
+                      TAX{" "}
+                    </InputAdornment>
                   ),
                 }}
                 inputProps={{ min: 0, step: 0.01 }}
@@ -770,7 +767,12 @@ const OrderList = ({
                 fullWidth
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">Total</InputAdornment>
+                    <InputAdornment
+                      position="start"
+                      className={classes.amountTitle}
+                    >
+                      Total
+                    </InputAdornment>
                   ),
                 }}
                 className={classes.input2}
@@ -782,17 +784,6 @@ const OrderList = ({
                   ((productTotalPrice - discount) * tax) / 100
                 ).toFixed(2)}
               />
-            </Grid>
-            <Grid item xs={9}></Grid>
-            <Grid item xs={3}>
-              <Button
-                variant="contained"
-                fullWidth
-                disableElevation
-                size="large"
-              >
-                Submit
-              </Button>
             </Grid>
           </Grid>
           {/* <Grid container alignItems="right" justifyContent="flex-end">
@@ -820,6 +811,7 @@ const OrderList = ({
               </p>
             </Grid>
           </Grid> */}
+
           <Dialog
             open={open}
             onClose={handleClose}
@@ -852,4 +844,4 @@ const OrderList = ({
   );
 };
 
-export default OrderList;
+export default Invoice;

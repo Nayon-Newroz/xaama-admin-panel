@@ -47,6 +47,7 @@ import Checkbox from "@mui/material/Checkbox";
 import moment from "moment";
 import Slide from "@mui/material/Slide";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import ClearIcon from "@mui/icons-material/Clear";
 import OrderList from "./OrderList";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -362,7 +363,7 @@ const ProductList = () => {
     }
     console.log("orderIds", orderIds);
   };
- 
+
   const sortByParentName = (a, b) => {
     const nameA = a.parent_name.toUpperCase();
     const nameB = b.parent_name.toUpperCase();
@@ -693,14 +694,15 @@ const ProductList = () => {
                     <TableCell
                       style={{ minWidth: "120px", whiteSpace: "nowrap" }}
                     >
-                   
                       {row?.filter_data.length > 0
-                        ? row?.filter_data.sort(sortByParentName).map((e, i) => (
-                            <label key={e._id}>
-                              {i !== 0 && <>,&nbsp;&nbsp;</>}
-                              <b>{e.parent_name}</b> : {e.name}
-                            </label>
-                          ))
+                        ? row?.filter_data
+                            .sort(sortByParentName)
+                            .map((e, i) => (
+                              <label key={e._id}>
+                                {i !== 0 && <>,&nbsp;&nbsp;</>}
+                                <b>{e.parent_name}</b> : {e.name}
+                              </label>
+                            ))
                         : "N/A"}
                     </TableCell>
 
@@ -1039,8 +1041,9 @@ const ProductList = () => {
         open={openOrderList}
         onClose={handleOpenOrderListClose}
       >
-        <DialogTitle>Order List</DialogTitle>
+        {/* <DialogTitle>Order List</DialogTitle> */}
         <DialogContent>
+          
           <OrderList
             orderItems={orderItems}
             setOrderItems={setOrderItems}
@@ -1048,9 +1051,7 @@ const ProductList = () => {
             handleOpenOrderListClose={handleOpenOrderListClose}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleOpenOrderListClose}>Close</Button>
-        </DialogActions>
+    
       </Dialog>
     </>
   );
