@@ -28,7 +28,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { v4 as uuidv4 } from "uuid";
 import ClearIcon from "@mui/icons-material/Clear";
 import axios from "axios";
-
+import PulseLoader from "react-spinners/PulseLoader";
 import { useSnackbar } from "notistack";
 import { InputAdornment } from "@mui/material";
 const useStyles = makeStyles((theme) => ({
@@ -177,7 +177,7 @@ const useStyles = makeStyles((theme) => ({
       "-moz-appearance": "textfield",
       fontSize: "16px",
       fontWeight: 500,
-      textAlign: "right",
+      // textAlign: "right",
       color: "#154360",
       border: "none",
       [theme.breakpoints.down("sm")]: {
@@ -297,7 +297,7 @@ const OrderList = ({
   const classes = useStyles();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [PhoneNo, setPhoneNo] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
   const [address, setAddress] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [productTotalPrice, setProductTotalPrice] = useState(0);
@@ -306,6 +306,7 @@ const OrderList = ({
   const [open, setOpen] = React.useState(false);
   const [refresh, setRefresh] = useState(false);
   const [tax, setTax] = useState(0);
+  const [paidAmount, setPaidAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const handleSnakbarOpen = (msg, vrnt) => {
@@ -414,6 +415,29 @@ const OrderList = ({
   const validation = () => {
     let isError = false;
 
+    if (!name.trim()) {
+      handleSnakbarOpen("Please enter shipping address", "error");
+      document.getElementById("name").focus();
+      return (isError = true);
+    }
+    if (!phoneNo.trim()) {
+      handleSnakbarOpen("Please enter shipping address", "error");
+      document.getElementById("phoneNo").focus();
+      return (isError = true);
+    }
+    if (!email.trim()) {
+      // handleSnakbarOpen("Please enter email address", "error");
+      // document.getElementById("email").focus();
+      // return (isError = true);
+    } else if (
+      !/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        email.trim()
+      )
+    ) {
+      handleSnakbarOpen("Invalid email address", "error");
+      document.getElementById("email").focus();
+      return (isError = true);
+    }
     if (!address.trim()) {
       handleSnakbarOpen("Please enter shipping address", "error");
       document.getElementById("address").focus();
@@ -422,7 +446,58 @@ const OrderList = ({
 
     return isError;
   };
+  const onSubmit = async (e) => {
+    e.preventDefault();
 
+    let err = false;
+    // let err = validation();
+    if (err) {
+      return;
+    } else {
+      setLoading(true);
+
+      try {
+        let data = {
+          customer_name: name,
+          customer_email: email,
+          customer_phone: phoneNo,
+          customer_address: address,
+          customer_address: address,
+          discount: discount,
+          tax: tax,
+          total_amount: 5000,
+          amount_paid: 5000,
+          transaction_type: "Offline",
+          payment_method: "Cash",
+          transaction_id: "N/A",
+          order_list: orderItems,
+        };
+
+        let response = await axios({
+          url: `/api/v1/order/create`,
+          method: "post",
+          data: data,
+          headers: { "Content-Type": "application/json" },
+        });
+        if (response.status >= 200 && response.status < 300) {
+          handleSnakbarOpen("Added successfully", "success");
+          // navigate("/product-list");
+        }
+      } catch (error) {
+        console.log("error", error);
+        handleSnakbarOpen(error.response.data.message, "error");
+        setLoading(false);
+      }
+      setLoading(false);
+    }
+  };
+  const calculateTotalAmount = () => {
+    return (
+      productTotalPrice -
+      discount +
+      ((productTotalPrice - discount) * tax) / 100
+    ).toFixed(2);
+  };
   return (
     <div>
       {orderItems?.length < 1 ? (
@@ -457,7 +532,7 @@ const OrderList = ({
                 Item{orderItems.length > 1 && "s"}){/* </span> */}
               </p>
             </Grid>
-            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }} >
+            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
               <IconButton onClick={handleOpenOrderListClose}>
                 <ClearIcon style={{ color: "#205295" }} />
               </IconButton>
@@ -468,21 +543,22 @@ const OrderList = ({
             justifyContent="center"
             // alignItems="center"
             spacing={2}
+            // style={{background:"#ddd"}}
           >
-            <Grid item xs={3}>
+            <Grid item xs={2.5}>
               <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
+                id="name"
+                label="Customer Name"
+                variant="standard"
                 size="small"
                 fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      Customer Name
-                    </InputAdornment>
-                  ),
-                }}
+                // InputProps={{
+                //   startAdornment: (
+                //     <InputAdornment position="start">
+                //       Customer Name
+                //     </InputAdornment>
+                //   ),
+                // }}
                 className={classes.input3}
                 inputProps={{ min: 0, step: 0.01 }}
                 onWheel={(e) => e.target.blur()}
@@ -490,56 +566,56 @@ const OrderList = ({
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2.5}>
               <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
+                id="email"
+                label="Customer Email"
+                variant="standard"
                 size="small"
                 fullWidth
                 className={classes.input3}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Email</InputAdornment>
-                  ),
-                }}
+                // InputProps={{
+                //   startAdornment: (
+                //     <InputAdornment position="start">Email</InputAdornment>
+                //   ),
+                // }}
                 inputProps={{ min: 0, step: 0.01 }}
                 onWheel={(e) => e.target.blur()}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2.5}>
               <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
+                id="phoneNo"
+                label="Customer Phone"
+                variant="standard"
                 size="small"
                 fullWidth
                 className={classes.input3}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Phone</InputAdornment>
-                  ),
-                }}
+                // InputProps={{
+                //   startAdornment: (
+                //     <InputAdornment position="start">Phone</InputAdornment>
+                //   ),
+                // }}
                 inputProps={{ min: 0, step: 0.01 }}
                 onWheel={(e) => e.target.blur()}
-                value={PhoneNo}
+                value={phoneNo}
                 onChange={(e) => setPhoneNo(e.target.value)}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={4.5}>
               <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
+                id="address"
+                label="Customer Address"
+                variant="standard"
                 size="small"
                 fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Address</InputAdornment>
-                  ),
-                }}
+                // InputProps={{
+                //   startAdornment: (
+                //     <InputAdornment position="start">Address</InputAdornment>
+                //   ),
+                // }}
                 className={classes.input3}
                 inputProps={{ min: 0, step: 0.01 }}
                 onWheel={(e) => e.target.blur()}
@@ -768,6 +844,49 @@ const OrderList = ({
                 size="small"
                 type="number"
                 fullWidth
+                className={classes.input2}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      Paid Amount{" "}
+                    </InputAdornment>
+                  ),
+                }}
+                inputProps={{ min: 0, step: 0.01 }}
+                onWheel={(e) => e.target.blur()}
+                value={paidAmount}
+                onChange={(e) => setPaidAmount(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id="outlined-basic"
+                // label="Outlined"
+                variant="outlined"
+                size="small"
+                type="number"
+                fullWidth
+                className={classes.input2}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      Due Amount{" "}
+                    </InputAdornment>
+                  ),
+                }}
+                inputProps={{ min: 0, step: 0.01 }}
+                onWheel={(e) => e.target.blur()}
+                value={parseInt(calculateTotalAmount()) - paidAmount}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                id="outlined-basic"
+                // label="Outlined"
+                variant="outlined"
+                size="small"
+                type="number"
+                fullWidth
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">Total</InputAdornment>
@@ -776,22 +895,29 @@ const OrderList = ({
                 className={classes.input2}
                 inputProps={{ min: 0, step: 0.01 }}
                 onWheel={(e) => e.target.blur()}
-                value={(
-                  productTotalPrice -
-                  discount +
-                  ((productTotalPrice - discount) * tax) / 100
-                ).toFixed(2)}
+                value={calculateTotalAmount()}
               />
             </Grid>
             <Grid item xs={9}></Grid>
             <Grid item xs={3}>
               <Button
-                variant="contained"
                 fullWidth
-                disableElevation
+                variant="contained"
+                // disabled={loading}
                 size="large"
+                style={{ minHeight: "35px" }}
+                autoFocus
+                disableElevation
+                onClick={onSubmit}
               >
+                {/* <PulseLoader
+                  color={"#353b48"}
+                  loading={loading}
+                  size={10}
+                  speedMultiplier={0.5}
+                />{" "} */}
                 Submit
+                {/* {loading === false && "Submit"} */}
               </Button>
             </Grid>
           </Grid>
