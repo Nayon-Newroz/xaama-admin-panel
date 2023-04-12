@@ -220,11 +220,6 @@ const UpdateProduct = () => {
           formdata.append("images", files[i]);
         }
 
-        // let data = {
-        //   name: name,
-        //   description: convertedContent,
-        // };
-
         let response = await axios({
           url: `/api/v1/product/update/${state?.row?._id}`,
           method: "put",

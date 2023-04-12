@@ -679,7 +679,8 @@ const ProductList = () => {
                         : "N/A"}
                     </TableCell>
                     <TableCell style={{ whiteSpace: "nowrap" }}>
-                      {row?.stock_unit}
+                      {row?.stock_unit}{" "}
+                      {parseInt(row?.stock_unit) > 1 ? "Units" : "Unit"}
                     </TableCell>
                     <TableCell style={{ whiteSpace: "nowrap" }}>
                       {row?.sku}
@@ -1043,7 +1044,6 @@ const ProductList = () => {
       >
         {/* <DialogTitle>Order List</DialogTitle> */}
         <DialogContent>
-          
           <OrderList
             orderItems={orderItems}
             setOrderItems={setOrderItems}
@@ -1051,7 +1051,6 @@ const ProductList = () => {
             handleOpenOrderListClose={handleOpenOrderListClose}
           />
         </DialogContent>
-    
       </Dialog>
     </>
   );

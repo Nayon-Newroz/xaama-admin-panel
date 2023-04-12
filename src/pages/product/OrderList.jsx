@@ -31,6 +31,10 @@ import axios from "axios";
 import PulseLoader from "react-spinners/PulseLoader";
 import { useSnackbar } from "notistack";
 import { InputAdornment } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
 const useStyles = makeStyles((theme) => ({
   cardHolder: {
     display: "flex",
@@ -299,6 +303,10 @@ const OrderList = ({
   const [email, setEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
   const [address, setAddress] = useState("");
+  const [transactionType, setTransactionType] = useState("Offline");
+  const [paymentMethod, setPaymentMethod] = useState("Cash");
+  const [transactionId, setTransactionId] = useState("");
+  const [shippingAddress, setShippingAddress] = useState("11/A, Dhaka");
   const [promoCode, setPromoCode] = useState("");
   const [productTotalPrice, setProductTotalPrice] = useState(0);
   const [removeItemId, setRemoveItemId] = useState("");
@@ -462,11 +470,11 @@ const OrderList = ({
           customer_email: email,
           customer_phone: phoneNo,
           customer_address: address,
-          customer_address: address,
+          shipping_address: shippingAddress,
           discount: discount,
           tax: tax,
-          total_amount: 5000,
-          amount_paid: 5000,
+          total_amount: calculateTotalAmount(),
+          amount_paid: paidAmount,
           transaction_type: "Offline",
           payment_method: "Cash",
           transaction_id: "N/A",
@@ -621,6 +629,77 @@ const OrderList = ({
                 onWheel={(e) => e.target.blur()}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={2.5}>
+              {/* <TextField
+                id="transactionType"
+                label="Transaction Type"
+                variant="standard"
+                size="small"
+                fullWidth
+                className={classes.input3}
+                inputProps={{ min: 0, step: 0.01 }}
+                onWheel={(e) => e.target.blur()}
+                value={transactionType}
+                onChange={(e) => setTransactionType(e.target.value)}
+              /> */}
+              <FormControl fullWidth variant="standard" size="small">
+                <InputLabel id="demo-simple-select-label">
+                  Transaction Type
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Transaction Type"
+                  value={transactionType}
+                  onChange={(e) => setTransactionType(e.target.value)}
+                >
+                  <MenuItem value={"Offline"}>Offline</MenuItem>
+                  <MenuItem value={"Online"}>Online</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={2.5}>
+              <TextField
+                id="paymentMethod"
+                label="Payment Method"
+                variant="standard"
+                size="small"
+                fullWidth
+                className={classes.input3}
+                inputProps={{ min: 0, step: 0.01 }}
+                onWheel={(e) => e.target.blur()}
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={2.5}>
+              <TextField
+                id="transactionId"
+                label="Transaction Id"
+                variant="standard"
+                size="small"
+                fullWidth
+                className={classes.input3}
+                inputProps={{ min: 0, step: 0.01 }}
+                onWheel={(e) => e.target.blur()}
+                value={transactionId}
+                onChange={(e) => setTransactionId(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={4.5}>
+              <TextField
+                id="shippingAddress"
+                label="Shipping Address"
+                variant="standard"
+                size="small"
+                fullWidth
+                className={classes.input3}
+                inputProps={{ min: 0, step: 0.01 }}
+                onWheel={(e) => e.target.blur()}
+                value={shippingAddress}
+                onChange={(e) => setShippingAddress(e.target.value)}
               />
             </Grid>
           </Grid>
