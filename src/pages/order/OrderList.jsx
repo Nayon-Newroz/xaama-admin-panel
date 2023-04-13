@@ -48,7 +48,6 @@ import moment from "moment";
 import Slide from "@mui/material/Slide";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-import OrderItems from "./OrderItems";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
@@ -104,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const ProductList = () => {
+const OrderList = () => {
   const classes = useStyles();
   const [tableDataList, setTableDataList] = useState([]);
   const [page, setPage] = useState(0);
@@ -234,7 +233,7 @@ const ProductList = () => {
     try {
       setLoading2(true);
       let response = await axios({
-        url: `/api/v1/product/delete/${deleteData.row._id}`,
+        url: `/api/v1/order/delete/${deleteData.row._id}`,
         method: "delete",
       });
       if (response.status >= 200 && response.status < 300) {
@@ -268,7 +267,7 @@ const ProductList = () => {
     setStartingTime(null);
     setEndingTime(null);
     setPage(0);
-    const newUrl = `/api/v1/product?limit=${rowsPerPage}&page=1`;
+    const newUrl = `/api/v1/order?limit=${rowsPerPage}&page=1`;
     getData(0, rowsPerPage, newUrl);
   };
 
@@ -318,7 +317,7 @@ const ProductList = () => {
           newEndingTime = dayjs(endingTime).format("YYYY-MM-DD");
         }
 
-        url = `/api/v1/product?name=${name}&category_id=${category}&minPrice=${newMinPrice}&maxPrice=${newMaxPrice}&sku=${sku}&startDate=${newStartingTime}&endDate=${newEndingTime}&status=${newStatus}&limit=${newLimit}&page=${
+        url = `/api/v1/order?name=${name}&category_id=${category}&minPrice=${newMinPrice}&maxPrice=${newMaxPrice}&sku=${sku}&startDate=${newStartingTime}&endDate=${newEndingTime}&status=${newStatus}&limit=${newLimit}&page=${
           newPageNO + 1
         }`;
       }
@@ -348,11 +347,6 @@ const ProductList = () => {
   };
   const handleOrderChange = (id, row) => {
     console.log("event.target.checked", id);
-
-    if (parseInt(row.stock_unit) < 1) {
-      return handleSnakbarOpen("Stock is not available", "error");
-    }
-    console.log("run");
     if (orderIds.includes(id)) {
       console.log("if-----------");
       let newIds = orderIds.filter((res) => res !== id);
@@ -407,38 +401,20 @@ const ProductList = () => {
               component="div"
               onClick={check}
             >
-              Product List
+              Order List
             </Typography>
           </Grid>
           <Grid item lg={3} xl={3} style={{ textAlign: "right" }}>
-            <Grid container spacing={{ lg: 6, xl: 3 }}>
-              <Grid item xs={9}>
-                {" "}
-                <Button
-                  variant="outlined"
-                  color="success"
-                  size="large"
-                  fullWidth
-                  disableElevation
-                  onClick={handleClickOpen}
-                >
-                  Order List
-                  {orderItems.length > 0 && " (" + orderItems.length + ")"}
-                </Button>
-              </Grid>
-              <Grid item xs={3}>
-                <Button
-                  disableElevation
-                  variant="outlined"
-                  size="large"
-                  color="info"
-                  // startIcon={<FilterListIcon />}
-                  onClick={() => setOpen(!open)}
-                >
-                  {open ? <FilterListOffIcon /> : <FilterListIcon />}
-                </Button>
-              </Grid>
-            </Grid>
+            <Button
+              disableElevation
+              variant="outlined"
+              size="large"
+              color="info"
+              // startIcon={<FilterListIcon />}
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <FilterListOffIcon /> : <FilterListIcon />}
+            </Button>
           </Grid>
 
           <Grid item xs={12}>
@@ -606,6 +582,7 @@ const ProductList = () => {
         <div
           style={{
             overflowX: "auto",
+
             minWidth: "100%",
             width: "Calc(100vw - 385px)",
             // padding: "10px 16px 0px",
@@ -615,23 +592,51 @@ const ProductList = () => {
           <Table aria-label="simple table" className={classes.tableStyle}>
             <TableHead>
               <TableRow>
-                <TableCell style={{ width: "20px" }}>
-                  <Checkbox disabled />
-                </TableCell>
-                <TableCell style={{ minWidth: "70px" }}>Image</TableCell>
-                <TableCell style={{ minWidth: "220px" }}>Name</TableCell>
-                <TableCell>Price</TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>Order Id</TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
-                  Discount Price
+                  Customer Name
                 </TableCell>
-                <TableCell style={{ whiteSpace: "nowrap" }}>In Stock</TableCell>
-                <TableCell>SKU</TableCell>
-                <TableCell style={{ whiteSpace: "nowrap" }}>Viewed</TableCell>
-                <TableCell>Category</TableCell>
-                <TableCell>Filters</TableCell>
-                {/* <TableCell>Images</TableCell> */}
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Customer phone
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Customer Email
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Customer Address
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Shipping Address
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Discount Amount
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>Tax</TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Paid Amount
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Due Amount
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Total Amount
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Order Status
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Payment Method
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Tracking Info
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Transaction Id
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Transaction Type
+                </TableCell>
 
-                {/* <TableCell>Description</TableCell> */}
                 <TableCell style={{ whiteSpace: "nowrap" }}>
                   Created Info
                 </TableCell>
@@ -650,74 +655,24 @@ const ProductList = () => {
                     key={i}
                     // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
+                    <TableCell>{row?.order_id}</TableCell>
+                    <TableCell>{row?.customer_name}</TableCell>
+                    <TableCell>{row?.customer_phone}</TableCell>
+                    <TableCell>{row?.customer_email}</TableCell>
+                    <TableCell>{row?.customer_address}</TableCell>
+                    <TableCell>{row?.shipping_address}</TableCell>
+                    <TableCell>{row?.discount}</TableCell>
+                    <TableCell>{row?.tax}</TableCell>
+                    <TableCell>{row?.paid_amount}</TableCell>
                     <TableCell>
-                      <Checkbox
-                        checked={orderIds.includes(row?._id)}
-                        onChange={() => handleOrderChange(row?._id, row)}
-                        inputProps={{ "aria-label": "controlled" }}
-                      />
+                      {parseInt(row?.total_amount) - parseInt(row?.paid_amount)}
                     </TableCell>
-                    <TableCell>
-                      {row?.images.length > 0 ? (
-                        <>
-                          <img
-                            src={row?.images[0].url}
-                            alt=""
-                            width="70px"
-                            height="70px"
-                            style={{ display: "block", margin: "5px 0" }}
-                          />
-                          <Button
-                            // variant="outlined"
-                            size="small"
-                            style={{ whiteSpace: "nowrap", fontSize: "10px" }}
-                            onClick={() => handleImageClickOpen(row?.images)}
-                          >
-                            View All
-                          </Button>
-                        </>
-                      ) : (
-                        "No Image Available"
-                      )}
-                    </TableCell>
-                    <TableCell style={{ minWidth: "250px" }}>
-                      {row?.name}
-                    </TableCell>
-                    <TableCell>{row?.price}</TableCell>
-                    <TableCell>
-                      {parseInt(row.discount_price) > 0
-                        ? row.discount_price
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell style={{ whiteSpace: "nowrap" }}>
-                      {row?.stock_unit}{" "}
-                      {parseInt(row?.stock_unit) > 1 ? "Units" : "Unit"}
-                    </TableCell>
-                    <TableCell style={{ whiteSpace: "nowrap" }}>
-                      {row?.sku}
-                    </TableCell>
-                    <TableCell>{row?.viewed}</TableCell>
-                    <TableCell>
-                      {row?.category_data.length > 0
-                        ? row?.category_data[0].name
-                        : "N/A"}
-                    </TableCell>
-
-                    <TableCell
-                      style={{ minWidth: "120px", whiteSpace: "nowrap" }}
-                    >
-                      {row?.filter_data.length > 0
-                        ? row?.filter_data
-                            .sort(sortByParentName)
-                            .map((e, i) => (
-                              <label key={e._id}>
-                                {i !== 0 && <>,&nbsp;&nbsp;</>}
-                                <b>{e.parent_name}</b> : {e.name}
-                              </label>
-                            ))
-                        : "N/A"}
-                    </TableCell>
-
+                    <TableCell>{row?.total_amount}</TableCell>
+                    <TableCell>{row?.order_status}</TableCell>
+                    <TableCell>{row?.payment_method}</TableCell>
+                    <TableCell>{row?.tracking_info}</TableCell>
+                    <TableCell>{row?.transaction_id}</TableCell>
+                    <TableCell>{row?.transaction_type}</TableCell>
                     <TableCell>
                       <b>{row?.created_by}</b>
 
@@ -1046,25 +1001,8 @@ const ProductList = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        fullWidth={true}
-        maxWidth="xl"
-        TransitionComponent={Transition}
-        open={openOrderList}
-        onClose={handleOpenOrderListClose}
-      >
-        {/* <DialogTitle>Order List</DialogTitle> */}
-        <DialogContent>
-          <OrderItems
-            orderItems={orderItems}
-            setOrderItems={setOrderItems}
-            handleOrderChange={handleOrderChange}
-            handleOpenOrderListClose={handleOpenOrderListClose}
-          />
-        </DialogContent>
-      </Dialog>
     </>
   );
 };
 
-export default ProductList;
+export default OrderList;

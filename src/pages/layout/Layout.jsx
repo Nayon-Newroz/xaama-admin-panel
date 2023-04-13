@@ -771,6 +771,22 @@ export default function Layout() {
                 </Link>
               </List>
             </Collapse>
+            <Link to="/order-list" className={classes.linkStyle}>
+              <ListItemButton
+                className={`${classes.menuItem} ${
+                  pathname === "/order-list" ? classes.menuItemActive : null
+                }`}
+                onClick={() => {
+                  manageOpen("order-list");
+                }}
+              >
+                <ListItemIcon>
+                  <HomeIcon />
+                </ListItemIcon>
+
+                <ListItemText primary="Order List" />
+              </ListItemButton>
+            </Link>
           </List>
         </Drawer>
         <Main open={open}>

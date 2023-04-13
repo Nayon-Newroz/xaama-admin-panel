@@ -291,8 +291,14 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  select: {
+    "& .MuiSelect-select": {
+      fontWeight: 500,
+      color: "#154360 !important",
+    },
+  },
 }));
-const OrderList = ({
+const OrderItems = ({
   orderItems,
   setOrderItems,
   handleOrderChange,
@@ -474,10 +480,10 @@ const OrderList = ({
           discount: discount,
           tax: tax,
           total_amount: calculateTotalAmount(),
-          amount_paid: paidAmount,
-          transaction_type: "Offline",
-          payment_method: "Cash",
-          transaction_id: "N/A",
+          paid_amount: paidAmount,
+          transaction_type: transactionType,
+          payment_method: paymentMethod,
+          transaction_id: transactionId,
           order_list: orderItems,
         };
 
@@ -535,9 +541,10 @@ const OrderList = ({
           <Grid container>
             <Grid item xs={6} sm={6} md={6}>
               <p className={classes.titleStyle2}>
-                Orders &nbsp;&nbsp;
-                {/* <span style={{ fontSize: "18px" }}> */}({orderItems.length}{" "}
-                Item{orderItems.length > 1 && "s"}){/* </span> */}
+                Order &nbsp;
+                <span style={{ fontSize: "16px", color: "#7c7c7c" }}>
+                  ({orderItems.length} Item{orderItems.length > 1 && "s"})
+                </span>
               </p>
             </Grid>
             <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
@@ -652,6 +659,7 @@ const OrderList = ({
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Transaction Type"
+                  className={classes.select}
                   value={transactionType}
                   onChange={(e) => setTransactionType(e.target.value)}
                 >
@@ -854,9 +862,9 @@ const OrderList = ({
             container
             justifyContent="center"
             // alignItems="center"
-            spacing={2}
+            spacing={1}
           >
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <TextField
                 id="outlined-basic"
                 // label="Outlined"
@@ -875,7 +883,7 @@ const OrderList = ({
                 value={productTotalPrice}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <TextField
                 id="outlined-basic"
                 // label="Outlined"
@@ -895,7 +903,7 @@ const OrderList = ({
                 onChange={(e) => setDiscount(e.target.value)}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <TextField
                 id="outlined-basic"
                 // label="Outlined"
@@ -915,7 +923,7 @@ const OrderList = ({
                 onChange={(e) => setTax(e.target.value)}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <TextField
                 id="outlined-basic"
                 // label="Outlined"
@@ -937,7 +945,7 @@ const OrderList = ({
                 onChange={(e) => setPaidAmount(e.target.value)}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <TextField
                 id="outlined-basic"
                 // label="Outlined"
@@ -958,7 +966,7 @@ const OrderList = ({
                 value={parseInt(calculateTotalAmount()) - paidAmount}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <TextField
                 id="outlined-basic"
                 // label="Outlined"
@@ -977,14 +985,14 @@ const OrderList = ({
                 value={calculateTotalAmount()}
               />
             </Grid>
-            <Grid item xs={9}></Grid>
-            <Grid item xs={3}>
+            <Grid item xs={8}></Grid>
+            <Grid item xs={4}>
               <Button
                 fullWidth
                 variant="contained"
                 // disabled={loading}
                 size="large"
-                style={{ minHeight: "35px" }}
+                style={{ minHeight: "35px",marginTop:"20px" }}
                 autoFocus
                 disableElevation
                 onClick={onSubmit}
@@ -1057,4 +1065,4 @@ const OrderList = ({
   );
 };
 
-export default OrderList;
+export default OrderItems;
