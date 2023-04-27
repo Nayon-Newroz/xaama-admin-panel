@@ -48,7 +48,7 @@ import moment from "moment";
 import Slide from "@mui/material/Slide";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-import OrderItems from "./OrderItems";
+import OrderItemList from "./OrderItemList";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
@@ -104,7 +104,11 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const ProductList = () => {
+const ProductList = ({
+  orderListItems,
+  setOrderListItems,
+  isFromOrderList,
+}) => {
   const classes = useStyles();
   const [tableDataList, setTableDataList] = useState([]);
   const [page, setPage] = useState(0);
@@ -348,23 +352,35 @@ const ProductList = () => {
   };
   const handleOrderChange = (id, row) => {
     console.log("event.target.checked", id);
+    console.log("row row", row);
 
-    if (parseInt(row.stock_unit) < 1) {
+    if (row !== undefined && parseInt(row.stock_unit) < 1) {
       return handleSnakbarOpen("Stock is not available", "error");
     }
     console.log("run");
     if (orderIds.includes(id)) {
       console.log("if-----------");
       let newIds = orderIds.filter((res) => res !== id);
-      let newOrderItem = orderItems.filter((res) => res._id !== id);
       setOrderIds(newIds);
-      setOrderItems(newOrderItem);
+
+      if (isFromOrderList) {
+        let newOrderItemList = orderListItems.filter(
+          (res) => res.product_id !== id
+        );
+        setOrderListItems(newOrderItemList);
+      } else {
+        let newOrderItem = orderItems.filter((res) => res.product_id !== id);
+        setOrderItems(newOrderItem);
+      }
     } else {
       console.log("else-----------");
       let newRow = { ...row, quantity: 1 };
       setOrderIds([...orderIds, id]);
-      setOrderItems([...orderItems, newRow]);
-      // orderIds.push(id);
+      if (isFromOrderList) {
+        setOrderListItems([...orderListItems, newRow]);
+      } else {
+        setOrderItems([...orderItems, newRow]);
+      }
     }
     console.log("orderIds", orderIds);
   };
@@ -385,6 +401,17 @@ const ProductList = () => {
   useEffect(() => {
     getData();
     getCategoryList();
+  }, []);
+
+  // this useEffect is only for maintain add new product in updateOrderList
+  useEffect(() => {
+    if (isFromOrderList) {
+      let newIds = [];
+      orderListItems.map((res) => newIds.push(res.product_id));
+      setOrderIds(newIds);
+      setOrderItems(orderListItems);
+      setOrderListItems([...orderListItems]);
+    }
   }, []);
 
   return (
@@ -619,7 +646,9 @@ const ProductList = () => {
                   <Checkbox disabled />
                 </TableCell>
                 <TableCell style={{ minWidth: "70px" }}>Image</TableCell>
-                <TableCell style={{ minWidth: "220px" }}>Name</TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Product Name
+                </TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
                   Discount Price
@@ -652,8 +681,8 @@ const ProductList = () => {
                   >
                     <TableCell>
                       <Checkbox
-                        checked={orderIds.includes(row?._id)}
-                        onChange={() => handleOrderChange(row?._id, row)}
+                        checked={orderIds.includes(row?.product_id)}
+                        onChange={() => handleOrderChange(row?.product_id, row)}
                         inputProps={{ "aria-label": "controlled" }}
                       />
                     </TableCell>
@@ -680,7 +709,7 @@ const ProductList = () => {
                         "No Image Available"
                       )}
                     </TableCell>
-                    <TableCell style={{ minWidth: "250px" }}>
+                    <TableCell style={{ maxWidth: "220px", minWidth: "220px" }}>
                       {row?.name}
                     </TableCell>
                     <TableCell>{row?.price}</TableCell>
@@ -1055,7 +1084,7 @@ const ProductList = () => {
       >
         {/* <DialogTitle>Order List</DialogTitle> */}
         <DialogContent>
-          <OrderItems
+          <OrderItemList
             orderItems={orderItems}
             setOrderItems={setOrderItems}
             handleOrderChange={handleOrderChange}

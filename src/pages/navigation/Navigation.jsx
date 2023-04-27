@@ -26,7 +26,8 @@ import Test from "../../Test";
 import UpdateProduct from "../product/UpdateProduct";
 import AddProduct from "../product/AddProduct";
 import ProductList from "../product/ProductList";
-import OrderList from "../order/OrderList";
+import OrderList2 from "../order/OrderList2";
+import UpdateOrderList from "../order/UpdateOrderList";
 
 const useStyles = makeStyles((theme) => ({
   dialogStyle: {
@@ -224,7 +225,15 @@ const Navigation = ({ openLoadingDialog, setOpenLoadingDialog }) => {
           path="order-list"
           element={
             <PrivateRoute>
-              <OrderList />
+              <OrderList2 />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="update-order/:id"
+          element={
+            <PrivateRoute>
+              <UpdateOrderList />
             </PrivateRoute>
           }
         />

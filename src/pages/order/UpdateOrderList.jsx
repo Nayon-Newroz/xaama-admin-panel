@@ -16,7 +16,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -35,6 +35,8 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
+import { getDataWithToken } from "../../services/GetDataService";
+import ProductList from "../product/ProductList";
 const useStyles = makeStyles((theme) => ({
   cardHolder: {
     display: "flex",
@@ -298,13 +300,13 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const OrderItems = ({
-  orderItems,
-  setOrderItems,
+const OrderItemList = ({ 
   handleOrderChange,
   handleOpenOrderListClose,
 }) => {
   const classes = useStyles();
+  const { state } = useLocation();
+  let { id } = useParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
@@ -315,13 +317,19 @@ const OrderItems = ({
   const [shippingAddress, setShippingAddress] = useState("11/A, Dhaka");
   const [promoCode, setPromoCode] = useState("");
   const [productTotalPrice, setProductTotalPrice] = useState(0);
-  const [removeItemId, setRemoveItemId] = useState("");
+  const [cancelProductData, setCancelProductData] = useState({});
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = React.useState(false);
+  const [loadingFetchData, setLoadingFetchData] = useState(false);
+  const [open, setOpen] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [tax, setTax] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [orderListItems, setOrderListItems] = useState([]);
+
+  const [cancelProductLoading, setCancelProductLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [newProductListDialog, setNewProductListDialog] = useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const handleSnakbarOpen = (msg, vrnt) => {
     let duration;
@@ -348,25 +356,25 @@ const OrderItems = ({
 
     return 0;
   };
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
   const handleClose = () => {
     setOpen(false);
-    setRemoveItemId("");
+    setCancelProductData({});
+  };
+  const handleNewProductListDialogClose = () => {
+    setNewProductListDialog(false);
   };
 
-  const removeDialog = (id) => {
-    console.log("id", id);
-    handleClickOpen();
-    setRemoveItemId(id);
+  const removeDialog = (row) => {
+    console.log("row", row);
+    setOpen(true);
+    setCancelProductData(row);
   };
-  const removelist = () => {
-    console.log("removeItemId", removeItemId);
-    handleOrderChange(removeItemId);
-    handleClose();
-  };
+  // const removelist = () => {
+  //   console.log("cancelProductData", cancelProductData);
+  //   handleOrderChange(cancelProductData);
+  //   handleClose();
+  // };
 
   const modifyArray = (value, row, i) => {
     console.log("value", value);
@@ -386,7 +394,7 @@ const OrderItems = ({
         newObject = { ...row, quantity: parseInt(value) };
       }
       console.log("newObject", newObject);
-      let newOrderItems = orderItems.map((item) => {
+      let newOrderItems = orderListItems.map((item) => {
         if (item._id === row._id) {
           return newObject;
         } else {
@@ -394,7 +402,7 @@ const OrderItems = ({
         }
       });
       console.log("newOrderItems", newOrderItems);
-      setOrderItems(newOrderItems);
+      setOrderListItems(newOrderItems);
     }
   };
   const increaseQuantity = (qty, row, i) => {
@@ -412,7 +420,7 @@ const OrderItems = ({
     console.log("fnTotalPrice");
     let total = 0;
 
-    orderItems.map((item) => {
+    orderListItems?.map((item) => {
       let itemPrice;
       if (parseInt(item.discount_price) > 0) {
         itemPrice = parseInt(item.discount_price);
@@ -423,19 +431,17 @@ const OrderItems = ({
     });
     setProductTotalPrice(total);
   };
-  useEffect(() => {
-    fnTotalPrice();
-  }, [orderItems]);
+
   const validation = () => {
     let isError = false;
 
     if (!name.trim()) {
-      handleSnakbarOpen("Please enter shipping address", "error");
+      handleSnakbarOpen("Please enter customer name", "error");
       document.getElementById("name").focus();
       return (isError = true);
     }
     if (!phoneNo.trim()) {
-      handleSnakbarOpen("Please enter shipping address", "error");
+      handleSnakbarOpen("Please enter customer phone number", "error");
       document.getElementById("phoneNo").focus();
       return (isError = true);
     }
@@ -463,13 +469,23 @@ const OrderItems = ({
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    let err = false;
-    // let err = validation();
+    let err = validation();
     if (err) {
       return;
     } else {
       setLoading(true);
-
+      let newTax = tax;
+      let newDiscount = discount;
+      let newPaidAmount = paidAmount;
+      if (tax === "") {
+        newTax = 0;
+      }
+      if (discount === "") {
+        newDiscount = 0;
+      }
+      if (paidAmount === "") {
+        newPaidAmount = 0;
+      }
       try {
         let data = {
           customer_name: name,
@@ -477,24 +493,24 @@ const OrderItems = ({
           customer_phone: phoneNo,
           customer_address: address,
           shipping_address: shippingAddress,
-          discount: discount,
-          tax: tax,
+          discount: newDiscount,
+          tax: newTax,
           total_amount: calculateTotalAmount(),
-          paid_amount: paidAmount,
+          paid_amount: newPaidAmount,
           transaction_type: transactionType,
           payment_method: paymentMethod,
           transaction_id: transactionId,
-          order_list: orderItems,
+          order_list: orderListItems,
         };
 
         let response = await axios({
-          url: `/api/v1/order/create`,
-          method: "post",
+          url: `/api/v1/order/update/${id}`,
+          method: "put",
           data: data,
           headers: { "Content-Type": "application/json" },
         });
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Added successfully", "success");
+          handleSnakbarOpen("Successful", "success");
           // navigate("/product-list");
         }
       } catch (error) {
@@ -512,9 +528,89 @@ const OrderItems = ({
       ((productTotalPrice - discount) * tax) / 100
     ).toFixed(2);
   };
+  const getData = async (pageNO, limit, newUrl) => {
+    console.log("pageNO ==============", pageNO);
+
+    try {
+      setLoadingFetchData(true);
+
+      let url = `/api/v1/order/${id}`;
+
+      let allData = await getDataWithToken(url);
+
+      if (allData.status >= 200 && allData.status < 300) {
+        setName(allData?.data?.data.customer_name);
+        setEmail(allData?.data?.data.customer_email);
+        setPhoneNo(allData?.data?.data.customer_phone);
+        setAddress(allData?.data?.data.customer_address);
+        setTransactionType(allData?.data?.data.transaction_type);
+        setPaymentMethod(allData?.data?.data.payment_method);
+        setTransactionId(allData?.data?.data.transaction_id);
+        setShippingAddress(allData?.data?.data.shipping_address);
+        setOrderListItems(allData?.data?.data.product_details);
+        setDiscount(allData?.data?.data.discount);
+        setTax(allData?.data?.data.tax);
+        setPaidAmount(allData?.data?.data.paid_amount);
+
+        if (allData.data.data.length < 1) {
+          setMessage("No data found");
+        }
+      }
+      setLoadingFetchData(false);
+    } catch (error) {
+      console.log("error", error);
+      setLoadingFetchData(false);
+      handleSnakbarOpen(error.response.data.message.toString(), "error");
+    }
+  };
+  const cancelProduct = async (row) => {
+    try {
+      setCancelProductLoading(true);
+
+      let data = {
+        id: id,
+        productId: cancelProductData.product_id,
+      };
+      console.log("data", data);
+      let response = await axios({
+        url: `/api/v1/order/cancel-product`,
+        method: "post",
+        data: data,
+      });
+      console.log("response", response);
+      if (response.status >= 200 && response.status < 300) {
+        let newOrderItems = orderListItems.filter(
+          (res) => res.product_id !== cancelProductData.product_id
+        );
+        setOrderListItems(newOrderItems);
+      }
+      setCancelProductLoading(false);
+      handleClose();
+    } catch (error) {
+      console.log("error", error);
+      setCancelProductLoading(false);
+      handleSnakbarOpen(error.response.data.message.toString(), "error");
+    }
+  };
+  useEffect(() => {
+    getData();
+    console.log("state?.row", state?.row);
+     
+  }, []);
+  useEffect(() => {
+    fnTotalPrice();
+  }, [orderListItems]);
   return (
-    <div>
-      {orderItems?.length < 1 ? (
+    <div
+      style={{
+        background: "#fff",
+        border: "1px solid #ddd",
+        borderRadius: "5px",
+        overflow: "hidden",
+        padding: "24px",
+      }}
+    >
+      {orderListItems?.length < 1 ? (
         <div className={classes.cardHolder}>
           <div className={classes.card}>
             <p className={classes.cardTitle}>Order List</p>
@@ -543,16 +639,17 @@ const OrderItems = ({
               <p className={classes.titleStyle2}>
                 Order &nbsp;
                 <span style={{ fontSize: "16px", color: "#7c7c7c" }}>
-                  ({orderItems.length} Item{orderItems.length > 1 && "s"})
+                  ({orderListItems?.length} Item{orderListItems?.length > 1 && "s"})
                 </span>
               </p>
             </Grid>
-            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+            {/* <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
               <IconButton onClick={handleOpenOrderListClose}>
                 <ClearIcon style={{ color: "#205295" }} />
               </IconButton>
-            </Grid>
+            </Grid> */}
           </Grid>
+
           <Grid
             container
             justifyContent="center"
@@ -712,6 +809,17 @@ const OrderItems = ({
             </Grid>
           </Grid>
           <br />
+          <div style={{ textAlign: "right" }}>
+            <Button
+              disableElevation
+              variant="outlined"
+              color="info"
+              onClick={() => setNewProductListDialog(true)}
+            >
+              Add New Product
+            </Button>
+          </div>
+          <br />
           <TableContainer>
             <Table
               aria-label="simple table"
@@ -723,17 +831,19 @@ const OrderItems = ({
                   <TableCell>Image</TableCell>
                   <TableCell>Title</TableCell>
                   <TableCell>Specification</TableCell>
-                  <TableCell align="">In Stock</TableCell>
                   <TableCell align="center">Quantity</TableCell>
                   <TableCell align="right"> Price</TableCell>
-                  <TableCell align="right"> Discount Price</TableCell>
+                  <TableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                    {" "}
+                    Discount Price
+                  </TableCell>
                   <TableCell align="right">Total</TableCell>
                   <TableCell align="right">Remove</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody className={classes.tableBodyStyle}>
-                {orderItems &&
-                  orderItems.map((row, i) => (
+                {orderListItems.length > 0 &&
+                  orderListItems?.map((row, i) => (
                     <TableRow
                       key={i}
                       sx={
@@ -766,10 +876,6 @@ const OrderItems = ({
                                 </label>
                               ))
                           : "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        {row?.stock_unit} unit
-                        {parseInt(row?.stock_unit) > 1 && "s"}
                       </TableCell>
 
                       <TableCell style={{ whiteSpace: "nowrap" }}>
@@ -847,7 +953,7 @@ const OrderItems = ({
                         <IconButton
                           aria-label="delete"
                           color="secondary"
-                          onClick={() => removeDialog(row._id)}
+                          onClick={() => removeDialog(row)}
                         >
                           <DeleteIcon style={{ color: "#95A5A6" }} />
                         </IconButton>
@@ -915,6 +1021,18 @@ const OrderItems = ({
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">TAX </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment
+                      position="end"
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: 500,
+                        color: "#154360",
+                      }}
+                    >
+                      %{" "}
+                    </InputAdornment>
                   ),
                 }}
                 inputProps={{ min: 0, step: 0.01 }}
@@ -992,7 +1110,7 @@ const OrderItems = ({
                 variant="contained"
                 // disabled={loading}
                 size="large"
-                style={{ minHeight: "35px",marginTop:"20px" }}
+                style={{ minHeight: "35px", marginTop: "20px" }}
                 autoFocus
                 disableElevation
                 onClick={onSubmit}
@@ -1003,7 +1121,7 @@ const OrderItems = ({
                   size={10}
                   speedMultiplier={0.5}
                 />{" "} */}
-                Submit
+                Update Order
                 {/* {loading === false && "Submit"} */}
               </Button>
             </Grid>
@@ -1039,23 +1157,65 @@ const OrderItems = ({
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">{"Remove Alart?"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Are you sure you want to remove this Item ?
-              </DialogContentText>
-            </DialogContent>
+            <div style={{ padding: "10px", minWidth: "300px" }}>
+              <DialogTitle id="alert-dialog-title">
+                {"Remove Alart?"}
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  You want to cancel {cancelProductData.name} order
+                </DialogContentText>
+              </DialogContent>
+            </div>
             <DialogActions>
-              <Button onClick={handleClose} style={{ color: "#AAB7B8" }}>
-                Cancel
-              </Button>
+              <Button onClick={handleClose}>cancel</Button>
               <Button
+                variant="contained"
+                disabled={cancelProductLoading}
+                onClick={cancelProduct}
+                style={{ minWidth: "100px", minHeight: "35px" }}
                 autoFocus
-                onClick={() => {
-                  removelist();
-                }}
+                disableElevation
               >
-                Confirm
+                <PulseLoader
+                  color={"#353b48"}
+                  loading={cancelProductLoading}
+                  size={10}
+                  speedMultiplier={0.5}
+                />{" "}
+                {cancelProductLoading === false && "Confirm"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={newProductListDialog}
+            onClose={handleNewProductListDialogClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            fullWidth={true}
+            maxWidth="xl"
+          >
+            <DialogContent>
+              <ProductList orderListItems={orderListItems} setOrderListItems={setOrderListItems} isFromOrderList={true} />
+            </DialogContent>
+
+            <DialogActions>
+              <Button onClick={handleNewProductListDialogClose}>cancel</Button>
+              <Button
+                variant="contained"
+                disabled={cancelProductLoading}
+                onClick={cancelProduct}
+                style={{ minWidth: "100px", minHeight: "35px" }}
+                autoFocus
+                disableElevation
+              >
+                <PulseLoader
+                  color={"#353b48"}
+                  loading={cancelProductLoading}
+                  size={10}
+                  speedMultiplier={0.5}
+                />{" "}
+                {cancelProductLoading === false && "Confirm"}
               </Button>
             </DialogActions>
           </Dialog>
@@ -1065,4 +1225,4 @@ const OrderItems = ({
   );
 };
 
-export default OrderItems;
+export default OrderItemList;

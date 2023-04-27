@@ -48,6 +48,8 @@ import moment from "moment";
 import Slide from "@mui/material/Slide";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
@@ -103,7 +105,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const OrderList = () => {
+const OrderList2 = () => {
   const classes = useStyles();
   const [tableDataList, setTableDataList] = useState([]);
   const [page, setPage] = useState(0);
@@ -134,7 +136,10 @@ const OrderList = () => {
   const [imageDialog, setImageDialog] = useState(false);
   const [images, setImages] = useState([]);
   const [detailDialog, setDetailDialog] = useState(false);
-  const [details, setDetails] = useState({});
+  const [details, setDetails] = useState([]);
+  const [cancelProductData, setCancelProductData] = useState({});
+  const [cancelProductDialog, setCancelProductDialog] = useState(false);
+  const [cancelProductLoading, setCancelProductLoading] = useState(false);
   const handleDetailClickOpen = (obj) => {
     setDetails(obj);
     setDetailDialog(true);
@@ -142,6 +147,14 @@ const OrderList = () => {
   const handleDetailClose = () => {
     setDetails({});
     setDetailDialog(false);
+  };
+  const handleCancelProductClickOpen = (obj) => {
+    setCancelProductData(obj);
+    setCancelProductDialog(true);
+  };
+  const handleCancelProductClose = () => {
+    setCancelProductData({});
+    setCancelProductDialog(false);
   };
   const handleImageClickOpen = (images) => {
     setImages(images);
@@ -202,6 +215,51 @@ const OrderList = () => {
       variant: vrnt,
       autoHideDuration: duration,
     });
+  };
+
+  const cancelProduct = async (row) => {
+    console.log("cancelProductData.product_id", cancelProductData);
+    try {
+      setCancelProductLoading(true);
+
+      let data = {
+        id: details._id,
+        productId: cancelProductData.product_id,
+      };
+      console.log("data", data);
+      let response = await axios({
+        url: `/api/v1/order/cancel-product`,
+        method: "post",
+        data: data,
+      });
+      console.log("response", response);
+      if (response.status >= 200 && response.status < 300) {
+        let newProductDetails = details.product_details.filter(
+          (res) => res.product_id !== cancelProductData.product_id
+        );
+        console.log("details", details);
+        console.log("newProductDetails", newProductDetails);
+        setDetails({ ...details, product_details: newProductDetails });
+        let newTableDataList = [];
+        tableDataList.map((item) => {
+          if (item._id === details._id) {
+            newTableDataList.push({
+              ...item,
+              product_details: newProductDetails,
+            });
+          } else {
+            newTableDataList.push(item);
+          }
+          setTableDataList(newTableDataList);
+        });
+      }
+      setCancelProductLoading(false);
+      handleCancelProductClose();
+    } catch (error) {
+      console.log("error", error);
+      // setCancelProductLoading(false);
+      handleSnakbarOpen(error.response.data.message.toString(), "error");
+    }
   };
   const handleDeleteDialogClose = () => {
     setDeleteDialog(false);
@@ -344,23 +402,6 @@ const OrderList = () => {
     console.log("startingTime", dayjs(startingTime).format("YYYY-MM-DD"));
     let start = dayjs(startingTime).format("YYYY-MM-DD");
     console.log("new Start", start.concat("T00:00:00"));
-  };
-  const handleOrderChange = (id, row) => {
-    console.log("event.target.checked", id);
-    if (orderIds.includes(id)) {
-      console.log("if-----------");
-      let newIds = orderIds.filter((res) => res !== id);
-      let newOrderItem = orderItems.filter((res) => res._id !== id);
-      setOrderIds(newIds);
-      setOrderItems(newOrderItem);
-    } else {
-      console.log("else-----------");
-      let newRow = { ...row, quantity: 1 };
-      setOrderIds([...orderIds, id]);
-      setOrderItems([...orderItems, newRow]);
-      // orderIds.push(id);
-    }
-    console.log("orderIds", orderIds);
   };
 
   const sortByParentName = (a, b) => {
@@ -606,6 +647,9 @@ const OrderList = () => {
                   Customer Address
                 </TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Order Items
+                </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
                   Shipping Address
                 </TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
@@ -638,10 +682,10 @@ const OrderList = () => {
                 </TableCell>
 
                 <TableCell style={{ whiteSpace: "nowrap" }}>
-                  Created Info
+                  Order Created Info
                 </TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
-                  Last Updated Info
+                  Last Order Updated Info
                 </TableCell>
                 <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
                 <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
@@ -651,106 +695,132 @@ const OrderList = () => {
               {!loading &&
                 tableDataList.length > 0 &&
                 tableDataList.map((row, i) => (
-                  <TableRow
-                    key={i}
-                    // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell>{row?.order_id}</TableCell>
-                    <TableCell>{row?.customer_name}</TableCell>
-                    <TableCell>{row?.customer_phone}</TableCell>
-                    <TableCell>{row?.customer_email}</TableCell>
-                    <TableCell>{row?.customer_address}</TableCell>
-                    <TableCell>{row?.shipping_address}</TableCell>
-                    <TableCell>{row?.discount}</TableCell>
-                    <TableCell>{row?.tax}</TableCell>
-                    <TableCell>{row?.paid_amount}</TableCell>
-                    <TableCell>
-                      {parseInt(row?.total_amount) - parseInt(row?.paid_amount)}
-                    </TableCell>
-                    <TableCell>{row?.total_amount}</TableCell>
-                    <TableCell>{row?.order_status}</TableCell>
-                    <TableCell>{row?.payment_method}</TableCell>
-                    <TableCell>{row?.tracking_info}</TableCell>
-                    <TableCell>{row?.transaction_id}</TableCell>
-                    <TableCell>{row?.transaction_type}</TableCell>
-                    <TableCell>
-                      <b>{row?.created_by}</b>
+                  <>
+                    <TableRow
+                      key={i}
+                      // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell>{row?.order_id}</TableCell>
+                      <TableCell>{row?.customer_name}</TableCell>
+                      <TableCell>{row?.customer_phone}</TableCell>
+                      <TableCell>
+                        {row?.customer_email?.length > 0
+                          ? row?.customer_email
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>{row?.customer_address}</TableCell>
+                      <TableCell style={{ whiteSpace: "nowrap" }}>
+                        {row?.product_details?.length}{" "}
+                        {row?.product_details?.length > 1 ? "items" : "item"}
+                        {/* <IconButton>
+                          <KeyboardArrowDownIcon />
+                       
+                        </IconButton> */}
+                        <IconButton
+                          variant="contained"
+                          disableElevation
+                          onClick={() => handleDetailClickOpen(row)}
+                        >
+                          <VisibilityOutlinedIcon />
+                        </IconButton>
+                      </TableCell>
+                      <TableCell>{row?.shipping_address}</TableCell>
+                      <TableCell>{row?.discount}</TableCell>
+                      <TableCell>{row?.tax}%</TableCell>
+                      <TableCell>{row?.paid_amount}</TableCell>
+                      <TableCell>
+                        {parseInt(row?.total_amount) -
+                          parseInt(row?.paid_amount)}
+                      </TableCell>
+                      <TableCell>{row?.total_amount}</TableCell>
+                      <TableCell>{row?.order_status}</TableCell>
+                      <TableCell>{row?.payment_method}</TableCell>
+                      <TableCell>{row?.tracking_info}</TableCell>
+                      <TableCell>{row?.transaction_id}</TableCell>
+                      <TableCell>{row?.transaction_type}</TableCell>
+                      <TableCell>
+                        <b>{row?.created_by}</b>
 
-                      <br />
-                      {moment(row?.created_at).format("DD-MM-YYYY, h:mm:ss a")}
-                    </TableCell>
-                    <TableCell>
-                      <b>{row?.updated_by}</b>
-                      <br />
-                      {moment(row?.updated_at).format("DD-MM-YYYY, h:mm:ss a")}
-                    </TableCell>
-                    <TableCell>
-                      {row?.status ? (
-                        <>
-                          <TaskAltOutlinedIcon
-                            style={{
-                              color: "#10ac84",
-                              height: "16px",
-                              position: "relative",
-                              top: "4px",
-                            }}
-                          />{" "}
-                          <span
-                            style={{
-                              color: "#10ac84",
-                            }}
-                          >
-                            Active &nbsp;
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <HighlightOffOutlinedIcon
-                            style={{
-                              color: "#ee5253",
-                              height: "16px",
-                              position: "relative",
-                              top: "4px",
-                            }}
-                          />
-                          <span
-                            style={{
-                              color: "#ee5253",
-                            }}
-                          >
-                            Inactive
-                          </span>
-                        </>
-                      )}
-                    </TableCell>
+                        <br />
+                        {moment(row?.created_at).format(
+                          "DD-MM-YYYY, h:mm:ss a"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <b>{row?.updated_by}</b>
+                        <br />
+                        {moment(row?.updated_at).format(
+                          "DD-MM-YYYY, h:mm:ss a"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {row?.status ? (
+                          <>
+                            <TaskAltOutlinedIcon
+                              style={{
+                                color: "#10ac84",
+                                height: "16px",
+                                position: "relative",
+                                top: "4px",
+                              }}
+                            />{" "}
+                            <span
+                              style={{
+                                color: "#10ac84",
+                              }}
+                            >
+                              Active &nbsp;
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <HighlightOffOutlinedIcon
+                              style={{
+                                color: "#ee5253",
+                                height: "16px",
+                                position: "relative",
+                                top: "4px",
+                              }}
+                            />
+                            <span
+                              style={{
+                                color: "#ee5253",
+                              }}
+                            >
+                              Inactive
+                            </span>
+                          </>
+                        )}
+                      </TableCell>
 
-                    <TableCell align="right" style={{ minWidth: "130px" }}>
-                      <IconButton
-                        variant="contained"
-                        disableElevation
-                        onClick={() => handleDetailClickOpen(row)}
-                      >
-                        <VisibilityOutlinedIcon />
-                      </IconButton>
-                      <IconButton
-                        variant="contained"
-                        disableElevation
-                        component={Link}
-                        to={`/update-product`}
-                        state={{ row }}
-                      >
-                        <EditOutlinedIcon />
-                      </IconButton>
+                      <TableCell align="right" style={{ minWidth: "130px" }}>
+                        {/* <IconButton
+                          variant="contained"
+                          disableElevation
+                          onClick={() => handleDetailClickOpen(row)}
+                        >
+                          <VisibilityOutlinedIcon />
+                        </IconButton> */}
+                        <IconButton
+                          variant="contained"
+                          disableElevation
+                          component={Link}
+                          to={`/update-order/${row._id}`}
+                          // state={{ row }}
+                        >
+                          <EditOutlinedIcon />
+                        </IconButton>
 
-                      <IconButton
-                        variant="contained"
-                        disableElevation
-                        onClick={() => handleDeleteDialog(i, row)}
-                      >
-                        <DeleteOutlineIcon color="error" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
+                        <IconButton
+                          variant="contained"
+                          disableElevation
+                          onClick={() => handleDeleteDialog(i, row)}
+                        >
+                          <DeleteOutlineIcon color="error" />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  </>
                 ))}
 
               {!loading && tableDataList.length < 1 ? (
@@ -785,122 +855,176 @@ const OrderList = () => {
         onClose={handleDetailClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        maxWidth="lg"
+        maxWidth="xl"
         fullWidth={true}
       >
         {/* <div style={{ padding: "10px", minWidth: "300px" }}> */}
         <DialogTitle id="alert-dialog-title">{"Product Detail"}</DialogTitle>
         <DialogContent>
-          <Grid container>
-            <Grid item xs={6}>
-              <Typography variant="subtitle2">
-                <strong>Product Name</strong> : {details?.name}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Price</strong> : {details?.price}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Discount Price</strong> : {details?.discount_price}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Stock Unit</strong> : {details?.stock_unit} units
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>SKU</strong> : {details?.sku}
-              </Typography>
+          {details?.product_details?.length > 0 ? (
+            <>
+              <Table aria-label="simple table" className={classes.tableStyle}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{ minWidth: "70px" }}>Image</TableCell>
+                    <TableCell style={{ minWidth: "220px" }}>Name</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell style={{ whiteSpace: "nowrap" }}>
+                      Units
+                    </TableCell>
 
-              <Typography variant="subtitle2">
-                <strong>Category</strong> :{" "}
-                {details?.category_data?.length > 0 &&
-                  details?.category_data[0]?.name}
+                    {/* <TableCell>SKU</TableCell> */}
+
+                    <TableCell>Filters</TableCell>
+                    {/* <TableCell>Images</TableCell> */}
+
+                    {/* <TableCell>Description</TableCell> */}
+
+                    <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
+                    <TableCell align="right">
+                      Action &nbsp;&nbsp;&nbsp;
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {!loading &&
+                    details?.product_details?.length > 0 &&
+                    details?.product_details?.map((row, i) => (
+                      <TableRow
+                        key={i}
+                        // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      >
+                        <TableCell>
+                          {row?.images.length > 0 ? (
+                            <>
+                              <img
+                                src={row?.images[0].url}
+                                alt=""
+                                width="70px"
+                                height="70px"
+                                style={{
+                                  display: "block",
+                                  margin: "5px 0",
+                                }}
+                              />
+                              <Button
+                                // variant="outlined"
+                                size="small"
+                                style={{
+                                  whiteSpace: "nowrap",
+                                  fontSize: "10px",
+                                }}
+                                onClick={() =>
+                                  handleImageClickOpen(row?.images)
+                                }
+                              >
+                                View All
+                              </Button>
+                            </>
+                          ) : (
+                            "No Image Available"
+                          )}
+                        </TableCell>
+                        <TableCell style={{ maxWidth: "220px",minWidth: "220px" }}>
+                          {row?.name}
+                        </TableCell>
+                        <TableCell>{row?.price}</TableCell>
+
+                        <TableCell style={{ whiteSpace: "nowrap" }}>
+                          {row?.quantity}{" "}
+                          {parseInt(row?.quantity) > 1 ? "Units" : "Unit"}
+                        </TableCell>
+                        {/* <TableCell style={{ whiteSpace: "nowrap" }}>
+                                    {row?.sku}
+                                  </TableCell> */}
+
+                        <TableCell
+                          style={{
+                            minWidth: "120px",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {row?.filter_data.length > 0
+                            ? row?.filter_data
+                                .sort(sortByParentName)
+                                .map((e, i) => (
+                                  <label key={e._id}>
+                                    {i !== 0 && <>,&nbsp;&nbsp;</>}
+                                    <b>{e.parent_name}</b> : {e.name}
+                                  </label>
+                                ))
+                            : "N/A"}
+                        </TableCell>
+
+                        <TableCell>
+                          {row?.status ? (
+                            <>
+                              <TaskAltOutlinedIcon
+                                style={{
+                                  color: "#10ac84",
+                                  height: "16px",
+                                  position: "relative",
+                                  top: "4px",
+                                }}
+                              />{" "}
+                              <span
+                                style={{
+                                  color: "#10ac84",
+                                }}
+                              >
+                                Active &nbsp;
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <HighlightOffOutlinedIcon
+                                style={{
+                                  color: "#ee5253",
+                                  height: "16px",
+                                  position: "relative",
+                                  top: "4px",
+                                }}
+                              />
+                              <span
+                                style={{
+                                  color: "#ee5253",
+                                }}
+                              >
+                                Inactive
+                              </span>
+                            </>
+                          )}
+                        </TableCell>
+
+                        <TableCell align="right" style={{ minWidth: "130px" }}>
+                          <Button
+                            variant="contained"
+                            disableElevation
+                            color="error"
+                            onClick={() => handleCancelProductClickOpen(row)}
+                          >
+                            Remove
+                          </Button>
+                          {/* <IconButton
+                            variant="contained"
+                            disableElevation
+                            onClick={() => handleDetailClickOpen(row)}
+                          >
+                            <VisibilityOutlinedIcon />
+                          </IconButton> */}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </>
+          ) : (
+            <>
+              <Typography variant="h4" style={{ color: "#606060" }}>
+                No product avaiable
               </Typography>
-              <Typography variant="subtitle2">
-                <strong>Filters</strong> :{" "}
-                {details?.filter_data?.length > 0
-                  ? details?.filter_data?.map((e, i) => (
-                      <label key={e._id}>
-                        {i !== 0 && <>,&nbsp;&nbsp;</>}
-                        {e.name}
-                      </label>
-                    ))
-                  : "N/A"}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Status</strong> :
-                {details?.status ? (
-                  <>
-                    <TaskAltOutlinedIcon
-                      style={{
-                        color: "#10ac84",
-                        height: "16px",
-                        position: "relative",
-                        top: "4px",
-                      }}
-                    />{" "}
-                    <span
-                      style={{
-                        color: "#10ac84",
-                      }}
-                    >
-                      Active &nbsp;
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <HighlightOffOutlinedIcon
-                      style={{
-                        color: "#ee5253",
-                        height: "16px",
-                        position: "relative",
-                        top: "4px",
-                      }}
-                    />
-                    <span
-                      style={{
-                        color: "#ee5253",
-                      }}
-                    >
-                      Inactive
-                    </span>
-                  </>
-                )}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Created By</strong> : {details?.created_by}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Created At</strong> :&nbsp;
-                {moment(details?.created_at).format("DD-MM-YYYY, h:mm:ss a")}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Updated By</strong> : {details?.updated_by}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Updated At</strong> : &nbsp;
-                {moment(details?.updated_at).format("DD-MM-YYYY, h:mm:ss a")}
-              </Typography>
-              <Typography variant="subtitle2">
-                <strong>Images</strong>
-              </Typography>
-              <div style={{ display: "flex", gap: "10px" }}>
-                {details?.images?.length > 0
-                  ? details?.images?.map((item, i) => (
-                      <img src={item.url} alt="" width="70px" height="70px" />
-                    ))
-                  : "No Image Available"}
-              </div>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="subtitle2">
-                <strong>Description</strong>
-              </Typography>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: details?.description,
-                }}
-              ></div>
-            </Grid>
-          </Grid>
+            </>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDetailClose}>Close</Button>
@@ -942,7 +1066,7 @@ const OrderList = () => {
           <DialogTitle id="alert-dialog-title">{"Are you sure?"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              You want to delete {deleteData?.row?.name}
+              You want to delete order no <b>{deleteData?.row?.order_id} </b>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -962,6 +1086,40 @@ const OrderList = () => {
                 speedMultiplier={0.5}
               />{" "}
               {loading2 === false && "Confirm"}
+            </Button>
+          </DialogActions>
+        </div>
+      </Dialog>
+      <Dialog
+        open={cancelProductDialog}
+        onClose={handleCancelProductClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <div style={{ padding: "10px", minWidth: "300px" }}>
+          <DialogTitle id="alert-dialog-title">{"Are you sure?"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              You want to cancel <b>{cancelProductData?.name}</b> order
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancelProductClose}>cancel</Button>
+            <Button
+              variant="contained"
+              disabled={cancelProductLoading}
+              onClick={cancelProduct}
+              style={{ minWidth: "100px", minHeight: "35px" }}
+              autoFocus
+              disableElevation
+            >
+              <PulseLoader
+                color={"#353b48"}
+                loading={cancelProductLoading}
+                size={10}
+                speedMultiplier={0.5}
+              />{" "}
+              {cancelProductLoading === false && "Confirm"}
             </Button>
           </DialogActions>
         </div>
@@ -1005,4 +1163,4 @@ const OrderList = () => {
   );
 };
 
-export default OrderList;
+export default OrderList2;
