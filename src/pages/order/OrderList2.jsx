@@ -117,8 +117,10 @@ const OrderList2 = () => {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [loading2, setLoading2] = useState(false);
   const [deleteData, setDeleteData] = useState({});
-  const [name, setName] = useState("");
-  const [sku, setSku] = useState("");
+  const [orderID, setOrderID] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
   const [status, setStatus] = useState("");
@@ -126,13 +128,10 @@ const OrderList2 = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [open, setOpen] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
-  const [filterListDialog, setFilterListDialog] = useState(false);
   const [filterList, setFilterList] = useState([]);
   const [startingTime, setStartingTime] = useState(null);
   const [endingTime, setEndingTime] = useState(null);
-  const [orderIds, setOrderIds] = useState([]);
-  const [orderItems, setOrderItems] = useState([]);
-  const [openOrderList, setOpenOrderList] = useState(false);
+
   const [imageDialog, setImageDialog] = useState(false);
   const [images, setImages] = useState([]);
   const [detailDialog, setDetailDialog] = useState(false);
@@ -164,13 +163,6 @@ const OrderList2 = () => {
     setImages([]);
     setImageDialog(false);
   };
-  const handleClickOpen = () => {
-    setOpenOrderList(true);
-  };
-
-  const handleOpenOrderListClose = () => {
-    setOpenOrderList(false);
-  };
 
   const handleChange = (event) => {
     SetCategory(event.target.value);
@@ -197,13 +189,7 @@ const OrderList2 = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
-  const handleFilterListDialogOpen = () => {
-    setFilterListDialog(true);
-  };
 
-  const handleFilterListDialogClose = () => {
-    setFilterListDialog(false);
-  };
   const handleSnakbarOpen = (msg, vrnt) => {
     let duration;
     if (vrnt === "error") {
@@ -316,9 +302,11 @@ const OrderList2 = () => {
 
   const clearFilter = (event) => {
     console.log("clearFilter");
-    setName("");
+    setOrderID("");
+    setCustomerName("");
     setStatus("");
-    setSku("");
+    setCustomerEmail("");
+    setCustomerPhone("");
     SetCategory("");
     setMinPrice("");
     setMaxPrice("");
@@ -375,7 +363,7 @@ const OrderList2 = () => {
           newEndingTime = dayjs(endingTime).format("YYYY-MM-DD");
         }
 
-        url = `/api/v1/order?name=${name}&category_id=${category}&minPrice=${newMinPrice}&maxPrice=${newMaxPrice}&sku=${sku}&startDate=${newStartingTime}&endDate=${newEndingTime}&status=${newStatus}&limit=${newLimit}&page=${
+        url = `/api/v1/order?orderID=${orderID}&customerName=${customerName}&customerEmail=${customerEmail}&customerPhone=${customerPhone}&minPrice=${newMinPrice}&maxPrice=${newMaxPrice}&startDate=${newStartingTime}&endDate=${newEndingTime}&status=${newStatus}&limit=${newLimit}&page=${
           newPageNO + 1
         }`;
       }
@@ -464,44 +452,47 @@ const OrderList2 = () => {
               <Grid container spacing={3}>
                 <Grid item xs={3}>
                   <TextField
-                    id="Product Name"
+                    id="OrderID"
                     fullWidth
                     size="small"
                     variant="outlined"
-                    label="Product Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    label="Order Id"
+                    value={orderID}
+                    onChange={(e) => setOrderID(e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel id="demo-simple-select-label">
-                      Category *
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="category"
-                      value={category}
-                      label="Category *"
-                      onChange={handleChange}
-                    >
-                      {categoryList?.map((item, i) => (
-                        <MenuItem value={item.category_id}>
-                          {item.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={3}>
                   <TextField
-                    id="sku"
+                    id="Customer Name"
                     fullWidth
                     size="small"
                     variant="outlined"
-                    label="SKU"
-                    value={sku}
-                    onChange={(e) => setSku(e.target.value)}
+                    label="Customer Name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                  />
+                </Grid>
+
+                <Grid item xs={3}>
+                  <TextField
+                    id="customerPhone"
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    label="Customer Phone"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <TextField
+                    id="customerEmail"
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    label="Customer Email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={3}>
@@ -522,7 +513,7 @@ const OrderList2 = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={3}>
+                {/* <Grid item xs={3}>
                   <TextField
                     type="number"
                     size="small"
@@ -537,8 +528,8 @@ const OrderList2 = () => {
                       setMinPrice(e.target.value);
                     }}
                   />
-                </Grid>
-                <Grid item xs={3}>
+                </Grid> */}
+                {/* <Grid item xs={3}>
                   <TextField
                     type="number"
                     size="small"
@@ -553,7 +544,7 @@ const OrderList2 = () => {
                       setMaxPrice(e.target.value);
                     }}
                   />
-                </Grid>
+                </Grid> */}
 
                 <Grid item xs={3} style={{ paddingTop: "16px" }}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -584,7 +575,6 @@ const OrderList2 = () => {
                   </LocalizationProvider>
                 </Grid>
 
-                <Grid item xs={9}></Grid>
                 <Grid item xs={3}>
                   <Grid container spacing={{ lg: 6, xl: 3 }}>
                     <Grid item xs={3}>
@@ -688,7 +678,9 @@ const OrderList2 = () => {
                   Last Order Updated Info
                 </TableCell>
                 <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
-                <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
+                <TableCell align="right" style={{ minWidth: "120px" }}>
+                  Action &nbsp;&nbsp;&nbsp;
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -825,7 +817,7 @@ const OrderList2 = () => {
 
               {!loading && tableDataList.length < 1 ? (
                 <TableRow>
-                  <TableCell colSpan={9} style={{ textAlign: "center" }}>
+                  <TableCell colSpan={15} style={{ textAlign: "center" }}>
                     <strong> {message}</strong>
                   </TableCell>
                 </TableRow>
@@ -881,9 +873,9 @@ const OrderList2 = () => {
                     {/* <TableCell>Description</TableCell> */}
 
                     <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
-                    <TableCell align="right">
+                    {/* <TableCell align="right">
                       Action &nbsp;&nbsp;&nbsp;
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -925,7 +917,9 @@ const OrderList2 = () => {
                             "No Image Available"
                           )}
                         </TableCell>
-                        <TableCell style={{ maxWidth: "220px",minWidth: "220px" }}>
+                        <TableCell
+                          style={{ maxWidth: "220px", minWidth: "220px" }}
+                        >
                           {row?.name}
                         </TableCell>
                         <TableCell>{row?.price}</TableCell>
@@ -935,7 +929,7 @@ const OrderList2 = () => {
                           {parseInt(row?.quantity) > 1 ? "Units" : "Unit"}
                         </TableCell>
                         {/* <TableCell style={{ whiteSpace: "nowrap" }}>
-                                    {row?.sku}
+                                    {row?.customerEmail}
                                   </TableCell> */}
 
                         <TableCell
@@ -996,7 +990,7 @@ const OrderList2 = () => {
                           )}
                         </TableCell>
 
-                        <TableCell align="right" style={{ minWidth: "130px" }}>
+                        {/* <TableCell align="right" style={{ minWidth: "130px" }}>
                           <Button
                             variant="contained"
                             disableElevation
@@ -1005,14 +999,8 @@ const OrderList2 = () => {
                           >
                             Remove
                           </Button>
-                          {/* <IconButton
-                            variant="contained"
-                            disableElevation
-                            onClick={() => handleDetailClickOpen(row)}
-                          >
-                            <VisibilityOutlinedIcon />
-                          </IconButton> */}
-                        </TableCell>
+                         
+                        </TableCell> */}
                       </TableRow>
                     ))}
                 </TableBody>
@@ -1123,41 +1111,6 @@ const OrderList2 = () => {
             </Button>
           </DialogActions>
         </div>
-      </Dialog>
-      <Dialog
-        open={filterListDialog}
-        onClose={handleFilterListDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Category Filter List"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {filterList.length > 0 ? (
-              filterList.map((row, i) => (
-                <>
-                  <p>
-                    <b>{row.filter_name}</b>
-                  </p>
-                  <div>
-                    {row?.filter_values?.map((value) => (
-                      <label>{value.name},&nbsp;&nbsp;</label>
-                    ))}
-                  </div>
-                </>
-              ))
-            ) : (
-              <p>No filter is available for this category</p>
-            )}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleFilterListDialogClose} autoFocus>
-            Close
-          </Button>
-        </DialogActions>
       </Dialog>
     </>
   );

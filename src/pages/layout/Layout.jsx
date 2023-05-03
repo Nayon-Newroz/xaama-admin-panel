@@ -333,6 +333,17 @@ export default function Layout() {
       return false;
     }
   };
+  const checkOrderListRoute = () => {
+   
+
+    if (pathname.includes("/order-list")) {
+      return true;
+    } else if (pathname.includes("/update-order/")) {
+      return true;
+    } else {
+      return false;
+    }
+  };
   const checkProductRoute = () => {
     const userPathname = ["/add-product", "/update-product", "/product-list"];
     if (userPathname.includes(pathname)) {
@@ -774,7 +785,7 @@ export default function Layout() {
             <Link to="/order-list" className={classes.linkStyle}>
               <ListItemButton
                 className={`${classes.menuItem} ${
-                  pathname === "/order-list" ? classes.menuItemActive : null
+                  checkOrderListRoute() ? classes.menuItemActive : null
                 }`}
                 onClick={() => {
                   manageOpen("order-list");

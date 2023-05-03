@@ -300,10 +300,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const OrderItemList = ({ 
-  handleOrderChange,
-  handleOpenOrderListClose,
-}) => {
+const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
   const classes = useStyles();
   const { state } = useLocation();
   let { id } = useParams();
@@ -595,7 +592,6 @@ const OrderItemList = ({
   useEffect(() => {
     getData();
     console.log("state?.row", state?.row);
-     
   }, []);
   useEffect(() => {
     fnTotalPrice();
@@ -610,133 +606,111 @@ const OrderItemList = ({
         padding: "24px",
       }}
     >
-      {orderListItems?.length < 1 ? (
-        <div className={classes.cardHolder}>
-          <div className={classes.card}>
-            <p className={classes.cardTitle}>Order List</p>
-            <p className={classes.cardText}>
-              You have no items in your order list.
+      <>
+        <Grid container>
+          <Grid item xs={6} sm={6} md={6}>
+            <p className={classes.titleStyle2}>
+              Order &nbsp;
+              <span style={{ fontSize: "16px", color: "#7c7c7c" }}>
+                ({orderListItems?.length} Item
+                {orderListItems?.length > 1 && "s"})
+              </span>
             </p>
-            <Button
-              variant="contained"
-              disableElevation
-              className={classes.cardButton}
-              color="primary"
-              // component={Link}
-              // to="/products"
-              onClick={handleOpenOrderListClose}
-              startIcon={<KeyboardBackspaceIcon fontSize="large" />}
-            >
-              {/* Continue Shopping */}
-              Back
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <>
-          <Grid container>
-            <Grid item xs={6} sm={6} md={6}>
-              <p className={classes.titleStyle2}>
-                Order &nbsp;
-                <span style={{ fontSize: "16px", color: "#7c7c7c" }}>
-                  ({orderListItems?.length} Item{orderListItems?.length > 1 && "s"})
-                </span>
-              </p>
-            </Grid>
-            {/* <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+          </Grid>
+          {/* <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
               <IconButton onClick={handleOpenOrderListClose}>
                 <ClearIcon style={{ color: "#205295" }} />
               </IconButton>
             </Grid> */}
-          </Grid>
+        </Grid>
 
-          <Grid
-            container
-            justifyContent="center"
-            // alignItems="center"
-            spacing={2}
-            // style={{background:"#ddd"}}
-          >
-            <Grid item xs={2.5}>
-              <TextField
-                id="name"
-                label="Customer Name"
-                variant="standard"
-                size="small"
-                fullWidth
-                // InputProps={{
-                //   startAdornment: (
-                //     <InputAdornment position="start">
-                //       Customer Name
-                //     </InputAdornment>
-                //   ),
-                // }}
-                className={classes.input3}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={2.5}>
-              <TextField
-                id="email"
-                label="Customer Email"
-                variant="standard"
-                size="small"
-                fullWidth
-                className={classes.input3}
-                // InputProps={{
-                //   startAdornment: (
-                //     <InputAdornment position="start">Email</InputAdornment>
-                //   ),
-                // }}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={2.5}>
-              <TextField
-                id="phoneNo"
-                label="Customer Phone"
-                variant="standard"
-                size="small"
-                fullWidth
-                className={classes.input3}
-                // InputProps={{
-                //   startAdornment: (
-                //     <InputAdornment position="start">Phone</InputAdornment>
-                //   ),
-                // }}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={phoneNo}
-                onChange={(e) => setPhoneNo(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={4.5}>
-              <TextField
-                id="address"
-                label="Customer Address"
-                variant="standard"
-                size="small"
-                fullWidth
-                // InputProps={{
-                //   startAdornment: (
-                //     <InputAdornment position="start">Address</InputAdornment>
-                //   ),
-                // }}
-                className={classes.input3}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={2.5}>
-              {/* <TextField
+        <Grid
+          container
+          justifyContent="center"
+          // alignItems="center"
+          spacing={2}
+          // style={{background:"#ddd"}}
+        >
+          <Grid item xs={2.5}>
+            <TextField
+              id="name"
+              label="Customer Name"
+              variant="standard"
+              size="small"
+              fullWidth
+              // InputProps={{
+              //   startAdornment: (
+              //     <InputAdornment position="start">
+              //       Customer Name
+              //     </InputAdornment>
+              //   ),
+              // }}
+              className={classes.input3}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={2.5}>
+            <TextField
+              id="email"
+              label="Customer Email"
+              variant="standard"
+              size="small"
+              fullWidth
+              className={classes.input3}
+              // InputProps={{
+              //   startAdornment: (
+              //     <InputAdornment position="start">Email</InputAdornment>
+              //   ),
+              // }}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={2.5}>
+            <TextField
+              id="phoneNo"
+              label="Customer Phone"
+              variant="standard"
+              size="small"
+              fullWidth
+              className={classes.input3}
+              // InputProps={{
+              //   startAdornment: (
+              //     <InputAdornment position="start">Phone</InputAdornment>
+              //   ),
+              // }}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={phoneNo}
+              onChange={(e) => setPhoneNo(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={4.5}>
+            <TextField
+              id="address"
+              label="Customer Address"
+              variant="standard"
+              size="small"
+              fullWidth
+              // InputProps={{
+              //   startAdornment: (
+              //     <InputAdornment position="start">Address</InputAdornment>
+              //   ),
+              // }}
+              className={classes.input3}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={2.5}>
+            {/* <TextField
                 id="transactionType"
                 label="Transaction Type"
                 variant="standard"
@@ -748,385 +722,387 @@ const OrderItemList = ({
                 value={transactionType}
                 onChange={(e) => setTransactionType(e.target.value)}
               /> */}
-              <FormControl fullWidth variant="standard" size="small">
-                <InputLabel id="demo-simple-select-label">
-                  Transaction Type
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Transaction Type"
-                  className={classes.select}
-                  value={transactionType}
-                  onChange={(e) => setTransactionType(e.target.value)}
-                >
-                  <MenuItem value={"Offline"}>Offline</MenuItem>
-                  <MenuItem value={"Online"}>Online</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={2.5}>
-              <TextField
-                id="paymentMethod"
-                label="Payment Method"
-                variant="standard"
-                size="small"
-                fullWidth
-                className={classes.input3}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={2.5}>
-              <TextField
-                id="transactionId"
-                label="Transaction Id"
-                variant="standard"
-                size="small"
-                fullWidth
-                className={classes.input3}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={transactionId}
-                onChange={(e) => setTransactionId(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={4.5}>
-              <TextField
-                id="shippingAddress"
-                label="Shipping Address"
-                variant="standard"
-                size="small"
-                fullWidth
-                className={classes.input3}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={shippingAddress}
-                onChange={(e) => setShippingAddress(e.target.value)}
-              />
-            </Grid>
+            <FormControl fullWidth variant="standard" size="small">
+              <InputLabel id="demo-simple-select-label">
+                Transaction Type
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                label="Transaction Type"
+                className={classes.select}
+                value={transactionType}
+                onChange={(e) => setTransactionType(e.target.value)}
+              >
+                <MenuItem value={"Offline"}>Offline</MenuItem>
+                <MenuItem value={"Online"}>Online</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
-          <br />
-          <div style={{ textAlign: "right" }}>
-            <Button
-              disableElevation
-              variant="outlined"
-              color="info"
-              onClick={() => setNewProductListDialog(true)}
-            >
-              Add New Product
-            </Button>
-          </div>
-          <br />
-          <TableContainer>
-            <Table
-              aria-label="simple table"
-              className={classes.tableStyle}
-              //  style={{ border:"1px solid #c4c4c4",}}
-            >
-              <TableHead className={classes.tableStyle}>
-                <TableRow>
-                  <TableCell>Image</TableCell>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Specification</TableCell>
-                  <TableCell align="center">Quantity</TableCell>
-                  <TableCell align="right"> Price</TableCell>
-                  <TableCell align="right" style={{ whiteSpace: "nowrap" }}>
-                    {" "}
-                    Discount Price
-                  </TableCell>
-                  <TableCell align="right">Total</TableCell>
-                  <TableCell align="right">Remove</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody className={classes.tableBodyStyle}>
-                {orderListItems.length > 0 &&
-                  orderListItems?.map((row, i) => (
-                    <TableRow
-                      key={i}
-                      sx={
-                        {
-                          // "&:last-child td, &:last-child th": { border: 0 },
-                        }
+          <Grid item xs={2.5}>
+            <TextField
+              id="paymentMethod"
+              label="Payment Method"
+              variant="standard"
+              size="small"
+              fullWidth
+              className={classes.input3}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={2.5}>
+            <TextField
+              id="transactionId"
+              label="Transaction Id"
+              variant="standard"
+              size="small"
+              fullWidth
+              className={classes.input3}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={transactionId}
+              onChange={(e) => setTransactionId(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={4.5}>
+            <TextField
+              id="shippingAddress"
+              label="Shipping Address"
+              variant="standard"
+              size="small"
+              fullWidth
+              className={classes.input3}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={shippingAddress}
+              onChange={(e) => setShippingAddress(e.target.value)}
+            />
+          </Grid>
+        </Grid>
+        <br />
+        <div style={{ textAlign: "right" }}>
+          <Button
+            disableElevation
+            variant="outlined"
+            color="info"
+            onClick={() => setNewProductListDialog(true)}
+          >
+            Add New Product
+          </Button>
+        </div>
+        <br />
+        <TableContainer>
+          <Table
+            aria-label="simple table"
+            className={classes.tableStyle}
+            //  style={{ border:"1px solid #c4c4c4",}}
+          >
+            <TableHead className={classes.tableStyle}>
+              <TableRow>
+                <TableCell>Image</TableCell>
+                <TableCell>Title</TableCell>
+                <TableCell>Specification</TableCell>
+                <TableCell align="center">Quantity</TableCell>
+                <TableCell align="right"> Price</TableCell>
+                <TableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                  {" "}
+                  Discount Price
+                </TableCell>
+                <TableCell align="right">Total</TableCell>
+                <TableCell align="right">Remove</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody className={classes.tableBodyStyle}>
+              {orderListItems.length > 0 ? (
+                orderListItems?.map((row, i) => (
+                  <TableRow
+                    key={i}
+                    sx={
+                      {
+                        // "&:last-child td, &:last-child th": { border: 0 },
                       }
-                    >
-                      <TableCell className={classes.imgDiv}>
-                        {row?.images.length > 0 ? (
-                          <img
-                            src={row?.images[0].url}
-                            alt=""
-                            className={classes.cartImg}
-                          />
-                        ) : (
-                          "No Image Available"
-                        )}
-                      </TableCell>
-                      <TableCell>{row?.name}</TableCell>
-                      <TableCell>
-                        {" "}
-                        {row?.filter_data.length > 0
-                          ? row?.filter_data
-                              .sort(sortByParentName)
-                              .map((e, i) => (
-                                <label key={e._id}>
-                                  {i !== 0 && <>,&nbsp;&nbsp;</>}
-                                  <b>{e.parent_name}</b> : {e.name}
-                                </label>
-                              ))
-                          : "N/A"}
-                      </TableCell>
+                    }
+                  >
+                    <TableCell className={classes.imgDiv}>
+                      {row?.images.length > 0 ? (
+                        <img
+                          src={row?.images[0].url}
+                          alt=""
+                          className={classes.cartImg}
+                        />
+                      ) : (
+                        "No Image Available"
+                      )}
+                    </TableCell>
+                    <TableCell>{row?.name}</TableCell>
+                    <TableCell>
+                      {" "}
+                      {row?.filter_data.length > 0
+                        ? row?.filter_data
+                            .sort(sortByParentName)
+                            .map((e, i) => (
+                              <label key={e._id}>
+                                {i !== 0 && <>,&nbsp;&nbsp;</>}
+                                <b>{e.parent_name}</b> : {e.name}
+                              </label>
+                            ))
+                        : "N/A"}
+                    </TableCell>
 
-                      <TableCell style={{ whiteSpace: "nowrap" }}>
-                        {" "}
-                        <Grid
-                          container
-                          justifyContent="center"
-                          alignItems="center"
-                          className={classes.buttonGroup}
-                        >
-                          <Grid className={classes.quantityControler}>
-                            <IconButton
-                              onClick={() =>
-                                decreaseQuantity(row.quantity, row, i)
-                              }
-                              className={classes.iconButton}
-                            >
-                              <RemoveIcon className={classes.iconStyle} />
-                            </IconButton>
-                            &nbsp;
-                          </Grid>
-                          <Grid className={classes.quantityControler}>
-                            {" "}
-                            <TextField
-                              id="outlined-basic"
-                              className={classes.input}
-                              variant="outlined"
-                              size="small"
-                              // style={{ width: "50px"  }}
-                              type="number"
-                              value={
-                                parseInt(row.quantity) === 0 ? "" : row.quantity
-                              }
-                              onChange={(e) => {
-                                modifyArray(e.target.value, row, i);
-                              }}
-                            />
-                          </Grid>
-                          <Grid className={classes.quantityControler}>
-                            &nbsp;
-                            <IconButton
-                              aria-label="AddIcon"
-                              onClick={() =>
-                                increaseQuantity(row.quantity, row, i)
-                              }
-                              className={classes.iconButton}
-                            >
-                              <AddIcon className={classes.iconStyle} />
-                            </IconButton>
-                          </Grid>
+                    <TableCell style={{ whiteSpace: "nowrap" }}>
+                      {" "}
+                      <Grid
+                        container
+                        justifyContent="center"
+                        alignItems="center"
+                        className={classes.buttonGroup}
+                      >
+                        <Grid className={classes.quantityControler}>
+                          <IconButton
+                            onClick={() =>
+                              decreaseQuantity(row.quantity, row, i)
+                            }
+                            className={classes.iconButton}
+                          >
+                            <RemoveIcon className={classes.iconStyle} />
+                          </IconButton>
+                          &nbsp;
                         </Grid>
-                        {/* <div className={classes.forMobileView}>
+                        <Grid className={classes.quantityControler}>
+                          {" "}
+                          <TextField
+                            id="outlined-basic"
+                            className={classes.input}
+                            variant="outlined"
+                            size="small"
+                            // style={{ width: "50px"  }}
+                            type="number"
+                            value={
+                              parseInt(row.quantity) === 0 ? "" : row.quantity
+                            }
+                            onChange={(e) => {
+                              modifyArray(e.target.value, row, i);
+                            }}
+                          />
+                        </Grid>
+                        <Grid className={classes.quantityControler}>
+                          &nbsp;
+                          <IconButton
+                            aria-label="AddIcon"
+                            onClick={() =>
+                              increaseQuantity(row.quantity, row, i)
+                            }
+                            className={classes.iconButton}
+                          >
+                            <AddIcon className={classes.iconStyle} />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                      {/* <div className={classes.forMobileView}>
                             <br />
                             {row.quantity * row.price}
                           </div> */}
-                      </TableCell>
-                      <TableCell align="right" className={classes.forOtherView}>
-                        {row.price}
-                      </TableCell>
-                      <TableCell align="right" className={classes.forOtherView}>
-                        {parseInt(row.discount_price) > 0
-                          ? row.discount_price
-                          : "N/A"}
-                      </TableCell>
-                      <TableCell align="right" className={classes.forOtherView}>
-                        {parseInt(row.discount_price) > 0
-                          ? row.quantity * row.discount_price
-                          : row.quantity * row.price}
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        // className={classes.forOtherView}
-                        className={classes.removeButton}
-                      >
-                        <IconButton
-                          aria-label="delete"
-                          color="secondary"
-                          onClick={() => removeDialog(row)}
-                        >
-                          <DeleteIcon style={{ color: "#95A5A6" }} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <br />
-          <Grid
-            container
-            justifyContent="center"
-            // alignItems="center"
-            spacing={1}
-          >
-            <Grid item xs={2}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                type="number"
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Subtotal </InputAdornment>
-                  ),
-                }}
-                className={classes.input2}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={productTotalPrice}
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                type="number"
-                fullWidth
-                className={classes.input2}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Discount </InputAdornment>
-                  ),
-                }}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                type="number"
-                fullWidth
-                className={classes.input2}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">TAX </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment
-                      position="end"
-                      style={{
-                        fontSize: "16px",
-                        fontWeight: 500,
-                        color: "#154360",
-                      }}
+                    </TableCell>
+                    <TableCell align="right" className={classes.forOtherView}>
+                      {row.price}
+                    </TableCell>
+                    <TableCell align="right" className={classes.forOtherView}>
+                      {parseInt(row.discount_price) > 0
+                        ? row.discount_price
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell align="right" className={classes.forOtherView}>
+                      {parseInt(row.discount_price) > 0
+                        ? row.quantity * row.discount_price
+                        : row.quantity * row.price}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      // className={classes.forOtherView}
+                      className={classes.removeButton}
                     >
-                      %{" "}
-                    </InputAdornment>
-                  ),
-                }}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={tax}
-                onChange={(e) => setTax(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                type="number"
-                fullWidth
-                className={classes.input2}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      Paid Amount{" "}
-                    </InputAdornment>
-                  ),
-                }}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={paidAmount}
-                onChange={(e) => setPaidAmount(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                type="number"
-                fullWidth
-                className={classes.input2}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      Due Amount{" "}
-                    </InputAdornment>
-                  ),
-                }}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={parseInt(calculateTotalAmount()) - paidAmount}
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                id="outlined-basic"
-                // label="Outlined"
-                variant="outlined"
-                size="small"
-                type="number"
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Total</InputAdornment>
-                  ),
-                }}
-                className={classes.input2}
-                inputProps={{ min: 0, step: 0.01 }}
-                onWheel={(e) => e.target.blur()}
-                value={calculateTotalAmount()}
-              />
-            </Grid>
-            <Grid item xs={8}></Grid>
-            <Grid item xs={4}>
-              <Button
-                fullWidth
-                variant="contained"
-                // disabled={loading}
-                size="large"
-                style={{ minHeight: "35px", marginTop: "20px" }}
-                autoFocus
-                disableElevation
-                onClick={onSubmit}
-              >
-                {/* <PulseLoader
+                      <IconButton
+                        aria-label="delete"
+                        color="secondary"
+                        onClick={() => removeDialog(row)}
+                      >
+                        <DeleteIcon style={{ color: "#95A5A6" }} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} style={{ textAlign: "center" }}>
+                    <strong> Please add some products</strong>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <br />
+        <Grid
+          container
+          justifyContent="center"
+          // alignItems="center"
+          spacing={1}
+        >
+          <Grid item xs={2}>
+            <TextField
+              id="outlined-basic"
+              // label="Outlined"
+              variant="outlined"
+              size="small"
+              type="number"
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Subtotal </InputAdornment>
+                ),
+              }}
+              className={classes.input2}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={productTotalPrice}
+            />
+          </Grid>
+          <Grid item xs={2}>
+            <TextField
+              id="outlined-basic"
+              // label="Outlined"
+              variant="outlined"
+              size="small"
+              type="number"
+              fullWidth
+              className={classes.input2}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Discount </InputAdornment>
+                ),
+              }}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={2}>
+            <TextField
+              id="outlined-basic"
+              // label="Outlined"
+              variant="outlined"
+              size="small"
+              type="number"
+              fullWidth
+              className={classes.input2}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">TAX </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment
+                    position="end"
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: 500,
+                      color: "#154360",
+                    }}
+                  >
+                    %{" "}
+                  </InputAdornment>
+                ),
+              }}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={tax}
+              onChange={(e) => setTax(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={2}>
+            <TextField
+              id="outlined-basic"
+              // label="Outlined"
+              variant="outlined"
+              size="small"
+              type="number"
+              fullWidth
+              className={classes.input2}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Paid Amount </InputAdornment>
+                ),
+              }}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={paidAmount}
+              onChange={(e) => setPaidAmount(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={2}>
+            <TextField
+              id="outlined-basic"
+              // label="Outlined"
+              variant="outlined"
+              size="small"
+              type="number"
+              fullWidth
+              className={classes.input2}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Due Amount </InputAdornment>
+                ),
+              }}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={parseInt(calculateTotalAmount()) - paidAmount}
+            />
+          </Grid>
+          <Grid item xs={2}>
+            <TextField
+              id="outlined-basic"
+              // label="Outlined"
+              variant="outlined"
+              size="small"
+              type="number"
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Total</InputAdornment>
+                ),
+              }}
+              className={classes.input2}
+              inputProps={{ min: 0, step: 0.01 }}
+              onWheel={(e) => e.target.blur()}
+              value={calculateTotalAmount()}
+            />
+          </Grid>
+          <Grid item xs={8}></Grid>
+          <Grid item xs={4}>
+            <Button
+              fullWidth
+              variant="contained"
+              // disabled={loading}
+              size="large"
+              style={{ minHeight: "35px", marginTop: "20px" }}
+              disableElevation
+              onClick={onSubmit}
+            >
+              {/* <PulseLoader
                   color={"#353b48"}
                   loading={loading}
                   size={10}
                   speedMultiplier={0.5}
                 />{" "} */}
-                Update Order
-                {/* {loading === false && "Submit"} */}
-              </Button>
-            </Grid>
+              Update Order
+              {/* {loading === false && "Submit"} */}
+            </Button>
           </Grid>
-          {/* <Grid container alignItems="right" justifyContent="flex-end">
+        </Grid>
+        {/* <Grid container alignItems="right" justifyContent="flex-end">
             <Grid item>
               <p
                 style={{
@@ -1151,76 +1127,77 @@ const OrderItemList = ({
               </p>
             </Grid>
           </Grid> */}
-          <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <div style={{ padding: "10px", minWidth: "300px" }}>
-              <DialogTitle id="alert-dialog-title">
-                {"Remove Alart?"}
-              </DialogTitle>
-              <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                  You want to cancel {cancelProductData.name} order
-                </DialogContentText>
-              </DialogContent>
-            </div>
-            <DialogActions>
-              <Button onClick={handleClose}>cancel</Button>
-              <Button
-                variant="contained"
-                disabled={cancelProductLoading}
-                onClick={cancelProduct}
-                style={{ minWidth: "100px", minHeight: "35px" }}
-                autoFocus
-                disableElevation
-              >
-                <PulseLoader
-                  color={"#353b48"}
-                  loading={cancelProductLoading}
-                  size={10}
-                  speedMultiplier={0.5}
-                />{" "}
-                {cancelProductLoading === false && "Confirm"}
-              </Button>
-            </DialogActions>
-          </Dialog>
-          <Dialog
-            open={newProductListDialog}
-            onClose={handleNewProductListDialogClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-            fullWidth={true}
-            maxWidth="xl"
-          >
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <div style={{ padding: "10px", minWidth: "300px" }}>
+            <DialogTitle id="alert-dialog-title">{"Remove Alart?"}</DialogTitle>
             <DialogContent>
-              <ProductList orderListItems={orderListItems} setOrderListItems={setOrderListItems} isFromOrderList={true} />
+              <DialogContentText id="alert-dialog-description">
+                You want to cancel {cancelProductData.name} order
+              </DialogContentText>
             </DialogContent>
+          </div>
+          <DialogActions>
+            <Button onClick={handleClose}>cancel</Button>
+            <Button
+              variant="contained"
+              disabled={cancelProductLoading}
+              onClick={cancelProduct}
+              style={{ minWidth: "100px", minHeight: "35px" }}
+              autoFocus
+              disableElevation
+            >
+              <PulseLoader
+                color={"#353b48"}
+                loading={cancelProductLoading}
+                size={10}
+                speedMultiplier={0.5}
+              />{" "}
+              {cancelProductLoading === false && "Confirm"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={newProductListDialog}
+          onClose={handleNewProductListDialogClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          fullWidth={true}
+          maxWidth="xl"
+        >
+          <DialogContent>
+            <ProductList
+              orderListItems={orderListItems}
+              setOrderListItems={setOrderListItems}
+              isFromOrderList={true}
+            />
+          </DialogContent>
 
-            <DialogActions>
-              <Button onClick={handleNewProductListDialogClose}>cancel</Button>
-              <Button
-                variant="contained"
-                disabled={cancelProductLoading}
-                onClick={cancelProduct}
-                style={{ minWidth: "100px", minHeight: "35px" }}
-                autoFocus
-                disableElevation
-              >
-                <PulseLoader
-                  color={"#353b48"}
-                  loading={cancelProductLoading}
-                  size={10}
-                  speedMultiplier={0.5}
-                />{" "}
-                {cancelProductLoading === false && "Confirm"}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </>
-      )}
+          <DialogActions>
+            <Button onClick={handleNewProductListDialogClose}>cancel</Button>
+            <Button
+              variant="contained"
+              disabled={cancelProductLoading}
+              onClick={cancelProduct}
+              style={{ minWidth: "100px", minHeight: "35px" }}
+              autoFocus
+              disableElevation
+            >
+              <PulseLoader
+                color={"#353b48"}
+                loading={cancelProductLoading}
+                size={10}
+                speedMultiplier={0.5}
+              />{" "}
+              {cancelProductLoading === false && "Confirm"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     </div>
   );
 };

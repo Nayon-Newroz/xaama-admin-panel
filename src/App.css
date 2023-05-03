@@ -1,6 +1,10 @@
 body {
   background: rgb(245, 245, 245);
 }
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
 /* --------------------------Text Editor Css Start----------------------------------- */
 .wrapper-class {
   /* padding: 1rem; */
@@ -20,12 +24,12 @@ body {
 /* --------------------------Input number up and down arrow hide Css Start----------------------------------- */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input[type=number] {
-    -moz-appearance:textfield; /* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
 /* --------------------------Input number up and down arrow hide Css End----------------------------------- */

@@ -461,56 +461,74 @@ const OrderItemList = ({
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("orderItems", orderItems);
     let err = validation();
     if (err) {
       return;
     } else {
       setLoading(true);
-      let newTax = tax;
-      let newDiscount = discount;
-      let newPaidAmount = paidAmount;
-      if (tax === "") {
-        newTax = 0;
-      }
-      if (discount === "") {
-        newDiscount = 0;
-      }
-      if (paidAmount === "") {
-        newPaidAmount = 0;
-      }
-      try {
-        let data = {
-          customer_name: name,
-          customer_email: email,
-          customer_phone: phoneNo,
-          customer_address: address,
-          shipping_address: shippingAddress,
-          discount: newDiscount,
-          tax: newTax,
-          total_amount: calculateTotalAmount(),
-          paid_amount: newPaidAmount,
-          transaction_type: transactionType,
-          payment_method: paymentMethod,
-          transaction_id: transactionId,
-          order_list: orderItems,
-        };
-
-        let response = await axios({
-          url: `/api/v1/order/create`,
-          method: "post",
-          data: data,
-          headers: { "Content-Type": "application/json" },
-        });
-        if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Successful", "success");
-          // navigate("/product-list");
+      let isAnyHasNoQuantity = false;
+      
+      // for (let index = 0; index < orderItems.length; index++) {
+      //   const element = orderItems[index];
+      //   if (element.quantity < 1) {
+      //     handleSnakbarOpen(
+      //       `Please enter quantity of ${element.name}`,
+      //       "error"
+      //     );
+      //     setLoading(false);
+      //     isAnyHasNoQuantity = true;
+      //     break;
+      //   }
+      // }
+      if (!isAnyHasNoQuantity) {
+        let newTax = tax;
+        let newDiscount = discount;
+        let newPaidAmount = paidAmount;
+        if (tax === "") {
+          newTax = 0;
         }
-      } catch (error) {
-        console.log("error", error);
-        handleSnakbarOpen(error.response.data.message, "error");
+        if (discount === "") {
+          newDiscount = 0;
+        }
+        if (paidAmount === "") {
+          newPaidAmount = 0;
+        }
+
+        try {
+          let data = {
+            customer_name: name,
+            customer_email: email,
+            customer_phone: phoneNo,
+            customer_address: address,
+            shipping_address: shippingAddress,
+            discount: newDiscount,
+            tax: newTax,
+            total_amount: calculateTotalAmount(),
+            paid_amount: newPaidAmount,
+            transaction_type: transactionType,
+            payment_method: paymentMethod,
+            transaction_id: transactionId,
+            order_list: orderItems,
+          };
+
+          let response = await axios({
+            url: `/api/v1/order/create`,
+            method: "post",
+            data: data,
+            headers: { "Content-Type": "application/json" },
+          });
+          if (response.status >= 200 && response.status < 300) {
+            handleSnakbarOpen("Successful", "success");
+            // navigate("/product-list");
+          }
+        } catch (error) {
+          console.log("error", error);
+          handleSnakbarOpen(error.response.data.message, "error");
+          setLoading(false);
+        }
         setLoading(false);
       }
-      setLoading(false);
     }
   };
   const calculateTotalAmount = () => {
