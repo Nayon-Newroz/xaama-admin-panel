@@ -304,6 +304,7 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
   const classes = useStyles();
   const { state } = useLocation();
   let { id } = useParams();
+  const [orderNo, setOrderNo] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
@@ -534,8 +535,37 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
       let url = `/api/v1/order/${id}`;
 
       let allData = await getDataWithToken(url);
-
+      let productDetailsWithStockUnit = [];
       if (allData.status >= 200 && allData.status < 300) {
+        if (allData?.data?.data?.product_details?.length > 0) {
+          let productIds = allData?.data?.data?.product_details.map(
+            (item) => item.product_id
+          );
+          console.log("productIds", productIds);
+          let response = await axios({
+            url: `/api/v1/product/product-list-by-ids`,
+            method: "post",
+            data: { productIds: productIds },
+          });
+          console.log("response", response?.data?.data);
+          if (response.status >= 200 && response.status < 300) {
+            response?.data?.data.map((item) => {
+              let product = allData?.data?.data.product_details.find(
+                (el) => el.product_id === item.product_id
+              );
+              if (product !== undefined) {
+                product.stock_unit = item.stock_unit;
+              }
+              productDetailsWithStockUnit.push(product);
+            });
+          }
+          console.log(
+            "productDetailsWithStockUnit",
+            productDetailsWithStockUnit
+          );
+        }
+
+        setOrderNo(allData?.data?.data.order_id);
         setName(allData?.data?.data.customer_name);
         setEmail(allData?.data?.data.customer_email);
         setPhoneNo(allData?.data?.data.customer_phone);
@@ -544,7 +574,7 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
         setPaymentMethod(allData?.data?.data.payment_method);
         setTransactionId(allData?.data?.data.transaction_id);
         setShippingAddress(allData?.data?.data.shipping_address);
-        setOrderListItems(allData?.data?.data.product_details);
+        setOrderListItems(productDetailsWithStockUnit);
         setDiscount(allData?.data?.data.discount);
         setTax(allData?.data?.data.tax);
         setPaidAmount(allData?.data?.data.paid_amount);
@@ -569,18 +599,18 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
         productId: cancelProductData.product_id,
       };
       console.log("data", data);
-      let response = await axios({
-        url: `/api/v1/order/cancel-product`,
-        method: "post",
-        data: data,
-      });
-      console.log("response", response);
-      if (response.status >= 200 && response.status < 300) {
-        let newOrderItems = orderListItems.filter(
-          (res) => res.product_id !== cancelProductData.product_id
-        );
-        setOrderListItems(newOrderItems);
-      }
+      // let response = await axios({
+      //   url: `/api/v1/order/cancel-product`,
+      //   method: "post",
+      //   data: data,
+      // });
+      // console.log("response", response);
+      // if (response.status >= 200 && response.status < 300) {
+      let newOrderItems = orderListItems.filter(
+        (res) => res.product_id !== cancelProductData.product_id
+      );
+      setOrderListItems(newOrderItems);
+      // }
       setCancelProductLoading(false);
       handleClose();
     } catch (error) {
@@ -610,11 +640,15 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
         <Grid container>
           <Grid item xs={6} sm={6} md={6}>
             <p className={classes.titleStyle2}>
-              Order &nbsp;
+              Update Order &nbsp;
+              <span style={{ fontSize: "16px", color: "#7c7c7c" }}>
+                ( Order No: {orderNo})
+              </span>
+              {/* &nbsp;
               <span style={{ fontSize: "16px", color: "#7c7c7c" }}>
                 ({orderListItems?.length} Item
                 {orderListItems?.length > 1 && "s"})
-              </span>
+              </span> */}
             </p>
           </Grid>
           {/* <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
@@ -805,6 +839,7 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
                 <TableCell>Image</TableCell>
                 <TableCell>Title</TableCell>
                 <TableCell>Specification</TableCell>
+                <TableCell>Available Stocks</TableCell>
                 <TableCell align="center">Quantity</TableCell>
                 <TableCell align="right"> Price</TableCell>
                 <TableCell align="right" style={{ whiteSpace: "nowrap" }}>
@@ -851,7 +886,7 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
                             ))
                         : "N/A"}
                     </TableCell>
-
+                    <TableCell>{row?.stock_unit} {parseInt(row?.stock_unit) > 1 ?"Units":"Unit"}</TableCell>
                     <TableCell style={{ whiteSpace: "nowrap" }}>
                       {" "}
                       <Grid
