@@ -839,7 +839,9 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
                 <TableCell>Image</TableCell>
                 <TableCell>Title</TableCell>
                 <TableCell>Specification</TableCell>
-                <TableCell>Available Stocks</TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Available Stocks
+                </TableCell>
                 <TableCell align="center">Quantity</TableCell>
                 <TableCell align="right"> Price</TableCell>
                 <TableCell align="right" style={{ whiteSpace: "nowrap" }}>
@@ -886,7 +888,10 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
                             ))
                         : "N/A"}
                     </TableCell>
-                    <TableCell>{row?.stock_unit} {parseInt(row?.stock_unit) > 1 ?"Units":"Unit"}</TableCell>
+                    <TableCell>
+                      {row?.stock_unit}{" "}
+                      {parseInt(row?.stock_unit) > 1 ? "Units" : "Unit"}
+                    </TableCell>
                     <TableCell style={{ whiteSpace: "nowrap" }}>
                       {" "}
                       <Grid
