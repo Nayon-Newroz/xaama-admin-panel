@@ -305,8 +305,8 @@ const OrderItemList = ({
   handleOpenOrderListClose,
 }) => {
   const classes = useStyles();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
   const [address, setAddress] = useState("");
   const [transactionType, setTransactionType] = useState("Offline");
@@ -427,9 +427,9 @@ const OrderItemList = ({
   const validation = () => {
     let isError = false;
 
-    if (!name.trim()) {
+    if (!customerName.trim()) {
       handleSnakbarOpen("Please enter customer name", "error");
-      document.getElementById("name").focus();
+      document.getElementById("customerName").focus();
       return (isError = true);
     }
     if (!phoneNo.trim()) {
@@ -437,17 +437,17 @@ const OrderItemList = ({
       document.getElementById("phoneNo").focus();
       return (isError = true);
     }
-    if (!email.trim()) {
+    if (!customerEmail.trim()) {
       // handleSnakbarOpen("Please enter email address", "error");
-      // document.getElementById("email").focus();
+      // document.getElementById("customerEmail").focus();
       // return (isError = true);
     } else if (
       !/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
-        email.trim()
+        customerEmail.trim()
       )
     ) {
       handleSnakbarOpen("Invalid email address", "error");
-      document.getElementById("email").focus();
+      document.getElementById("customerEmail").focus();
       return (isError = true);
     }
     if (!address.trim()) {
@@ -497,8 +497,8 @@ const OrderItemList = ({
 
         try {
           let data = {
-            customer_name: name,
-            customer_email: email,
+            customer_name: customerName,
+            customer_email: customerEmail,
             customer_phone: phoneNo,
             customer_address: address,
             shipping_address: shippingAddress,
@@ -592,7 +592,7 @@ const OrderItemList = ({
           >
             <Grid item xs={2.5}>
               <TextField
-                id="name"
+                id="customerName"
                 label="Customer Name"
                 variant="standard"
                 size="small"
@@ -607,13 +607,13 @@ const OrderItemList = ({
                 className={classes.input3}
                 inputProps={{ min: 0, step: 0.01 }}
                 onWheel={(e) => e.target.blur()}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
               />
             </Grid>
             <Grid item xs={2.5}>
               <TextField
-                id="email"
+                id="customerEmail"
                 label="Customer Email"
                 variant="standard"
                 size="small"
@@ -626,8 +626,8 @@ const OrderItemList = ({
                 // }}
                 inputProps={{ min: 0, step: 0.01 }}
                 onWheel={(e) => e.target.blur()}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
               />
             </Grid>
             <Grid item xs={2.5}>

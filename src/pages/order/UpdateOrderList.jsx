@@ -554,6 +554,7 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
                 (el) => el.product_id === item.product_id
               );
               if (product !== undefined) {
+                product.previous_order_quantity = product.quantity;
                 product.stock_unit = item.stock_unit;
               }
               productDetailsWithStockUnit.push(product);
@@ -842,6 +843,9 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
                 <TableCell style={{ whiteSpace: "nowrap" }}>
                   Available Stocks
                 </TableCell>
+                <TableCell style={{ whiteSpace: "nowrap" }}>
+                  Previous Order Quantity
+                </TableCell>
                 <TableCell align="center">Quantity</TableCell>
                 <TableCell align="right"> Price</TableCell>
                 <TableCell align="right" style={{ whiteSpace: "nowrap" }}>
@@ -890,6 +894,10 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
                     </TableCell>
                     <TableCell>
                       {row?.stock_unit}{" "}
+                      {parseInt(row?.stock_unit) > 1 ? "Units" : "Unit"}
+                    </TableCell>
+                    <TableCell>
+                      {row?.previous_order_quantity}{" "}
                       {parseInt(row?.stock_unit) > 1 ? "Units" : "Unit"}
                     </TableCell>
                     <TableCell style={{ whiteSpace: "nowrap" }}>
