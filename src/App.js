@@ -9,7 +9,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 import Test from "./Test";
 import DropZoneImage from "./pages/utils/DropZoneImage";
-import Test2 from "./Test2";
+import Invoice from "./pages/utils/Invoice";
 const theme = createTheme({
   palette: {
     primary: {
@@ -58,8 +58,8 @@ function App() {
         >
           <BrowserRouter>
             <AuthContextProvider>
-              {/* <Layout /> */}
-              <Test2 />
+              <Layout />
+              {/* <Invoice /> */}
               {/* <DropZoneImage /> */}
               {/* <Test /> */}
             </AuthContextProvider>

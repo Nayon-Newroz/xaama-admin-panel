@@ -50,6 +50,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import Invoice from "../utils/Invoice";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
@@ -139,6 +140,7 @@ const OrderList2 = () => {
   const [cancelProductData, setCancelProductData] = useState({});
   const [cancelProductDialog, setCancelProductDialog] = useState(false);
   const [cancelProductLoading, setCancelProductLoading] = useState(false);
+  
   const handleDetailClickOpen = (obj) => {
     setDetails(obj);
     setDetailDialog(true);
@@ -678,6 +680,9 @@ const OrderList2 = () => {
                   Last Order Updated Info
                 </TableCell>
                 <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
+                <TableCell align="center" style={{ minWidth: "120px" }}>
+                  Invoice
+                </TableCell>
                 <TableCell align="right" style={{ minWidth: "120px" }}>
                   Action &nbsp;&nbsp;&nbsp;
                 </TableCell>
@@ -785,6 +790,10 @@ const OrderList2 = () => {
                         )}
                       </TableCell>
 
+                      <TableCell align="center" style={{ minWidth: "130px" }}>
+                         
+                        <Invoice data={row} />
+                      </TableCell>
                       <TableCell align="right" style={{ minWidth: "130px" }}>
                         {/* <IconButton
                           variant="contained"

@@ -33,3 +33,12 @@ input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
 }
 /* --------------------------Input number up and down arrow hide Css End----------------------------------- */
+@page {
+  size: auto;
+  margin: 10mm;
+}
+/* @media print {
+  @page {
+    size: 50mm 150mm;
+  }
+} */

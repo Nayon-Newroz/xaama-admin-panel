@@ -165,7 +165,7 @@ const useStyles = makeStyles((theme) => ({
   },
   logoStyle: {
     cursor: "pointer",
-    width: "175px",
+    width: "155px",
     height: "75px",
   },
   listStyle: {
@@ -381,7 +381,7 @@ export default function Layout() {
                 }}
               >
                 <img
-                  src="/image/demo.png"
+                  src="/image/logo2.svg"
                   alt=""
                   className={classes.logoStyle}
                 />
