@@ -37,6 +37,7 @@ import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import { getDataWithToken } from "../../services/GetDataService";
 import ProductList from "../product/ProductList";
+import Invoice from "../utils/Invoice";
 const useStyles = makeStyles((theme) => ({
   cardHolder: {
     display: "flex",
@@ -324,7 +325,7 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
   const [paidAmount, setPaidAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [orderListItems, setOrderListItems] = useState([]);
-
+  const [responseData, setResponseData] = useState({});
   const [cancelProductLoading, setCancelProductLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [newProductListDialog, setNewProductListDialog] = useState(false);
@@ -508,7 +509,8 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
           headers: { "Content-Type": "application/json" },
         });
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Successful", "success");
+          // handleSnakbarOpen("Successful", "success");
+          setResponseData(response.data.data);
           // navigate("/product-list");
         }
       } catch (error) {
@@ -652,11 +654,14 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
               </span> */}
             </p>
           </Grid>
-          {/* <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
-              <IconButton onClick={handleOpenOrderListClose}>
+          <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+            {/* <IconButton onClick={handleOpenOrderListClose}>
                 <ClearIcon style={{ color: "#205295" }} />
-              </IconButton>
-            </Grid> */}
+              </IconButton> */}
+            {Object.keys(responseData).length > 0 && (
+              <Invoice data={responseData} />
+            )}
+          </Grid>
         </Grid>
 
         <Grid

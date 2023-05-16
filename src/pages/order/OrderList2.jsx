@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { getDataWithToken } from "../../services/GetDataService";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -51,6 +51,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Invoice from "../utils/Invoice";
+import ReactToPrint from "react-to-print";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
@@ -140,7 +141,7 @@ const OrderList2 = () => {
   const [cancelProductData, setCancelProductData] = useState({});
   const [cancelProductDialog, setCancelProductDialog] = useState(false);
   const [cancelProductLoading, setCancelProductLoading] = useState(false);
-  
+  const componentRef = useRef();
   const handleDetailClickOpen = (obj) => {
     setDetails(obj);
     setDetailDialog(true);
@@ -791,7 +792,6 @@ const OrderList2 = () => {
                       </TableCell>
 
                       <TableCell align="center" style={{ minWidth: "130px" }}>
-                         
                         <Invoice data={row} />
                       </TableCell>
                       <TableCell align="right" style={{ minWidth: "130px" }}>

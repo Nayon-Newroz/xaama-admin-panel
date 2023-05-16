@@ -160,8 +160,16 @@ const ProductList = ({
     setOpenOrderList(true);
   };
 
-  const handleOpenOrderListClose = () => {
-    setOpenOrderList(false);
+  const handleOpenOrderListClose = (event, reason, isCloseAfterCreateData) => {
+    console.log("isCloseAfterCreateData", isCloseAfterCreateData);
+    if (reason !== "backdropClick") {
+      setOpenOrderList(false);
+    }
+    if (isCloseAfterCreateData) {
+      clearFilter();
+      setOrderIds([]);
+      setOrderItems([]);
+    }
   };
 
   const handleChange = (event) => {
@@ -1080,6 +1088,7 @@ const ProductList = ({
         maxWidth="xl"
         TransitionComponent={Transition}
         open={openOrderList}
+        disableEscapeKeyDown={true}
         onClose={handleOpenOrderListClose}
       >
         {/* <DialogTitle>Order List</DialogTitle> */}

@@ -16,7 +16,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -35,6 +35,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
+import Invoice from "../utils/Invoice";
 const useStyles = makeStyles((theme) => ({
   cardHolder: {
     display: "flex",
@@ -305,6 +306,7 @@ const OrderItemList = ({
   handleOpenOrderListClose,
 }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
@@ -322,6 +324,7 @@ const OrderItemList = ({
   const [tax, setTax] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [responseData, setResponseData] = useState({});
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const handleSnakbarOpen = (msg, vrnt) => {
     let duration;
@@ -468,7 +471,7 @@ const OrderItemList = ({
     } else {
       setLoading(true);
       let isAnyHasNoQuantity = false;
-      
+
       // for (let index = 0; index < orderItems.length; index++) {
       //   const element = orderItems[index];
       //   if (element.quantity < 1) {
@@ -519,8 +522,13 @@ const OrderItemList = ({
             headers: { "Content-Type": "application/json" },
           });
           if (response.status >= 200 && response.status < 300) {
+            console.log("response", response.data.data);
+            // setResponseData(response.data.data);
+
             handleSnakbarOpen("Successful", "success");
-            // navigate("/product-list");
+
+            // handleOpenOrderListClose();
+            setResponseData(response.data.data);
           }
         } catch (error) {
           console.log("error", error);
@@ -530,6 +538,7 @@ const OrderItemList = ({
         setLoading(false);
       }
     }
+    console.log("end=============================");
   };
   const calculateTotalAmount = () => {
     return (
@@ -537,6 +546,10 @@ const OrderItemList = ({
       discount +
       ((productTotalPrice - discount) * tax) / 100
     ).toFixed(2);
+  };
+
+  const handleAfterPrint = () => {
+    console.log("handleAfterPrint");
   };
   useEffect(() => {
     fnTotalPrice();
@@ -578,7 +591,33 @@ const OrderItemList = ({
               </p>
             </Grid>
             <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
-              <IconButton onClick={handleOpenOrderListClose}>
+              {Object.keys(responseData).length > 0 && (
+                <>
+                  <Button
+                    variant="outlined"
+                    onClick={() =>
+                      navigate(`/update-order/${responseData._id}`)
+                    }
+                  >
+                    Update Order
+                  </Button>
+                  &nbsp;&nbsp; &nbsp;{" "}
+                  <Invoice
+                    data={responseData}
+                    handleAfterPrint={handleAfterPrint}
+                  />
+                  &nbsp;&nbsp; &nbsp;{" "}
+                </>
+              )}
+              <IconButton
+                onClick={() =>
+                  handleOpenOrderListClose(
+                    "",
+                    "",
+                    responseData._id !== undefined
+                  )
+                }
+              >
                 <ClearIcon style={{ color: "#205295" }} />
               </IconButton>
             </Grid>
