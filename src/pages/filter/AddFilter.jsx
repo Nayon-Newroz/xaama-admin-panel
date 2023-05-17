@@ -228,7 +228,7 @@ const AddFilter = () => {
               onChange={handleChange}
             >
               {parentList?.map((item, i) => (
-                <MenuItem value={item.name}>{item.name}</MenuItem>
+                <MenuItem key={item.filter_id} value={item.name}>{item.name}</MenuItem>
               ))}
             </Select>
           </FormControl>

@@ -175,7 +175,7 @@ const UpdateLocation = () => {
               onChange={handleChange}
             >
               {parentList?.map((item, i) => (
-                <MenuItem value={item.name}>{item.name}</MenuItem>
+                <MenuItem  key={item.location_id} value={item.name}>{item.name}</MenuItem>
               ))}
             </Select>
           </FormControl>

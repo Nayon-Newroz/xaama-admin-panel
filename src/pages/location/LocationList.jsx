@@ -368,7 +368,7 @@ const LocationList = () => {
                 tableDataList.length > 0 &&
                 tableDataList.map((row, i) => (
                   <TableRow
-                    key={i}
+                    key={row.location_id}
                     // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>{row?.name}</TableCell>

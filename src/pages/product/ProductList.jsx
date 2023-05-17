@@ -103,6 +103,15 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  dialogTitleStyle: {
+    fontSize: "22px",
+    color: "#154360",
+    fontWeight: 500,
+    margin: "0 0 20px 0px",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "17px",
+    },
+  },
 }));
 const ProductList = ({
   orderListItems,
@@ -449,17 +458,21 @@ const ProductList = ({
             <Grid container spacing={{ lg: 6, xl: 3 }}>
               <Grid item xs={9}>
                 {" "}
-                <Button
-                  variant="outlined"
-                  color="success"
-                  size="large"
-                  fullWidth
-                  disableElevation
-                  onClick={handleClickOpen}
-                >
-                  Order List
-                  {orderItems.length > 0 && " (" + orderItems.length + ")"}
-                </Button>
+                {isFromOrderList ? (
+                  ""
+                ) : (
+                  <Button
+                    variant="outlined"
+                    color="success"
+                    size="large"
+                    fullWidth
+                    disableElevation
+                    onClick={handleClickOpen}
+                  >
+                    Order List
+                    {orderItems.length > 0 && " (" + orderItems.length + ")"}
+                  </Button>
+                )}
               </Grid>
               <Grid item xs={3}>
                 <Button
@@ -504,7 +517,10 @@ const ProductList = ({
                       onChange={handleChange}
                     >
                       {categoryList?.map((item, i) => (
-                        <MenuItem value={item.category_id}>
+                        <MenuItem
+                          key={item.category_id}
+                          value={item.category_id}
+                        >
                           {item.name}
                         </MenuItem>
                       ))}
@@ -642,7 +658,7 @@ const ProductList = ({
           style={{
             overflowX: "auto",
             minWidth: "100%",
-            width: "Calc(100vw - 385px)",
+            width: isFromOrderList ? "auto" : "Calc(100vw - 385px)",
             // padding: "10px 16px 0px",
             boxSizing: "border-box",
           }}
@@ -676,7 +692,11 @@ const ProductList = ({
                   Last Updated Info
                 </TableCell>
                 <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
-                <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
+                {isFromOrderList ? (
+                  ""
+                ) : (
+                  <TableCell align="right">Action &nbsp;&nbsp;&nbsp;</TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -684,7 +704,7 @@ const ProductList = ({
                 tableDataList.length > 0 &&
                 tableDataList.map((row, i) => (
                   <TableRow
-                    key={i}
+                    key={row?.product_id}
                     // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>
@@ -805,33 +825,36 @@ const ProductList = ({
                         </>
                       )}
                     </TableCell>
+                    {isFromOrderList ? (
+                      ""
+                    ) : (
+                      <TableCell align="right" style={{ minWidth: "130px" }}>
+                        <IconButton
+                          variant="contained"
+                          disableElevation
+                          onClick={() => handleDetailClickOpen(row)}
+                        >
+                          <VisibilityOutlinedIcon />
+                        </IconButton>
+                        <IconButton
+                          variant="contained"
+                          disableElevation
+                          component={Link}
+                          to={`/update-product`}
+                          state={{ row }}
+                        >
+                          <EditOutlinedIcon />
+                        </IconButton>
 
-                    <TableCell align="right" style={{ minWidth: "130px" }}>
-                      <IconButton
-                        variant="contained"
-                        disableElevation
-                        onClick={() => handleDetailClickOpen(row)}
-                      >
-                        <VisibilityOutlinedIcon />
-                      </IconButton>
-                      <IconButton
-                        variant="contained"
-                        disableElevation
-                        component={Link}
-                        to={`/update-product`}
-                        state={{ row }}
-                      >
-                        <EditOutlinedIcon />
-                      </IconButton>
-
-                      <IconButton
-                        variant="contained"
-                        disableElevation
-                        onClick={() => handleDeleteDialog(i, row)}
-                      >
-                        <DeleteOutlineIcon color="error" />
-                      </IconButton>
-                    </TableCell>
+                        <IconButton
+                          variant="contained"
+                          disableElevation
+                          onClick={() => handleDeleteDialog(i, row)}
+                        >
+                          <DeleteOutlineIcon color="error" />
+                        </IconButton>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
 
@@ -871,8 +894,19 @@ const ProductList = ({
         fullWidth={true}
       >
         {/* <div style={{ padding: "10px", minWidth: "300px" }}> */}
-        <DialogTitle id="alert-dialog-title">{"Product Detail"}</DialogTitle>
+        {/* <DialogTitle id="alert-dialog-title">{"Product Detail"}</DialogTitle> */}
         <DialogContent>
+          <Grid container style={{ borderBottom: "1px solid #154360" }}>
+            <Grid item xs={6} sm={6} md={6}>
+              <p className={classes.dialogTitleStyle}>Product Detail</p>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+              <IconButton onClick={handleDetailClose}>
+                <ClearIcon style={{ color: "#205295" }} />
+              </IconButton>
+            </Grid>
+          </Grid>
+          <br />
           <Grid container>
             <Grid item xs={6}>
               <Typography variant="subtitle2">
@@ -966,8 +1000,14 @@ const ProductList = ({
               </Typography>
               <div style={{ display: "flex", gap: "10px" }}>
                 {details?.images?.length > 0
-                  ? details?.images?.map((item, i) => (
-                      <img src={item.url} alt="" width="70px" height="70px" />
+                  ? details?.images?.map((item) => (
+                      <img
+                        key={item.url}
+                        src={item.url}
+                        alt=""
+                        width="70px"
+                        height="70px"
+                      />
                     ))
                   : "No Image Available"}
               </div>
@@ -984,9 +1024,7 @@ const ProductList = ({
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDetailClose}>Close</Button>
-        </DialogActions>
+
         {/* </div> */}
       </Dialog>
       <Dialog
@@ -1002,8 +1040,14 @@ const ProductList = ({
           <DialogContentText id="alert-dialog-description">
             <div style={{ display: "flex", gap: "10px" }}>
               {images.length > 0
-                ? images.map((item, i) => (
-                    <img src={item.url} alt="" width="220px" height="220px" />
+                ? images.map((item) => (
+                    <img
+                      key={item.url}
+                      src={item.url}
+                      alt=""
+                      width="220px"
+                      height="220px"
+                    />
                   ))
                 : "No Image Available"}
             </div>

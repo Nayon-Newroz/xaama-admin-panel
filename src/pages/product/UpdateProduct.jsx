@@ -459,8 +459,10 @@ const UpdateProduct = () => {
               label="Category *"
               onChange={handleChange}
             >
-              {categoryList?.map((item, i) => (
-                <MenuItem value={item.category_id}>{item.name}</MenuItem>
+              {categoryList?.map((item) => (
+                <MenuItem key={item.category_id} value={item.category_id}>
+                  {item.name}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -479,8 +481,8 @@ const UpdateProduct = () => {
                     <Grid item xs={12}>
                       <Typography variant="h6">Select the filters</Typography>
                     </Grid>
-                    {filterList?.map((item, index) => (
-                      <Grid item xs={12} key={index}>
+                    {filterList?.map((item) => (
+                      <Grid item xs={12} key={item.filter_name}>
                         <div className={classes.checkboxStyle}>
                           <FormControl>
                             <FormLabel id="demo-row-radio-buttons-group-label">
@@ -493,8 +495,9 @@ const UpdateProduct = () => {
                               value={item.selectedFilterId}
                               onChange={handleFilter}
                             >
-                              {item.filter_values?.map((el, i) => (
+                              {item.filter_values?.map((el) => (
                                 <FormControlLabel
+                                key={el.filter_id}
                                   value={el.filter_id}
                                   control={<Radio />}
                                   label={el.name}

@@ -213,7 +213,7 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: "10px",
     },
   },
-  titleStyle2: {
+  dialogTitleStyle: {
     fontSize: "22px",
     color: "#154360",
     fontWeight: 500,
@@ -582,7 +582,7 @@ const OrderItemList = ({
         <>
           <Grid container>
             <Grid item xs={6} sm={6} md={6}>
-              <p className={classes.titleStyle2}>
+              <p className={classes.dialogTitleStyle}>
                 Order &nbsp;
                 <span style={{ fontSize: "16px", color: "#7c7c7c" }}>
                   ({orderItems?.length}{" "}
@@ -809,7 +809,7 @@ const OrderItemList = ({
                 {orderItems &&
                   orderItems.map((row, i) => (
                     <TableRow
-                      key={i}
+                      key={row.product_id}
                       sx={
                         {
                           // "&:last-child td, &:last-child th": { border: 0 },

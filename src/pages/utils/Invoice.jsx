@@ -363,7 +363,16 @@ const Invoice = ({ data, handleAfterPrint }) => {
               <Grid item xs={7}>
                 <p className={classes.cardSubtitle}>Payment Info :</p>
                 <p className={classes.cardText}>
-                  <b>Patment Method :</b> Cash
+                  <b>Payment Method :</b>{" "}
+                  {data?.payment_method?.length > 0
+                    ? data?.payment_method
+                    : "N/A"}
+                </p>
+                <p className={classes.cardText}>
+                  <b>Transaction Id :</b>{" "}
+                  {data?.transaction_id?.length > 0
+                    ? data?.transaction_id
+                    : "N/A"}
                 </p>
               </Grid>
               <Grid item xs={5}>
@@ -492,12 +501,15 @@ const Invoice = ({ data, handleAfterPrint }) => {
               <Grid item xs={7}>
                 <p className={classes.cardSubtitle}>Terms and Conditions :</p>
                 <p className={classes.cardText}>
-                  Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. Lorem Ipsum has been the industry's
-                  standard dummy text ever since the 1500s,
+                  You may cancel your order within a reasonable time before the
+                  products are dispatched. Please refer to our website or
+                  contact customer support for details on cancellations.Returns
+                  and refunds will be handled in accordance with our Return and
+                  Refund Policy, which can be found on our website.
                 </p>
               </Grid>
               <Grid item xs={5} style={{ textAlign: "center" }}>
+                <br />
                 <br />
                 <br />
                 -------------------------------

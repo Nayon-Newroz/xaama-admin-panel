@@ -379,7 +379,7 @@ const FilterList = () => {
                 tableDataList.length > 0 &&
                 tableDataList.map((row, i) => (
                   <TableRow
-                    key={i}
+                    key={row.filter_id}
                     // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>{row?.name}</TableCell>
@@ -388,10 +388,10 @@ const FilterList = () => {
                       {/* 111 */}
                       {row?.children.length > 1
                         ? row?.children?.map((item, i) => (
-                            <lavel key={item._id}>
+                            <label key={item._id}>
                               {item.name}
                               {row?.children.length === i + 1 ? "" : ", "}
-                            </lavel>
+                            </label>
                           ))
                         : "None"}
                     </TableCell>

@@ -74,7 +74,7 @@ const AddProduct = () => {
   const [filterList, setFilterList] = useState([]);
   const [filterLoading, setFilterLoading] = useState(false);
   const [files, setFiles] = useState([]);
-  
+
   const [refresh, setRefresh] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const handleChange = (event) => {
@@ -388,7 +388,9 @@ const AddProduct = () => {
               onChange={handleChange}
             >
               {categoryList?.map((item, i) => (
-                <MenuItem value={item.category_id}>{item.name}</MenuItem>
+                <MenuItem key={item.category_id} value={item.category_id}>
+                  {item.name}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -407,8 +409,8 @@ const AddProduct = () => {
                     <Grid item xs={12}>
                       <Typography variant="h6">Select the filters</Typography>
                     </Grid>
-                    {filterList?.map((item, index) => (
-                      <Grid item xs={12} key={index}>
+                    {filterList?.map((item) => (
+                      <Grid item xs={12} key={item.filter_name}>
                         <div className={classes.checkboxStyle}>
                           <FormControl>
                             <FormLabel id="demo-row-radio-buttons-group-label">
@@ -421,8 +423,9 @@ const AddProduct = () => {
                               value={item.selectedFilterId}
                               onChange={handleFilter}
                             >
-                              {item.filter_values?.map((el, i) => (
+                              {item.filter_values?.map((el) => (
                                 <FormControlLabel
+                                  key={el.filter_id}
                                   value={el.filter_id}
                                   control={<Radio />}
                                   label={el.name}
@@ -448,7 +451,7 @@ const AddProduct = () => {
               You can upload max 5 (jpg / jpeg / png) images.Try resolution
               800*600 for better image view.
             </Alert>
-            <DropZoneImage files={files} setFiles={setFiles} maxFilesNo = {5}/>
+            <DropZoneImage files={files} setFiles={setFiles} maxFilesNo={5} />
           </div>
           <div style={{ marginBottom: "30px" }}>
             <Typography variant="h6">

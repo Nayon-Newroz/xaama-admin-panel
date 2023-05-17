@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const AddLocation = () => {
-  const classes = useStyles(); 
+  const classes = useStyles();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [parentName, setParentName] = useState("");
@@ -86,7 +86,7 @@ const AddLocation = () => {
         });
         if (response.status >= 200 && response.status < 300) {
           handleSnakbarOpen("Added successfully", "success");
-            navigate("/location-list");
+          navigate("/location-list");
         }
       } catch (error) {
         console.log("error", error);
@@ -159,8 +159,10 @@ const AddLocation = () => {
               label="Parent Name"
               onChange={handleChange}
             >
-              {parentList?.map((item, i) => (
-                <MenuItem value={item.name}>{item.name}</MenuItem>
+              {parentList?.map((item) => (
+                <MenuItem key={item.location_id} value={item.name}>
+                  {item.name}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>

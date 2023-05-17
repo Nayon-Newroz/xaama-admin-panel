@@ -36,7 +36,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import { makeStyles } from "@mui/styles";
-import { Label } from "@mui/icons-material";
+import ClearIcon from "@mui/icons-material/Clear";
 const useStyles = makeStyles((theme) => ({
   tableBodyStyle: {
     "& tr:nth-of-type(odd)": {
@@ -88,6 +88,15 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  dialogTitleStyle: {
+    fontSize: "22px",
+    color: "#154360",
+    fontWeight: 500,
+    margin: "0 0 20px 0px",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "17px",
+    },
+  },
 }));
 const CategoryList = () => {
   const classes = useStyles();
@@ -108,7 +117,7 @@ const CategoryList = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [filterListDialog, setFilterListDialog] = useState(false);
   const [filterList, setFilterList] = useState([]);
-
+  const [categoryNameOfFilter, setCategoryNameOfFilter] = useState("");
   const handleFilterListDialogOpen = () => {
     setFilterListDialog(true);
   };
@@ -241,6 +250,7 @@ const CategoryList = () => {
       handleSnakbarOpen(error.response.data.message.toString(), "error");
     }
   };
+
   const getFilters = async (row) => {
     try {
       setFilterLoading(true);
@@ -254,7 +264,7 @@ const CategoryList = () => {
       if (response.status >= 200 && response.status < 300) {
         setFilterList(response?.data?.data);
         // setTotalData(response?.data?.totalData);
-
+        setCategoryNameOfFilter(row.name);
         if (response.data.data.length < 1) {
           setMessage("No data found");
         }
@@ -406,7 +416,7 @@ const CategoryList = () => {
                 tableDataList.length > 0 &&
                 tableDataList.map((row, i) => (
                   <TableRow
-                    key={i}
+                    key={row?.category_id}
                     // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>{row?.name}</TableCell>
@@ -554,35 +564,38 @@ const CategoryList = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Category Filter List"}
-        </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <Grid container style={{ borderBottom: "1px solid #154360" }}>
+            <Grid item xs={6} sm={6} md={6}>
+              <p className={classes.dialogTitleStyle}>
+                {categoryNameOfFilter} Filter List
+              </p>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+              <IconButton onClick={handleFilterListDialogClose}>
+                <ClearIcon style={{ color: "#205295" }} />
+              </IconButton>
+            </Grid>
+          </Grid>
+          <DialogContentText style={{ minWidth: "400px" }}>
             {filterList.length > 0 ? (
               filterList.map((row, i) => (
-                <>
-                  <p>
-                    <b>{row.filter_name}</b>
-                  </p>
+                <div key={row.filter_name}>
+                  <p style={{ fontWeight: "bold" }}>{row.filter_name}</p>
                   <div>
                     {row?.filter_values?.map((value) => (
-                      <label>{value.name},&nbsp;&nbsp;</label>
+                      <label key={value.filter_id} style={{ color: "#727272" }}>
+                        {value.name},&nbsp;&nbsp;
+                      </label>
                     ))}
                   </div>
-                </>
+                </div>
               ))
             ) : (
               <p>No filter is available for this category</p>
             )}
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleFilterListDialogClose}>Disagree</Button>
-          <Button onClick={handleFilterListDialogClose} autoFocus>
-            Agree
-          </Button>
-        </DialogActions>
       </Dialog>
     </>
   );

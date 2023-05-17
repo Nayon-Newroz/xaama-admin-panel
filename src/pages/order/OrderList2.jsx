@@ -52,6 +52,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Invoice from "../utils/Invoice";
 import ReactToPrint from "react-to-print";
+import OrderDetails from "./OrderDetails";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
@@ -106,6 +107,15 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  dialogTitleStyle: {
+    fontSize: "22px",
+    color: "#154360",
+    fontWeight: 500,
+    margin: "0 0 20px 0px",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "17px",
+    },
+  },
 }));
 const OrderList2 = () => {
   const classes = useStyles();
@@ -143,6 +153,7 @@ const OrderList2 = () => {
   const [cancelProductLoading, setCancelProductLoading] = useState(false);
   const componentRef = useRef();
   const handleDetailClickOpen = (obj) => {
+    console.log("obj", obj);
     setDetails(obj);
     setDetailDialog(true);
   };
@@ -681,9 +692,9 @@ const OrderList2 = () => {
                   Last Order Updated Info
                 </TableCell>
                 <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
-                <TableCell align="center" style={{ minWidth: "120px" }}>
+                {/* <TableCell align="center" style={{ minWidth: "120px" }}>
                   Invoice
-                </TableCell>
+                </TableCell> */}
                 <TableCell align="right" style={{ minWidth: "120px" }}>
                   Action &nbsp;&nbsp;&nbsp;
                 </TableCell>
@@ -695,7 +706,7 @@ const OrderList2 = () => {
                 tableDataList.map((row, i) => (
                   <>
                     <TableRow
-                      key={i}
+                      key={row?.order_id}
                       // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
                       <TableCell>{row?.order_id}</TableCell>
@@ -714,13 +725,6 @@ const OrderList2 = () => {
                           <KeyboardArrowDownIcon />
                        
                         </IconButton> */}
-                        <IconButton
-                          variant="contained"
-                          disableElevation
-                          onClick={() => handleDetailClickOpen(row)}
-                        >
-                          <VisibilityOutlinedIcon />
-                        </IconButton>
                       </TableCell>
                       <TableCell>{row?.shipping_address}</TableCell>
                       <TableCell>{row?.discount}</TableCell>
@@ -791,9 +795,9 @@ const OrderList2 = () => {
                         )}
                       </TableCell>
 
-                      <TableCell align="center" style={{ minWidth: "130px" }}>
+                      {/* <TableCell align="center" style={{ minWidth: "130px" }}>
                         <Invoice data={row} />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell align="right" style={{ minWidth: "130px" }}>
                         {/* <IconButton
                           variant="contained"
@@ -804,6 +808,14 @@ const OrderList2 = () => {
                         </IconButton> */}
                         <IconButton
                           variant="contained"
+                          disableElevation
+                          onClick={() => handleDetailClickOpen(row)}
+                        >
+                          <VisibilityOutlinedIcon />
+                        </IconButton>
+                        <IconButton
+                          variant="contained"
+                          color="info"
                           disableElevation
                           component={Link}
                           to={`/update-order/${row._id}`}
@@ -860,172 +872,22 @@ const OrderList2 = () => {
         fullWidth={true}
       >
         {/* <div style={{ padding: "10px", minWidth: "300px" }}> */}
-        <DialogTitle id="alert-dialog-title">{"Product Detail"}</DialogTitle>
+        {/* <DialogTitle id="alert-dialog-title">{"Product Detail"}</DialogTitle> */}
         <DialogContent>
-          {details?.product_details?.length > 0 ? (
-            <>
-              <Table aria-label="simple table" className={classes.tableStyle}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell style={{ minWidth: "70px" }}>Image</TableCell>
-                    <TableCell style={{ minWidth: "220px" }}>Name</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell style={{ whiteSpace: "nowrap" }}>
-                      Units
-                    </TableCell>
-
-                    {/* <TableCell>SKU</TableCell> */}
-
-                    <TableCell>Filters</TableCell>
-                    {/* <TableCell>Images</TableCell> */}
-
-                    {/* <TableCell>Description</TableCell> */}
-
-                    <TableCell style={{ minWidth: "120px" }}>Status</TableCell>
-                    {/* <TableCell align="right">
-                      Action &nbsp;&nbsp;&nbsp;
-                    </TableCell> */}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {!loading &&
-                    details?.product_details?.length > 0 &&
-                    details?.product_details?.map((row, i) => (
-                      <TableRow
-                        key={i}
-                        // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                      >
-                        <TableCell>
-                          {row?.images.length > 0 ? (
-                            <>
-                              <img
-                                src={row?.images[0].url}
-                                alt=""
-                                width="70px"
-                                height="70px"
-                                style={{
-                                  display: "block",
-                                  margin: "5px 0",
-                                }}
-                              />
-                              <Button
-                                // variant="outlined"
-                                size="small"
-                                style={{
-                                  whiteSpace: "nowrap",
-                                  fontSize: "10px",
-                                }}
-                                onClick={() =>
-                                  handleImageClickOpen(row?.images)
-                                }
-                              >
-                                View All
-                              </Button>
-                            </>
-                          ) : (
-                            "No Image Available"
-                          )}
-                        </TableCell>
-                        <TableCell
-                          style={{ maxWidth: "220px", minWidth: "220px" }}
-                        >
-                          {row?.name}
-                        </TableCell>
-                        <TableCell>{row?.price}</TableCell>
-
-                        <TableCell style={{ whiteSpace: "nowrap" }}>
-                          {row?.quantity}{" "}
-                          {parseInt(row?.quantity) > 1 ? "Units" : "Unit"}
-                        </TableCell>
-                        {/* <TableCell style={{ whiteSpace: "nowrap" }}>
-                                    {row?.customerEmail}
-                                  </TableCell> */}
-
-                        <TableCell
-                          style={{
-                            minWidth: "120px",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {row?.filter_data.length > 0
-                            ? row?.filter_data
-                                .sort(sortByParentName)
-                                .map((e, i) => (
-                                  <label key={e._id}>
-                                    {i !== 0 && <>,&nbsp;&nbsp;</>}
-                                    <b>{e.parent_name}</b> : {e.name}
-                                  </label>
-                                ))
-                            : "N/A"}
-                        </TableCell>
-
-                        <TableCell>
-                          {row?.status ? (
-                            <>
-                              <TaskAltOutlinedIcon
-                                style={{
-                                  color: "#10ac84",
-                                  height: "16px",
-                                  position: "relative",
-                                  top: "4px",
-                                }}
-                              />{" "}
-                              <span
-                                style={{
-                                  color: "#10ac84",
-                                }}
-                              >
-                                Active &nbsp;
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <HighlightOffOutlinedIcon
-                                style={{
-                                  color: "#ee5253",
-                                  height: "16px",
-                                  position: "relative",
-                                  top: "4px",
-                                }}
-                              />
-                              <span
-                                style={{
-                                  color: "#ee5253",
-                                }}
-                              >
-                                Inactive
-                              </span>
-                            </>
-                          )}
-                        </TableCell>
-
-                        {/* <TableCell align="right" style={{ minWidth: "130px" }}>
-                          <Button
-                            variant="contained"
-                            disableElevation
-                            color="error"
-                            onClick={() => handleCancelProductClickOpen(row)}
-                          >
-                            Remove
-                          </Button>
-                         
-                        </TableCell> */}
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </>
-          ) : (
-            <>
-              <Typography variant="h4" style={{ color: "#606060" }}>
-                No product avaiable
-              </Typography>
-            </>
-          )}
+          <Grid container style={{ borderBottom: "1px solid #154360" }}>
+            <Grid item xs={6} sm={6} md={6}>
+              <p className={classes.dialogTitleStyle}>Order Details</p>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+              <IconButton onClick={handleDetailClose}>
+                <ClearIcon style={{ color: "#205295" }} />
+              </IconButton>
+            </Grid>
+          </Grid>
+          <br />
+          <OrderDetails data={details} />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDetailClose}>Close</Button>
-        </DialogActions>
+
         {/* </div> */}
       </Dialog>
       <Dialog
@@ -1041,8 +903,14 @@ const OrderList2 = () => {
           <DialogContentText id="alert-dialog-description">
             <div style={{ display: "flex", gap: "10px" }}>
               {images.length > 0
-                ? images.map((item, i) => (
-                    <img src={item.url} alt="" width="220px" height="220px" />
+                ? images.map((item) => (
+                    <img
+                      key={item.url}
+                      src={item.url}
+                      alt=""
+                      width="220px"
+                      height="220px"
+                    />
                   ))
                 : "No Image Available"}
             </div>

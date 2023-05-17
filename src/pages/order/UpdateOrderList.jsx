@@ -300,6 +300,15 @@ const useStyles = makeStyles((theme) => ({
       color: "#154360 !important",
     },
   },
+  dialogTitleStyle: {
+    fontSize: "22px",
+    color: "#154360",
+    fontWeight: 500,
+    margin: "0 0 20px 0px",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "17px",
+    },
+  },
 }));
 const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
   const classes = useStyles();
@@ -1138,20 +1147,19 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
             <Button
               fullWidth
               variant="contained"
-              // disabled={loading}
+              disabled={loading}
               size="large"
               style={{ minHeight: "35px", marginTop: "20px" }}
               disableElevation
               onClick={onSubmit}
             >
-              {/* <PulseLoader
-                  color={"#353b48"}
-                  loading={loading}
-                  size={10}
-                  speedMultiplier={0.5}
-                />{" "} */}
-              Update Order
-              {/* {loading === false && "Submit"} */}
+              <PulseLoader
+                color={"#353b48"}
+                loading={loading}
+                size={10}
+                speedMultiplier={0.5}
+              />{" "}
+              {loading === false && "Update Order"}
             </Button>
           </Grid>
         </Grid>
@@ -1223,6 +1231,14 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
           maxWidth="xl"
         >
           <DialogContent>
+            <Grid container>
+              <Grid item xs={6} sm={6} md={6}></Grid>
+              <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+                <IconButton onClick={handleNewProductListDialogClose}>
+                  <ClearIcon style={{ color: "#205295" }} />
+                </IconButton>
+              </Grid>
+            </Grid>
             <ProductList
               orderListItems={orderListItems}
               setOrderListItems={setOrderListItems}
@@ -1231,8 +1247,8 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleNewProductListDialogClose}>cancel</Button>
-            <Button
+            {/* <Button variant="outlined" onClick={handleNewProductListDialogClose}>cancel</Button> */}
+            {/* <Button
               variant="contained"
               disabled={cancelProductLoading}
               onClick={cancelProduct}
@@ -1247,7 +1263,7 @@ const OrderItemList = ({ handleOrderChange, handleOpenOrderListClose }) => {
                 speedMultiplier={0.5}
               />{" "}
               {cancelProductLoading === false && "Confirm"}
-            </Button>
+            </Button> */}
           </DialogActions>
         </Dialog>
       </>
