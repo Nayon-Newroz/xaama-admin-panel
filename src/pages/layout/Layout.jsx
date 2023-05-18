@@ -334,8 +334,6 @@ export default function Layout() {
     }
   };
   const checkOrderListRoute = () => {
-   
-
     if (pathname.includes("/order-list")) {
       return true;
     } else if (pathname.includes("/update-order/")) {
@@ -346,6 +344,14 @@ export default function Layout() {
   };
   const checkProductRoute = () => {
     const userPathname = ["/add-product", "/update-product", "/product-list"];
+    if (userPathname.includes(pathname)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+  const checkUserRoute = () => {
+    const userPathname = ["/add-user", "/update-user", "/user-list"];
     if (userPathname.includes(pathname)) {
       return true;
     } else {
@@ -777,7 +783,7 @@ export default function Layout() {
                     <ListItemIcon>
                       <CircleIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Product list" />
+                    <ListItemText primary="Product List" />
                   </ListItemButton>
                 </Link>
               </List>
@@ -798,6 +804,58 @@ export default function Layout() {
                 <ListItemText primary="Order List" />
               </ListItemButton>
             </Link>
+            <ListItemButton
+              className={`${classes.menuItem} ${
+                checkUserRoute() ? classes.menuItemActive : null
+              }`}
+              onClick={() => {
+                manageOpen("User");
+              }}
+            >
+              <ListItemIcon>
+                <LockResetIcon />
+              </ListItemIcon>
+              <ListItemText primary="User" />
+              {activeMenu === "User" ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={activeMenu === "User"} timeout="auto" unmountOnExit>
+              <List
+                component="div"
+                disablePadding
+                className={classes.listStyle}
+              >
+                <Link to="/add-user" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/add-user"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Add User" />
+                  </ListItemButton>
+                </Link>
+                <Link to="/user-list" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/user-list"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="User List" />
+                  </ListItemButton>
+                </Link>
+              </List>
+            </Collapse>
           </List>
         </Drawer>
         <Main open={open}>

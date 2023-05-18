@@ -669,7 +669,9 @@ const ProductList = ({
                 <TableCell style={{ width: "20px" }}>
                   <Checkbox disabled />
                 </TableCell>
-                <TableCell style={{ minWidth: "70px" }}>Image</TableCell>
+                <TableCell style={{ minWidth: "70px" }} align="center">
+                  Image
+                </TableCell>
                 <TableCell style={{ whiteSpace: "nowrap" }}>
                   Product Name
                 </TableCell>
@@ -720,14 +722,27 @@ const ProductList = ({
                           <img
                             src={row?.images[0].url}
                             alt=""
-                            width="70px"
-                            height="70px"
-                            style={{ display: "block", margin: "5px 0" }}
+                            width="50px"
+                            height="50px"
+                            style={{
+                              display: "block",
+                              margin: "5px auto",
+                              borderRadius: "5px",
+                              border: "3px solid #d1d1d1",
+                            }}
                           />
                           <Button
                             // variant="outlined"
                             size="small"
-                            style={{ whiteSpace: "nowrap", fontSize: "10px" }}
+                            style={{
+                              whiteSpace: "nowrap",
+                              fontSize: "10px",
+                              width: "70px",
+                              display: "block",
+                              margin: "auto",
+                              borderRadius: "5px",
+                              border: "2px solid #d1d1d1",
+                            }}
                             onClick={() => handleImageClickOpen(row?.images)}
                           >
                             View All
@@ -1035,8 +1050,18 @@ const ProductList = ({
         maxWidth="xl"
       >
         {/* <div style={{ padding: "10px", minWidth: "300px" }}> */}
-        <DialogTitle id="alert-dialog-title">{"Images"}</DialogTitle>
+
         <DialogContent>
+          <Grid container>
+            <Grid item xs={6} sm={6} md={6}>
+              <p className={classes.dialogTitleStyle}>Images</p>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+              <IconButton onClick={handleImageClose}>
+                <ClearIcon style={{ color: "#205295" }} />
+              </IconButton>
+            </Grid>
+          </Grid>
           <DialogContentText id="alert-dialog-description">
             <div style={{ display: "flex", gap: "10px" }}>
               {images.length > 0
@@ -1053,9 +1078,9 @@ const ProductList = ({
             </div>
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
+        {/* <DialogActions>
           <Button onClick={handleImageClose}>Close</Button>
-        </DialogActions>
+        </DialogActions> */}
         {/* </div> */}
       </Dialog>
       <Dialog

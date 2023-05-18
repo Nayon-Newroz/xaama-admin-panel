@@ -28,6 +28,7 @@ import AddProduct from "../product/AddProduct";
 import ProductList from "../product/ProductList";
 import OrderList2 from "../order/OrderList2";
 import UpdateOrderList from "../order/UpdateOrderList";
+import AddUser from "../users/AddUser";
 
 const useStyles = makeStyles((theme) => ({
   dialogStyle: {
@@ -226,6 +227,14 @@ const Navigation = ({ openLoadingDialog, setOpenLoadingDialog }) => {
           element={
             <PrivateRoute>
               <OrderList2 />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="add-user"
+          element={
+            <PrivateRoute>
+              <AddUser />
             </PrivateRoute>
           }
         />

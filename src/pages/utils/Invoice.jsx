@@ -142,6 +142,108 @@ const Invoice = ({ data, handleAfterPrint }) => {
     return subtotalAmount;
     // setProductTotalPrice(subtotalAmount);
   };
+  const fnCalculationSection = () => {
+    console.log("fnGetSubtotal");
+    let subtotalAmount = 0;
+
+    data?.product_details?.map((item) => {
+      let itemPrice;
+      if (parseInt(item.discount_price) > 0) {
+        itemPrice = parseInt(item.discount_price);
+      } else {
+        itemPrice = parseInt(item.price);
+      }
+      return (subtotalAmount += item.quantity * parseInt(itemPrice));
+    });
+
+    return (
+      <Grid item xs={5}>
+        <Grid
+          container
+          // style={{ background: "antiquewhite", padding: "10px" }}
+        >
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2}>Subtotal</p>
+          </Grid>
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2} style={{ textAlign: "right" }}>
+              {/* {subtotal} */}
+              {subtotalAmount.toFixed(2)}
+            </p>
+          </Grid>
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2}>Discount</p>
+          </Grid>
+          <Grid item xs={6} style={{ borderBottom: "1px solid #154360" }}>
+            <p className={classes.cardSubtitle2} style={{ textAlign: "right" }}>
+              {data?.discount?.toFixed(2)}
+            </p>
+          </Grid>
+          <Grid item xs={6}></Grid>
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2} style={{ textAlign: "right" }}>
+              {/* {totalBeforeTAX} */}
+              {(subtotalAmount - data?.discount).toFixed(2)}
+            </p>
+          </Grid>
+
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2}>TAX</p>
+          </Grid>
+          <Grid item xs={6} style={{ borderBottom: "1px solid #154360" }}>
+            <p className={classes.cardSubtitle2} style={{ textAlign: "right" }}>
+              {" "}
+              {data?.tax}%
+            </p>
+          </Grid>
+          <Grid item xs={6}></Grid>
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2} style={{ textAlign: "right" }}>
+              {" "}
+              {/* {totalAfterTAX} */}
+              {(
+                subtotalAmount -
+                data?.discount +
+                ((subtotalAmount - data?.discount) * data?.tax) / 100
+              ).toFixed(2)}
+            </p>
+          </Grid>
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2}>Paid Amount</p>
+          </Grid>
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2} style={{ textAlign: "right" }}>
+              {" "}
+              {data?.paid_amount?.toFixed(2)}{" "}
+            </p>
+          </Grid>
+
+          <Grid item xs={6}>
+            <p className={classes.cardSubtitle2}>Due Amount</p>
+          </Grid>
+          <Grid item xs={6} style={{ borderBottom: "1px solid #154360" }}>
+            <p className={classes.cardSubtitle2} style={{ textAlign: "right" }}>
+              {(data?.total_amount - data?.paid_amount).toFixed(2)}
+            </p>
+          </Grid>
+          <Grid item xs={6} style={{ background: "#f1f1f1" }}>
+            <p className={classes.cardSubtitle2} style={{ fontSize: "18px" }}>
+              Total
+            </p>
+          </Grid>
+          <Grid item xs={6} style={{ background: "#f1f1f1" }}>
+            <p
+              className={classes.cardSubtitle2}
+              style={{ textAlign: "right", fontSize: "18px" }}
+            >
+              {" "}
+              {data?.total_amount?.toFixed(2)}{" "}
+            </p>
+          </Grid>
+        </Grid>
+      </Grid>
+    );
+  };
   useEffect(() => {
     // fnGetSubtotal();
     // handlePrint();
@@ -375,11 +477,9 @@ const Invoice = ({ data, handleAfterPrint }) => {
                     : "N/A"}
                 </p>
               </Grid>
-              <Grid item xs={5}>
-                <Grid
-                  container
-                  // style={{ background: "antiquewhite", padding: "10px" }}
-                >
+
+              {fnCalculationSection()}
+              {/* <Grid container>
                   <Grid item xs={6}>
                     <p className={classes.cardSubtitle2}>Subtotal</p>
                   </Grid>
@@ -388,7 +488,6 @@ const Invoice = ({ data, handleAfterPrint }) => {
                       className={classes.cardSubtitle2}
                       style={{ textAlign: "right" }}
                     >
-                      {/* {subtotal} */}
                       {fnGetSubtotal().toFixed(2)}
                     </p>
                   </Grid>
@@ -413,7 +512,6 @@ const Invoice = ({ data, handleAfterPrint }) => {
                       className={classes.cardSubtitle2}
                       style={{ textAlign: "right" }}
                     >
-                      {/* {totalBeforeTAX} */}
                       {(fnGetSubtotal() - data?.discount).toFixed(2)}
                     </p>
                   </Grid>
@@ -441,7 +539,6 @@ const Invoice = ({ data, handleAfterPrint }) => {
                       style={{ textAlign: "right" }}
                     >
                       {" "}
-                      {/* {totalAfterTAX} */}
                       {(
                         fnGetSubtotal() -
                         data?.discount +
@@ -494,8 +591,7 @@ const Invoice = ({ data, handleAfterPrint }) => {
                       {data?.total_amount.toFixed(2)}{" "}
                     </p>
                   </Grid>
-                </Grid>
-              </Grid>
+                </Grid> */}
             </Grid>
             <Grid container spacing={4}>
               <Grid item xs={7}>

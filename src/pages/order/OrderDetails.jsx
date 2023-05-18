@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,10 +8,15 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
-
-import { useReactToPrint } from "react-to-print";
+import ClearIcon from "@mui/icons-material/Clear";
 import moment from "moment";
 import Invoice from "../utils/Invoice";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import { IconButton } from "@mui/material";
 const useStyles = makeStyles((theme) => ({
   cardTitle: {
     fontSize: "24px",
@@ -91,7 +96,16 @@ const useStyles = makeStyles((theme) => ({
 
 const OrderDetails = ({ data }) => {
   const classes = useStyles();
-
+  const [imageDialog, setImageDialog] = useState(false);
+  const [images, setImages] = useState([]);
+  const handleImageClickOpen = (images) => {
+    setImages(images);
+    setImageDialog(true);
+  };
+  const handleImageClose = () => {
+    setImages([]);
+    setImageDialog(false);
+  };
   const sortByParentName = (a, b) => {
     const nameA = a.parent_name.toUpperCase();
     const nameB = b.parent_name.toUpperCase();
@@ -106,7 +120,7 @@ const OrderDetails = ({ data }) => {
     return 0;
   };
 
-  const fnGetSubtotal = () => {
+  const fnCalculationSection = () => {
     console.log("fnGetSubtotal");
     let subtotalAmount = 0;
 
@@ -119,16 +133,118 @@ const OrderDetails = ({ data }) => {
       }
       return (subtotalAmount += item.quantity * parseInt(itemPrice));
     });
-    // setSubtotal(subtotalAmount.toFixed(2));
-    // setTotalBeforeTAX((subtotalAmount - data?.discount).toFixed(2));
-    // setTotalAfterTAX(
-    //   (totalBeforeTAX + (totalBeforeTAX * data?.tax) / 100).toFixed(2)
-    // );
 
-    // let totalBeforeTAX = subtotalAmount - row.discount;
-    // let totalAfterTAX = totalBeforeTAX + (totalBeforeTAX * 10) / 100;
-    return subtotalAmount;
-    // setProductTotalPrice(subtotalAmount);
+    return (
+      <Grid container alignItems="center">
+        <Grid item xs={7}></Grid>
+        <Grid item xs={5}>
+          <Grid
+            container
+            // style={{ background: "antiquewhite", padding: "10px" }}
+          >
+            <Grid item xs={6}>
+              <p className={classes.cardSubtitle2}>Subtotal</p>
+            </Grid>
+            <Grid item xs={6}>
+              <p
+                className={classes.cardSubtitle2}
+                style={{ textAlign: "right" }}
+              >
+                {/* {subtotal} */}
+                {subtotalAmount.toFixed(2)}
+              </p>
+            </Grid>
+            <Grid item xs={6}>
+              <p className={classes.cardSubtitle2}>Discount</p>
+            </Grid>
+            <Grid item xs={6} style={{ borderBottom: "1px solid #154360" }}>
+              <p
+                className={classes.cardSubtitle2}
+                style={{ textAlign: "right" }}
+              >
+                {data?.discount?.toFixed(2)}
+              </p>
+            </Grid>
+            <Grid item xs={6}></Grid>
+            <Grid item xs={6}>
+              <p
+                className={classes.cardSubtitle2}
+                style={{ textAlign: "right" }}
+              >
+                {/* {totalBeforeTAX} */}
+                {(subtotalAmount - data?.discount).toFixed(2)}
+              </p>
+            </Grid>
+
+            <Grid item xs={6}>
+              <p className={classes.cardSubtitle2}>TAX</p>
+            </Grid>
+            <Grid item xs={6} style={{ borderBottom: "1px solid #154360" }}>
+              <p
+                className={classes.cardSubtitle2}
+                style={{ textAlign: "right" }}
+              >
+                {" "}
+                {data?.tax}%
+              </p>
+            </Grid>
+            <Grid item xs={6}></Grid>
+            <Grid item xs={6}>
+              <p
+                className={classes.cardSubtitle2}
+                style={{ textAlign: "right" }}
+              >
+                {" "}
+                {/* {totalAfterTAX} */}
+                {(
+                  subtotalAmount -
+                  data?.discount +
+                  ((subtotalAmount - data?.discount) * data?.tax) / 100
+                ).toFixed(2)}
+              </p>
+            </Grid>
+            <Grid item xs={6}>
+              <p className={classes.cardSubtitle2}>Paid Amount</p>
+            </Grid>
+            <Grid item xs={6}>
+              <p
+                className={classes.cardSubtitle2}
+                style={{ textAlign: "right" }}
+              >
+                {" "}
+                {data?.paid_amount?.toFixed(2)}{" "}
+              </p>
+            </Grid>
+
+            <Grid item xs={6}>
+              <p className={classes.cardSubtitle2}>Due Amount</p>
+            </Grid>
+            <Grid item xs={6} style={{ borderBottom: "1px solid #154360" }}>
+              <p
+                className={classes.cardSubtitle2}
+                style={{ textAlign: "right" }}
+              >
+                {(data?.total_amount - data?.paid_amount).toFixed(2)}
+              </p>
+            </Grid>
+            <Grid item xs={6} style={{ background: "#f1f1f1" }}>
+              <p className={classes.cardSubtitle2} style={{ fontSize: "18px" }}>
+                Total
+              </p>
+            </Grid>
+            <Grid item xs={6} style={{ background: "#f1f1f1" }}>
+              <p
+                className={classes.cardSubtitle2}
+                style={{ textAlign: "right", fontSize: "18px" }}
+              >
+                {" "}
+                {data?.total_amount?.toFixed(2)}{" "}
+              </p>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    );
   };
 
   return (
@@ -164,7 +280,7 @@ const OrderDetails = ({ data }) => {
             <Invoice data={data} />
           </Grid>
         </Grid>
-     
+
         <Grid container alignItems="center" spacing={6}>
           <Grid item xs={5}>
             <p className={classes.cardSubtitle}>Customer Info</p>
@@ -271,6 +387,9 @@ const OrderDetails = ({ data }) => {
           >
             <TableHead className={classes.tableStyle}>
               <TableRow>
+                <TableCell style={{ minWidth: "70px" }} align="center">
+                  Image
+                </TableCell>
                 <TableCell>Title</TableCell>
                 <TableCell>Specification</TableCell>
 
@@ -293,6 +412,41 @@ const OrderDetails = ({ data }) => {
                         }
                       }
                     >
+                      <TableCell>
+                        {row?.images.length > 0 ? (
+                          <>
+                            <img
+                              src={row?.images[0].url}
+                              alt=""
+                              width="50px"
+                              height="50px"
+                              style={{
+                                display: "block",
+                                margin: "5px auto",
+                                borderRadius: "5px",
+                                border: "3px solid #d1d1d1",
+                              }}
+                            />
+                            <Button
+                              // variant="outlined"
+                              size="small"
+                              style={{
+                                whiteSpace: "nowrap",
+                                fontSize: "10px",
+                                display: "block",
+                                margin: "auto",
+                                borderRadius: "5px",
+                                border: "3px solid #d1d1d1",
+                              }}
+                              onClick={() => handleImageClickOpen(row?.images)}
+                            >
+                              View All
+                            </Button>
+                          </>
+                        ) : (
+                          "No Image Available"
+                        )}
+                      </TableCell>
                       <TableCell>{row.name}</TableCell>
                       <TableCell>
                         {" "}
@@ -333,8 +487,8 @@ const OrderDetails = ({ data }) => {
             </TableBody>
           </Table>
         </TableContainer>
-
-        <Grid container alignItems="center">
+        {fnCalculationSection()}
+        {/* <Grid container alignItems="center">
           <Grid item xs={7}></Grid>
           <Grid item xs={5}>
             <Grid
@@ -349,7 +503,6 @@ const OrderDetails = ({ data }) => {
                   className={classes.cardSubtitle2}
                   style={{ textAlign: "right" }}
                 >
-                  {/* {subtotal} */}
                   {fnGetSubtotal().toFixed(2)}
                 </p>
               </Grid>
@@ -370,7 +523,6 @@ const OrderDetails = ({ data }) => {
                   className={classes.cardSubtitle2}
                   style={{ textAlign: "right" }}
                 >
-                  {/* {totalBeforeTAX} */}
                   {(fnGetSubtotal() - data?.discount).toFixed(2)}
                 </p>
               </Grid>
@@ -394,7 +546,6 @@ const OrderDetails = ({ data }) => {
                   style={{ textAlign: "right" }}
                 >
                   {" "}
-                  {/* {totalAfterTAX} */}
                   {(
                     fnGetSubtotal() -
                     data?.discount +
@@ -445,8 +596,49 @@ const OrderDetails = ({ data }) => {
               </Grid>
             </Grid>
           </Grid>
-        </Grid>
+        </Grid> */}
       </div>
+      <Dialog
+        open={imageDialog}
+        onClose={handleImageClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="xl"
+      >
+        {/* <div style={{ padding: "10px", minWidth: "300px" }}> */}
+
+        <DialogContent>
+          <Grid container>
+            <Grid item xs={6} sm={6} md={6}>
+              <p className={classes.dialogTitleStyle}>Images</p>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+              <IconButton onClick={handleImageClose}>
+                <ClearIcon style={{ color: "#205295" }} />
+              </IconButton>
+            </Grid>
+          </Grid>
+          <DialogContentText id="alert-dialog-description">
+            <div style={{ display: "flex", gap: "10px" }}>
+              {images.length > 0
+                ? images.map((item) => (
+                    <img
+                      key={item.url}
+                      src={item.url}
+                      alt=""
+                      width="220px"
+                      height="220px"
+                    />
+                  ))
+                : "No Image Available"}
+            </div>
+          </DialogContentText>
+        </DialogContent>
+        {/* <DialogActions>
+          <Button onClick={handleImageClose}>Close</Button>
+        </DialogActions> */}
+        {/* </div> */}
+      </Dialog>
     </>
   );
 };
