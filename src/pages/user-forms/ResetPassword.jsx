@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 const ResetPassword = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { login, tuso_admin_panel } = useContext(AuthContext);
+  const { login, ecom_admin_panel } = useContext(AuthContext);
   const [oldPasswordShow, setOldPasswordShow] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPasswordShow, setNewPasswordShow] = useState(false);
@@ -84,6 +84,7 @@ const ResetPassword = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
     let err = validation();
 
     if (err) {
@@ -92,19 +93,26 @@ const ResetPassword = () => {
       setLoading(true);
       try {
         let data = {
-          old_password: oldPassword,
-          password: newPassword,
-          password_confirmation: confirmPassword,
+          id: ecom_admin_panel._id,
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+          confirmPassword: confirmPassword,
         };
-        let response = {};
-        handleSnakbarOpen(response.data.messages.toString(), "success");
-        login({});
-        navigate("/");
+        let response = await axios({
+          url: `/api/v1/user/update-password`,
+          method: "post",
+          data: data,
+        });
+        if (response.status >= 200 && response.status < 300) {
+          console.log("response", response.data);
+          handleSnakbarOpen(response.data.message.toString(), "success");
+          login(response.data.user);
+          navigate("/");
+        }
       } catch (error) {
         console.log("error", error);
-        handleSnakbarOpen(error.response.data.messages.toString(), "error");
-
         setLoading(false);
+        handleSnakbarOpen(error.response.data.message.toString(), "error");
       }
       setLoading(false);
     }
@@ -123,7 +131,7 @@ const ResetPassword = () => {
       >
         <form className={classes.form} onSubmit={onSubmit}>
           <img
-            src="/image/logoTuso.png"
+            src="/image/logo2.svg"
             alt=""
             style={{ display: "block", margin: "auto", maxWidth: "155px" }}
           />
@@ -235,7 +243,7 @@ const ResetPassword = () => {
             variant="contained"
             disableElevation
             fullWidth
-            style={{ marginBottom: "30px" }}
+            style={{ marginBottom: "30px", minHeight: "37px" }}
             disabled={loading}
             // onClick={onSubmit}
             type="submit"

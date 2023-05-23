@@ -44,6 +44,7 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import PriceChangeIcon from "@mui/icons-material/PriceChange";
 import CircleIcon from "@mui/icons-material/Circle";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useSnackbar } from "notistack";
 const useStyles = makeStyles((theme) => ({
   linkStyle: {
     textDecoration: "none",
@@ -252,12 +253,13 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function Layout() {
   const classes = useStyles();
   let navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   let pathname = useLocation().pathname;
   console.log("pathname", pathname);
 
-  const { login, tuso_admin_panel, logout } = useContext(AuthContext);
-  console.log("tuso_admin_panel", tuso_admin_panel);
-
+  const { login, ecom_admin_panel, logout } = useContext(AuthContext);
+  console.log("ecom_admin_panel", ecom_admin_panel);
+  const [signOutLoading, setSignOutLoading] = useState(false);
   const [activeMenu, setActiveMenu] = useState("Dashboard");
 
   const [openLoadingDialog, setOpenLoadingDialog] = useState(false);
@@ -265,10 +267,36 @@ export default function Layout() {
   const navigateRoutes = (routeName) => {
     navigate(routeName, { replace: true });
   };
+  const handleSnakbarOpen = (msg, vrnt) => {
+    let duration;
+    if (vrnt === "error") {
+      duration = 3000;
+    } else {
+      duration = 1000;
+    }
+    enqueueSnackbar(msg, {
+      variant: vrnt,
+      autoHideDuration: duration,
+    });
+  };
+  const fnLogout = async () => {
+    try {
+      setSignOutLoading(true);
 
-  const fnLogout = () => {
-    logout();
-    navigate("/");
+      let url = `/api/v1/user/logout`;
+      let allData = await getDataWithToken(url);
+
+      if (allData.status >= 200 && allData.status < 300) {
+        setSignOutLoading(false);
+        logout();
+        navigate("/");
+      }
+    } catch (error) {
+      console.log("error", error);
+      setSignOutLoading(false);
+      handleSnakbarOpen(error.response.data.message.toString(), "error");
+    }
+    setSignOutLoading(false);
   };
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -367,7 +395,7 @@ export default function Layout() {
         setOpenLoadingDialog={setOpenLoadingDialog}
       />
     );
-  } else if (!tuso_admin_panel.token) {
+  } else if (!ecom_admin_panel.name) {
     return (
       <Navigation
         openLoadingDialog={openLoadingDialog}
@@ -505,7 +533,7 @@ export default function Layout() {
         >
           <DrawerHeader>
             {/* <img
-              src="/image/logoTuso.png"
+              src="/image/logo2.svg"
               alt=""
               style={{
                 width: "155px",
@@ -525,7 +553,7 @@ export default function Layout() {
               sx={{ width: 40, height: 40 }}
               style={{ display: "block", margin: " auto auto 10px auto" }}
             />
-            {tuso_admin_panel ? tuso_admin_panel.email : ""}
+            {ecom_admin_panel ? ecom_admin_panel.email : ""}
           </div>
           <Divider />
 

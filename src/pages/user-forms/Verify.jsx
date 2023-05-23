@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 const Verify = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { login, tuso_admin_panel } = useContext(AuthContext);
+  const { login, ecom_admin_panel } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(false);
   const [otpTimeOut, setOtpTimeOut] = useState(false);
@@ -72,14 +72,14 @@ const Verify = () => {
     try {
       setLoading(true);
       let data = {
-        email: tuso_admin_panel.email,
-        password: tuso_admin_panel.password,
+        email: ecom_admin_panel.email,
+        password: ecom_admin_panel.password,
         token: "my token",
       };
 
       handleSnakbarOpen("OTP verified successfully", "success");
       setTimeout(() => {
-        login(data);
+        // login(data);
         setLoading(false);
         navigate("/dashboard");
       }, 1200);
@@ -89,7 +89,6 @@ const Verify = () => {
 
       setLoading(false);
     }
-   
   };
 
   return (
@@ -102,7 +101,7 @@ const Verify = () => {
       >
         <div className={classes.form}>
           <img
-            src="/image/logoTuso.png"
+            src="/image/logo2.svg"
             alt=""
             style={{ display: "block", margin: "auto", maxWidth: "155px" }}
           />{" "}
@@ -123,7 +122,7 @@ const Verify = () => {
             >
               {" "}
               We have sent a 6 digits varification code to{" "}
-              {tuso_admin_panel.email}
+              {ecom_admin_panel.email}
             </span>
           </Typography>
           {otpTimeOut === false && (

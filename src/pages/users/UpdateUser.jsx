@@ -12,7 +12,7 @@ import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
 import PulseLoader from "react-spinners/PulseLoader";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getDataWithToken } from "../../services/GetDataService";
 
 import InputAdornment from "@mui/material/InputAdornment";
@@ -38,14 +38,16 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
   },
 }));
-const AddUser = () => {
+const UpdateUser = () => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const { state } = useLocation();
   const uploadImage = "/image/userpic.png";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("admin@admin.com");
   const [password, setPassword] = useState("admin123");
   const [showPassword, setShowPassword] = useState(false);
+  const [status, setStatus] = useState(false);
   const [parentName, setParentName] = useState("");
   const [loading, setLoading] = useState(false);
   const [parentList, setParentList] = useState([]);
@@ -143,7 +145,7 @@ const AddUser = () => {
       setLoading(false);
     }
   };
-  
+
   const imageProcess = (e) => {
     if (e.target.files && e.target.files[0]) {
       let imageFile = e.target.files[0];
@@ -157,7 +159,14 @@ const AddUser = () => {
       setImageFile(null);
     }
   };
-   
+  useEffect(() => {
+    console.log("state?.row", state?.row);
+
+    setName(state?.row?.name);
+    setEmail(state?.row?.email);
+    setPreview(state?.row?.image?.url);
+    setStatus(state?.row?.status);
+  }, []);
   return (
     <>
       <Grid
@@ -171,7 +180,7 @@ const AddUser = () => {
             variant="h5"
             style={{ marginBottom: "30px", textAlign: "center" }}
           >
-            Add User
+            Update User
           </Typography>
           <div style={{ textAlign: "center", marginBottom: "30px" }}>
             <img
@@ -300,4 +309,4 @@ const AddUser = () => {
   );
 };
 
-export default AddUser;
+export default UpdateUser;

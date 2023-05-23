@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 const ForgotPasswordOTPVarify = ({ email }) => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { login, tuso_admin_panel } = useContext(AuthContext);
+  const { login, ecom_admin_panel } = useContext(AuthContext);
 
   const [showOTPSection, setShowOTPSection] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -67,7 +67,6 @@ const ForgotPasswordOTPVarify = ({ email }) => {
     });
   };
 
-  
   const onSubmit = async (e) => {
     e.preventDefault();
 
@@ -85,7 +84,7 @@ const ForgotPasswordOTPVarify = ({ email }) => {
         >
           <div className={classes.form}>
             <img
-              src="/image/logoTuso.png"
+              src="/image/logo2.svg"
               alt=""
               style={{ display: "block", margin: "auto", maxWidth: "155px" }}
             />{" "}
@@ -106,7 +105,7 @@ const ForgotPasswordOTPVarify = ({ email }) => {
               >
                 {" "}
                 We have sent a 6 digits varification code to{" "}
-                {tuso_admin_panel.email}
+                {ecom_admin_panel.email}
               </span>
             </Typography>
             {/* {otpTimeOut && (

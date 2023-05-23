@@ -12,6 +12,7 @@ import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import { useNavigate } from "react-router-dom";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import Skeleton from "@mui/material/Skeleton";
+import { Button } from "@mui/material";
 const useStyles = makeStyles((theme) => ({
   form: {
     padding: "50px",
@@ -110,9 +111,21 @@ const Dashboard = () => {
   const [cardData, setCardData] = useState({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const fnLogout = async (e) => {
+    e.preventDefault();
+    try {
+      let url = `/api/v1/user/setCookie`;
+      let allData = await getDataWithToken(url);
 
+      if (allData.status >= 200 && allData.status < 300) {
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
   return (
     <React.Fragment>
+      <Button onClick={fnLogout}>test cookie function</Button>
       <Grid
         container
         spacing={2}

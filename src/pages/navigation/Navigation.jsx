@@ -29,6 +29,7 @@ import ProductList from "../product/ProductList";
 import OrderList2 from "../order/OrderList2";
 import UpdateOrderList from "../order/UpdateOrderList";
 import AddUser from "../users/AddUser";
+import UpdateUser from "../users/UpdateUser";
 
 const useStyles = makeStyles((theme) => ({
   dialogStyle: {
@@ -42,18 +43,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function PrivateRoute({ children }) {
-  const { tuso_admin_panel } = useContext(AuthContext);
+  const { ecom_admin_panel } = useContext(AuthContext);
 
-  return tuso_admin_panel.token ? children : <Navigate to="/" />;
+  return ecom_admin_panel.name ? children : <Navigate to="/" />;
 }
 function RedirectToHome({ children }) {
-  const { tuso_admin_panel } = useContext(AuthContext);
+  const { ecom_admin_panel } = useContext(AuthContext);
 
-  return !tuso_admin_panel.token ? children : <Navigate to="/dashboard" />;
+  return !ecom_admin_panel.name ? children : <Navigate to="/dashboard" />;
 }
 const Navigation = ({ openLoadingDialog, setOpenLoadingDialog }) => {
   const classes = useStyles();
-  const { tuso_admin_panel } = useContext(AuthContext);
+  const { ecom_admin_panel } = useContext(AuthContext);
 
   const handleClickOpen = () => {
     setOpenLoadingDialog(true);
@@ -239,6 +240,14 @@ const Navigation = ({ openLoadingDialog, setOpenLoadingDialog }) => {
           }
         />
         <Route
+          path="update-user/:id"
+          element={
+            <PrivateRoute>
+              <UpdateUser />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="update-order/:id"
           element={
             <PrivateRoute>
@@ -249,7 +258,7 @@ const Navigation = ({ openLoadingDialog, setOpenLoadingDialog }) => {
         <Route path="test" element={<Test />} />
         <Route
           path="*"
-          element={!tuso_admin_panel.token ? <Navigate to="/" /> : <NoMatch />}
+          element={!ecom_admin_panel.name ? <Navigate to="/" /> : <NoMatch />}
         />
       </Routes>
     </div>

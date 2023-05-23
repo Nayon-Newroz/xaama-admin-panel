@@ -3,12 +3,13 @@ import axios from "axios";
 const getDataWithToken = async (url) => {
   console.log("url", url);
   try {
-    const localData = JSON.parse(localStorage.getItem("tuso_admin_panel"));
+    const localData = JSON.parse(localStorage.getItem("ecom_admin_panel"));
 
     // console.log("localData.token", localData.token);
     let response = await axios({
       method: "get",
       url: url,
+
       // headers: {
       //   Authorization: `Bearer ${localData.token}`,
       // },

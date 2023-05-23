@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 const ForgotPasswordResetPassword = ({ email, otp }) => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { login, tuso_admin_panel } = useContext(AuthContext);
+  const { login, ecom_admin_panel } = useContext(AuthContext);
   const [oldPassword, setOldPassword] = useState("");
   const [newPasswordShow, setNewPasswordShow] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -91,7 +91,7 @@ const ForgotPasswordResetPassword = ({ email, otp }) => {
           password: newPassword,
           password_confirmation: confirmPassword,
         };
-        let response = {}
+        let response = {};
         handleSnakbarOpen(response.data.messages.toString(), "success");
         login({});
         navigate("/");
@@ -118,7 +118,7 @@ const ForgotPasswordResetPassword = ({ email, otp }) => {
       >
         <form className={classes.form} onSubmit={onSubmit}>
           <img
-            src="/image/logoTuso.png"
+            src="/image/logo2.svg"
             alt=""
             style={{ display: "block", margin: "auto", maxWidth: "155px" }}
           />

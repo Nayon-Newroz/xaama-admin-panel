@@ -100,17 +100,23 @@ const Login = () => {
           email: email.trim(),
           password: password.trim(),
         };
-
-        handleSnakbarOpen("Successfull", "success");
-        setTimeout(() => {
-          login(data);
-          setLoading(false);
+        let response = await axios({
+          url: `/api/v1/user/login`,
+          method: "post",
+          data: data,
+        });
+        if (response.status >= 200 && response.status < 300) {
+          console.log("response", response.data.user);
+          handleSnakbarOpen("Successfully", "success");
+          // navigate("/category-list");
+          login(response.data.user);
           navigate("/verify");
-        }, 1200);
-      } catch (error) {
-        console.log("error", error);
-        handleSnakbarOpen(error.response.data.messages.toString(), "error");
+        }
         setLoading(false);
+      } catch (error) {
+        console.log("error", error.response.data);
+        setLoading(false);
+        handleSnakbarOpen(error.response.data.message.toString(), "error");
       }
     }
   };
@@ -138,7 +144,7 @@ const Login = () => {
           <Grid item xs={6}>
             <form className={classes.formStyle} onSubmit={onSubmit}>
               <img
-                src="/image/logoTuso.png"
+                src="/image/logo2.svg"
                 alt=""
                 style={{ display: "block", margin: "auto", maxWidth: "155px" }}
               />
