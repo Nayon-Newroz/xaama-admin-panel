@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -7,7 +6,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-
+import { useTheme } from "@mui/material/styles";
 import { TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
@@ -15,6 +14,19 @@ import PulseLoader from "react-spinners/PulseLoader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getDataWithToken } from "../../services/GetDataService";
+import Box from "@mui/material/Box";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Chip from "@mui/material/Chip";
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 const useStyles = makeStyles((theme) => ({
   form: {
     padding: "50px",
@@ -25,23 +37,19 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
   },
 }));
-const UpdateCategory = () => {
-  const classes = useStyles();
+const AddPermission = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
-
-  const { state } = useLocation();
+  const classes = useStyles();
   const [name, setName] = useState("");
-  const [parentName, setParentName] = useState("");
-  const [status, setStatus] = useState(false);
+  const [moduleName, setModuleName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [parentList, setParentList] = useState([]);
+  const [moduleList, setModuleList] = useState([]);
   const [message, setMessage] = useState("");
   const { enqueueSnackbar } = useSnackbar();
+
   const handleChange = (event) => {
-    setParentName(event.target.value);
-  };
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
+    setModuleName(event.target.value);
   };
 
   const handleSnakbarOpen = (msg, vrnt) => {
@@ -64,9 +72,9 @@ const UpdateCategory = () => {
       document.getElementById("name").focus();
       return (isError = true);
     }
-    if (!parentName.trim()) {
-      handleSnakbarOpen("Please select a parent", "error");
-      document.getElementById("parent-id").focus();
+    if (!moduleName.trim()) {
+      handleSnakbarOpen("Please select a module", "error");
+      document.getElementById("module-id").focus();
       return (isError = true);
     }
 
@@ -83,19 +91,17 @@ const UpdateCategory = () => {
       try {
         let data = {
           name: name,
-          parent_name: parentName,
-          status: status,
+          module_name: moduleName,
         };
 
         let response = await axios({
-          url: `/api/v1/category/update/${state?.row?._id}`,
-          method: "put",
+          url: `/api/v1/permission/create`,
+          method: "post",
           data: data,
         });
-        console.log("responseresponseresponse", response);
         if (response.status >= 200 && response.status < 300) {
-          handleSnakbarOpen("Update successfully", "success");
-          navigate("/category-list");
+          handleSnakbarOpen("Added successfully", "success");
+          navigate("/permission-list");
         }
       } catch (error) {
         console.log("error", error);
@@ -105,17 +111,16 @@ const UpdateCategory = () => {
       setLoading(false);
     }
   };
-  const getDropdownData = async (catName) => {
+  const getData = async () => {
     try {
       setLoading(true);
 
-      const allDataUrl = `/api/v1/category/dropdownlist`;
+      const allDataUrl = `/api/v1/permission/dropdownlist`;
       let allData = await getDataWithToken(allDataUrl);
       console.log("allData", allData);
 
       if (allData.status >= 200 && allData.status < 300) {
-        let list = allData?.data?.data.filter((item) => item.name !== catName);
-        setParentList(list);
+        setModuleList(allData?.data?.data);
 
         if (allData.data.data.length < 1) {
           setMessage("No data found");
@@ -130,10 +135,7 @@ const UpdateCategory = () => {
   };
 
   useEffect(() => {
-    setName(state?.row?.name);
-    setParentName(state?.row?.parent_name);
-    setStatus(state?.row?.status);
-    getDropdownData(state?.row?.name);
+    getData();
   }, []);
   return (
     <>
@@ -148,7 +150,7 @@ const UpdateCategory = () => {
             variant="h5"
             style={{ marginBottom: "30px", textAlign: "center" }}
           >
-            Update Category
+            Add Permission
           </Typography>
 
           <TextField
@@ -156,7 +158,7 @@ const UpdateCategory = () => {
             style={{ marginBottom: "30px" }}
             fullWidth
             id="name"
-            label="Category Name"
+            label="Permission Name"
             variant="outlined"
             value={name}
             onChange={(e) => {
@@ -164,34 +166,22 @@ const UpdateCategory = () => {
             }}
           />
           <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
-            <InputLabel id="demo-simple-select-label">Parent Name</InputLabel>
+            <InputLabel id="demo-simple-select-label">Module Name</InputLabel>
             <Select
               labelId="demo-simple-select-label"
-              id="parent-id"
-              value={parentName}
-              label="Parent Name"
+              id="module-id"
+              value={moduleName}
+              label="Module Name"
               onChange={handleChange}
             >
-              {parentList?.map((item, i) => (
-                <MenuItem key={item.category_id} value={item.name}>
+              {moduleList?.map((item, i) => (
+                <MenuItem key={item.permission_id} value={item.name}>
                   {item.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
-            <InputLabel id="demo-simple-select-label">Status</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="status"
-              value={status}
-              label="Status"
-              onChange={handleStatusChange}
-            >
-              <MenuItem value={true}>Active</MenuItem>
-              <MenuItem value={false}>Inactive</MenuItem>
-            </Select>
-          </FormControl>
+
           <div style={{ textAlign: "center" }}>
             <Button
               variant="contained"
@@ -207,7 +197,7 @@ const UpdateCategory = () => {
                 size={10}
                 speedMultiplier={0.5}
               />{" "}
-              {loading === false && "Update"}
+              {loading === false && "Submit"}
             </Button>
           </div>
         </form>
@@ -216,4 +206,4 @@ const UpdateCategory = () => {
   );
 };
 
-export default UpdateCategory;
+export default AddPermission;

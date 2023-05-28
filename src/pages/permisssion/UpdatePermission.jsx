@@ -7,7 +7,6 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-
 import { TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
@@ -15,6 +14,20 @@ import PulseLoader from "react-spinners/PulseLoader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getDataWithToken } from "../../services/GetDataService";
+import Box from "@mui/material/Box";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Chip from "@mui/material/Chip";
+import { useTheme } from "@mui/material/styles";
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 const useStyles = makeStyles((theme) => ({
   form: {
     padding: "50px",
@@ -25,20 +38,22 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
   },
 }));
-const UpdateCategory = () => {
+const UpdatePermission = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-
+  const theme = useTheme();
   const { state } = useLocation();
   const [name, setName] = useState("");
-  const [parentName, setParentName] = useState("");
+  const [moduleName, setModuleName] = useState("");
   const [status, setStatus] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [parentList, setParentList] = useState([]);
+  const [moduleList, setModuleList] = useState([]); 
   const [message, setMessage] = useState("");
   const { enqueueSnackbar } = useSnackbar();
+  
+ 
   const handleChange = (event) => {
-    setParentName(event.target.value);
+    setModuleName(event.target.value);
   };
   const handleStatusChange = (event) => {
     setStatus(event.target.value);
@@ -64,9 +79,9 @@ const UpdateCategory = () => {
       document.getElementById("name").focus();
       return (isError = true);
     }
-    if (!parentName.trim()) {
-      handleSnakbarOpen("Please select a parent", "error");
-      document.getElementById("parent-id").focus();
+    if (!moduleName.trim()) {
+      handleSnakbarOpen("Please select a module", "error");
+      document.getElementById("module-id").focus();
       return (isError = true);
     }
 
@@ -81,21 +96,22 @@ const UpdateCategory = () => {
     } else {
       setLoading(true);
       try {
+         
         let data = {
           name: name,
-          parent_name: parentName,
+          module_name: moduleName,
           status: status,
         };
 
         let response = await axios({
-          url: `/api/v1/category/update/${state?.row?._id}`,
+          url: `/api/v1/permission/update/${state?.row?._id}`,
           method: "put",
           data: data,
         });
         console.log("responseresponseresponse", response);
         if (response.status >= 200 && response.status < 300) {
           handleSnakbarOpen("Update successfully", "success");
-          navigate("/category-list");
+          navigate("/permission-list");
         }
       } catch (error) {
         console.log("error", error);
@@ -105,17 +121,19 @@ const UpdateCategory = () => {
       setLoading(false);
     }
   };
-  const getDropdownData = async (catName) => {
+  const getDropdownData = async (filterName) => {
     try {
       setLoading(true);
 
-      const allDataUrl = `/api/v1/category/dropdownlist`;
+      const allDataUrl = `/api/v1/permission/dropdownlist`;
       let allData = await getDataWithToken(allDataUrl);
       console.log("allData", allData);
 
       if (allData.status >= 200 && allData.status < 300) {
-        let list = allData?.data?.data.filter((item) => item.name !== catName);
-        setParentList(list);
+        let list = allData?.data?.data.filter(
+          (item) => item.name !== filterName
+        );
+        setModuleList(list);
 
         if (allData.data.data.length < 1) {
           setMessage("No data found");
@@ -131,7 +149,7 @@ const UpdateCategory = () => {
 
   useEffect(() => {
     setName(state?.row?.name);
-    setParentName(state?.row?.parent_name);
+    setModuleName(state?.row?.module_name);
     setStatus(state?.row?.status);
     getDropdownData(state?.row?.name);
   }, []);
@@ -148,7 +166,7 @@ const UpdateCategory = () => {
             variant="h5"
             style={{ marginBottom: "30px", textAlign: "center" }}
           >
-            Update Category
+            Update Permission
           </Typography>
 
           <TextField
@@ -156,7 +174,7 @@ const UpdateCategory = () => {
             style={{ marginBottom: "30px" }}
             fullWidth
             id="name"
-            label="Category Name"
+            label="Permission Name"
             variant="outlined"
             value={name}
             onChange={(e) => {
@@ -164,21 +182,22 @@ const UpdateCategory = () => {
             }}
           />
           <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
-            <InputLabel id="demo-simple-select-label">Parent Name</InputLabel>
+            <InputLabel id="demo-simple-select-label">Module Name</InputLabel>
             <Select
               labelId="demo-simple-select-label"
-              id="parent-id"
-              value={parentName}
-              label="Parent Name"
+              id="module-id"
+              value={moduleName}
+              label="Module Name"
               onChange={handleChange}
             >
-              {parentList?.map((item, i) => (
-                <MenuItem key={item.category_id} value={item.name}>
+              {moduleList?.map((item, i) => (
+                <MenuItem key={item.filter_id} value={item.name}>
                   {item.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+
           <FormControl fullWidth size="small" style={{ marginBottom: "30px" }}>
             <InputLabel id="demo-simple-select-label">Status</InputLabel>
             <Select
@@ -192,6 +211,7 @@ const UpdateCategory = () => {
               <MenuItem value={false}>Inactive</MenuItem>
             </Select>
           </FormControl>
+
           <div style={{ textAlign: "center" }}>
             <Button
               variant="contained"
@@ -216,4 +236,4 @@ const UpdateCategory = () => {
   );
 };
 
-export default UpdateCategory;
+export default UpdatePermission;

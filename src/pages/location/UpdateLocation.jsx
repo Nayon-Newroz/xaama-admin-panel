@@ -83,7 +83,7 @@ const UpdateLocation = () => {
       try {
         let data = {
           name: name,
-          parent_id: parentName,
+          parent_name: parentName,
           status: status,
         };
 

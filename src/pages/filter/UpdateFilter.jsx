@@ -125,7 +125,7 @@ const UpdateFilter = () => {
         console.log("categoryIds", categoryIds);
         let data = {
           name: name,
-          parent_id: parentName,
+          parent_name: parentName,
           category_id: categoryIds,
           status: status,
         };
@@ -250,7 +250,9 @@ const UpdateFilter = () => {
               onChange={handleChange}
             >
               {parentList?.map((item, i) => (
-                <MenuItem key={item.filter_id} value={item.name}>{item.name}</MenuItem>
+                <MenuItem key={item.filter_id} value={item.name}>
+                  {item.name}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>

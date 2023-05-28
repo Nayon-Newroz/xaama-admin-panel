@@ -30,6 +30,9 @@ import OrderList2 from "../order/OrderList2";
 import UpdateOrderList from "../order/UpdateOrderList";
 import AddUser from "../users/AddUser";
 import UpdateUser from "../users/UpdateUser";
+import PermissionList from "../permisssion/PermissionList";
+import AddPermission from "../permisssion/AddPermission";
+import UpdatePermission from "../permisssion/UpdatePermission";
 
 const useStyles = makeStyles((theme) => ({
   dialogStyle: {
@@ -196,6 +199,30 @@ const Navigation = ({ openLoadingDialog, setOpenLoadingDialog }) => {
           element={
             <PrivateRoute>
               <UpdateFilter />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="permission-list"
+          element={
+            <PrivateRoute>
+              <PermissionList />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="add-permission"
+          element={
+            <PrivateRoute>
+              <AddPermission />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="update-permission"
+          element={
+            <PrivateRoute>
+              <UpdatePermission />
             </PrivateRoute>
           }
         />

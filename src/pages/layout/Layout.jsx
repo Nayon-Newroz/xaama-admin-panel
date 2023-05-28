@@ -361,6 +361,18 @@ export default function Layout() {
       return false;
     }
   };
+  const checkPermissionRoute = () => {
+    const userPathname = [
+      "/add-permission",
+      "/update-permission",
+      "/permission-list",
+    ];
+    if (userPathname.includes(pathname)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
   const checkOrderListRoute = () => {
     if (pathname.includes("/order-list")) {
       return true;
@@ -880,6 +892,62 @@ export default function Layout() {
                       <CircleIcon />
                     </ListItemIcon>
                     <ListItemText primary="User List" />
+                  </ListItemButton>
+                </Link>
+              </List>
+            </Collapse>
+            <ListItemButton
+              className={`${classes.menuItem} ${
+                checkPermissionRoute() ? classes.menuItemActive : null
+              }`}
+              onClick={() => {
+                manageOpen("Permission");
+              }}
+            >
+              <ListItemIcon>
+                <LockResetIcon />
+              </ListItemIcon>
+              <ListItemText primary="Permission" />
+              {activeMenu === "Permission" ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse
+              in={activeMenu === "Permission"}
+              timeout="auto"
+              unmountOnExit
+            >
+              <List
+                component="div"
+                disablePadding
+                className={classes.listStyle}
+              >
+                <Link to="/add-permission" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/add-permission"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Add Permission" />
+                  </ListItemButton>
+                </Link>
+                <Link to="/permission-list" className={classes.linkStyle}>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    className={`${classes.menuSubItem} ${
+                      pathname === "/permission-list"
+                        ? classes.subMenuItemActive
+                        : null
+                    }`}
+                  >
+                    <ListItemIcon>
+                      <CircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Permission list" />
                   </ListItemButton>
                 </Link>
               </List>
